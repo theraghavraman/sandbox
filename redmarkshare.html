@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17202c">
+<meta name="description" content="RedmarkShare — torrent-style peer-to-peer file transfers with QR sharing, chunk verification and large-file streaming.">
+<title>RedmarkShare · Redmark Forge Sandbox</title>
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<style>
+:root{--ink:#17202c;--ink2:#344354;--muted:#73808d;--canvas:#f3f5f6;--paper:#fff;--line:#e0e5e9;--accent:#ed6a24;--accent2:#ffb23f;--soft:#fff0e5;--green:#18764c;--red:#b53b32;--display:'Bricolage Grotesque',system-ui,sans-serif;--body:'Figtree',system-ui,sans-serif;--mono:'Fira Code',monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--ink);font:14px/1.55 var(--body)}button,input,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #ed6a2466;outline-offset:2px}
+.top{height:64px;background:#fffffff2;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,3vw,32px);position:sticky;top:0;z-index:5;backdrop-filter:blur(12px)}.brand{display:flex;align-items:center;gap:12px}.mark{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:var(--ink);color:#ffd08c;font:700 13px var(--mono);box-shadow:inset 0 -3px var(--accent)}.brand strong{display:block;font:800 16px var(--display)}.brand small{display:block;color:var(--muted);font-size:11px}.top a{color:var(--ink2);text-decoration:none;font-weight:700;font-size:12px}
+main{max-width:1180px;margin:auto;padding:32px 18px 60px}.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px}.eyebrow{color:var(--accent);font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase}.hero h1{font:800 clamp(32px,5vw,48px)/1.05 var(--display);letter-spacing:-.045em;margin:8px 0}.hero p{margin:0;max-width:720px;color:var(--muted)}.badge{border:1px solid #f4c5a5;background:#fff8f1;color:#9b4718;padding:9px 12px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 3px 10px #18283806}.head{padding:18px 20px;border-bottom:1px solid var(--line)}.head h2{font:700 20px var(--display);margin:0 0 4px}.head p{margin:0;color:var(--muted);font-size:12px}.body{padding:20px}.field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}.field label{font-weight:700;font-size:12px;color:var(--ink2)}input[type=file],input[type=text],textarea{width:100%;border:1px solid #d8e0e5;border-radius:10px;padding:11px;background:#fff;color:var(--ink)}input[type=file]{background:#fafbfc;border-style:dashed}textarea{min-height:95px;resize:vertical;font:11px/1.5 var(--mono);overflow-wrap:anywhere}.hint{font-size:11px;color:var(--muted);line-height:1.5}.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.btn{border:1px solid var(--line);border-radius:9px;background:white;color:var(--ink2);padding:10px 13px;font-size:12px;font-weight:700}.btn.primary{background:var(--ink);color:white;border-color:var(--ink)}.btn.orange{background:var(--accent);color:white;border-color:var(--accent)}.btn:disabled{opacity:.45;cursor:not-allowed}.status{margin-top:13px;padding:11px 12px;border-radius:10px;background:#f3f5f6;color:var(--muted);font-size:12px;overflow-wrap:anywhere}.status.ok{background:#e8f7ef;color:var(--green)}.status.warn{background:#fff5df;color:#8b5b00}.status.err{background:#fff0ee;color:var(--red)}.progress{height:9px;border-radius:99px;background:#e9edf0;overflow:hidden;margin:14px 0 7px}.progress span{height:100%;display:block;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .2s}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}.stat{padding:10px;border:1px solid var(--line);border-radius:10px}.stat small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em}.stat strong{display:block;margin-top:4px;font:500 12px var(--mono);overflow-wrap:anywhere}.qrbox{display:flex;align-items:center;justify-content:center;min-height:210px;background:#fafbfc;border:1px dashed #d5dde3;border-radius:12px;padding:12px;margin:12px 0}.qrbox canvas{max-width:100%;height:auto!important}.camera{width:100%;max-height:280px;object-fit:cover;border-radius:12px;background:#111;display:none;margin-top:12px}.section-label{font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}.notice{margin-top:18px;padding:14px 16px;border:1px solid #f1d8b0;background:#fff9ec;border-radius:12px;color:#78510a;font-size:12px}.notice strong{display:block;margin-bottom:3px}.foot{margin-top:22px;color:var(--muted);font-size:11px;text-align:center}.hidden{display:none!important}
+@media(max-width:760px){main{padding:24px 12px 40px}.hero{display:block}.badge{display:inline-block;margin-top:14px}.grid{grid-template-columns:1fr}.body{padding:15px}.head{padding:15px}.stats{grid-template-columns:1fr 1fr}.top{padding:0 12px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand"><div class="mark">RS</div><div><strong>REDMARK<span style="color:var(--accent)">SHARE</span></strong><small>Peer-to-peer file transfer · Redmark Forge</small></div></div><a href="./index.html">← Sandbox home</a></header>
+<main>
+<section class="hero"><div><div class="eyebrow">Redmark Forge / P2P transfer</div><h1>Send big. Share directly.</h1><p>Torrent-style chunked transfers, peer discovery, QR handoff and automatic reconstruction. Choose one file; RedmarkShare handles the pieces.</p></div><div class="badge">BROWSER-BASED · NO ACCOUNT</div></section>
+<div class="grid">
+<section class="card">
+<div class="head"><h2>↗ Send a file</h2><p>Select one file and create a torrent-style share that another RedmarkShare peer can join.</p></div>
+<div class="body">
+<div class="field"><label for="sendFile">File to share</label><input id="sendFile" type="file"><div class="hint">Large files are processed as torrent pieces, not converted into one giant JavaScript buffer. Keep this tab open and the original file available while sharing.</div></div>
+<div class="btns"><button class="btn orange" id="startSeed">Create share & QR</button><button class="btn" id="stopSeed" disabled>Stop sharing</button></div>
+<div id="sendStatus" class="status">Choose a file to begin.</div>
+<div class="stats"><div class="stat"><small>File size</small><strong id="sendSize">—</strong></div><div class="stat"><small>Connected peers</small><strong id="seedPeers">0</strong></div><div class="stat"><small>Uploaded</small><strong id="uploaded">0 B</strong></div></div>
+<div class="section-label">Scan to join</div><div class="qrbox" id="sendQr"><span class="hint">Your share QR appears here.</span></div>
+<div class="field"><label for="magnetOut">Magnet link (fallback)</label><textarea id="magnetOut" readonly placeholder="Created after the torrent metadata is ready"></textarea></div>
+<div class="btns"><button class="btn" id="copyMagnet" disabled>Copy magnet link</button></div>
+</div></section>
+<section class="card">
+<div class="head"><h2>↙ Receive a file</h2><p>Scan the sender's QR or paste a RedmarkShare magnet link. Pieces are verified by the torrent protocol.</p></div>
+<div class="body">
+<div class="btns"><button class="btn orange" id="scanBtn">Scan QR with camera</button><button class="btn" id="stopScan" disabled>Stop camera</button></div>
+<video id="camera" class="camera" playsinline muted></video>
+<div class="hint" id="scanHint">Camera scanning uses BarcodeDetector where available. If your browser doesn't support it, paste the magnet link below.</div>
+<div class="field" style="margin-top:15px"><label for="magnetIn">Magnet link</label><textarea id="magnetIn" placeholder="magnet:?xt=urn:btih:…"></textarea></div>
+<div class="btns"><button class="btn primary" id="startDownload">Connect & receive</button><button class="btn" id="stopDownload" disabled>Cancel transfer</button></div>
+<div id="receiveStatus" class="status">Waiting for a share link.</div>
+<div class="progress"><span id="progressBar"></span></div>
+<div class="stats"><div class="stat"><small>Progress</small><strong id="progressText">0%</strong></div><div class="stat"><small>Peers</small><strong id="downloadPeers">0</strong></div><div class="stat"><small>Speed</small><strong id="downloadSpeed">0 B/s</strong></div></div>
+<div class="stat" style="margin-top:8px"><small>File</small><strong id="receiveFile">—</strong></div>
+<div class="btns"><button class="btn orange" id="saveFile" disabled>Save completed file</button></div>
+<div class="hint" style="margin-top:8px">For files over 10 GB, use a Chromium-based browser with file-saving support and sufficient free disk space. RedmarkShare streams the received file to disk where the File System Access API is available; it avoids building a single giant Blob in memory.</div>
+</div></section>
+</div>
+<div class="notice"><strong>Important limits to understand</strong>Browser peers use WebRTC and can connect to WebTorrent-compatible peers, not every conventional BitTorrent client. A public WebSocket tracker helps peers discover each other; it does not store the file. Both sides must stay online during the transfer. Network restrictions may prevent a connection. This first version does not promise resume after the page closes, and mobile browsers may impose storage or background-tab limits.</div>
+<div class="foot">RedmarkShare is an experimental peer-to-peer transfer tool. Share only files you have permission to distribute.</div>
+</main>
+<script type="module">
+import WebTorrent from 'https://esm.sh/webtorrent@2.6.6?bundle';
+const $ = id => document.getElementById(id);
+const trackers = [
+  'wss://tracker.openwebtorrent.com',
+  'wss://tracker.webtorrent.dev',
+  'wss://tracker.btorrent.xyz'
+];
+let client = null, seedTorrent = null, downloadTorrent = null, cameraStream = null, scanFrame = null, scanActive = false, completedFile = null;
+const fmt = n => { if (!Number.isFinite(n)) return '—'; const u=['B','KB','MB','GB','TB']; let i=0; while(n>=1024&&i<u.length-1){n/=1024;i++} return (n<10&&i?n.toFixed(1):Math.round(n))+' '+u[i]; };
+function status(id,msg,kind=''){ const el=$(id); el.textContent=msg; el.className='status'+(kind?' '+kind:''); }
+function getClient(){ if(!client) client=new WebTorrent({tracker:{}}); if(!WebTorrent.WEBRTC_SUPPORT) throw new Error('WebRTC is not supported in this browser. Try a current Chrome, Edge, Firefox or Safari browser.'); return client; }
+function cleanupTorrent(t){ if(t && client){ try{client.remove(t,()=>{});}catch(e){}} }
+function renderQR(value,box){ box.replaceChildren(); if(!window.QRCode){box.textContent='QR generator failed to load. Use the magnet link instead.';return;} const canvas=document.createElement('canvas'); box.append(canvas); QRCode.toCanvas(canvas,value,{width:240,margin:2,errorCorrectionLevel:'M'},err=>{if(err)box.textContent='Could not create QR. Copy the magnet link instead.';}); }
+$('sendFile').addEventListener('change',()=>{const f=$('sendFile').files[0];$('sendSize').textContent=f?fmt(f.size):'—';});
+$('startSeed').addEventListener('click',()=>{
+  const file=$('sendFile').files[0]; if(!file){status('sendStatus','Choose a file first.','warn');return;}
+  try{
+    getClient(); if(seedTorrent) cleanupTorrent(seedTorrent); $('startSeed').disabled=true; $('stopSeed').disabled=false;
+    $('sendQr').textContent='Preparing torrent pieces and metadata…'; $('magnetOut').value=''; $('copyMagnet').disabled=true;
+    status('sendStatus','Preparing '+file.name+' ('+fmt(file.size)+'). Keep this page open while metadata is created.');
+    client.seed(file,{name:file.name,announce:trackers},torrent=>{
+      seedTorrent=torrent; $('magnetOut').value=torrent.magnetURI; $('copyMagnet').disabled=false; renderQR(torrent.magnetURI,$('sendQr'));
+      status('sendStatus','Share is ready. Recipient can scan the QR or paste the magnet link. Keep this tab open to seed the file.','ok');
+      torrent.on('wire',()=>updateSeedStats()); torrent.on('upload',updateSeedStats); updateSeedStats();
+    });
+  }catch(e){status('sendStatus',e.message||'Could not create share.','err');$('startSeed').disabled=false;$('stopSeed').disabled=true;}
+});
+function updateSeedStats(){if(!seedTorrent)return;$('seedPeers').textContent=seedTorrent.numPeers;$('uploaded').textContent=fmt(seedTorrent.uploaded||0);}
+$('stopSeed').addEventListener('click',()=>{if(seedTorrent){cleanupTorrent(seedTorrent);seedTorrent=null;} $('startSeed').disabled=false;$('stopSeed').disabled=true;$('sendQr').textContent='Sharing stopped.';status('sendStatus','You stopped sharing. Recipients can no longer obtain missing pieces from this device.','warn');});
+$('copyMagnet').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('magnetOut').value);status('sendStatus','Magnet link copied. Share it privately or let the recipient scan the QR.','ok');}catch{ $('magnetOut').focus();$('magnetOut').select();status('sendStatus','Clipboard unavailable; select and copy the magnet link manually.','warn');}});
+function readMagnet(value){let v=value.trim();try{if(v.startsWith('http://')||v.startsWith('https://')){const u=new URL(v);v=u.searchParams.get('magnet')||v;}}catch{}if(!v.startsWith('magnet:?xt=urn:btih:')&&!v.startsWith('magnet:?xt=urn:btmh:'))throw new Error('That does not look like a valid RedmarkShare magnet link. Scan the sender QR or paste the full magnet link.');return v;}
+$('startDownload').addEventListener('click',()=>{
+  let magnet; try{magnet=readMagnet($('magnetIn').value);getClient();}catch(e){status('receiveStatus',e.message,'err');return;}
+  if(downloadTorrent)cleanupTorrent(downloadTorrent); downloadTorrent=null;completedFile=null;$('saveFile').disabled=true;$('startDownload').disabled=true;$('stopDownload').disabled=false;
+  $('progressBar').style.width='0%';$('progressText').textContent='0%';$('receiveFile').textContent='Finding peers…';
+  status('receiveStatus','Connecting to the torrent swarm. This can take a little while while peers are discovered.');
+  try{
+    client.add(magnet,{announce:trackers},torrent=>{
+      downloadTorrent=torrent;
+      const refresh=()=>{if(!downloadTorrent)return;const p=Math.round((torrent.progress||0)*100);$('progressBar').style.width=p+'%';$('progressText').textContent=p+'%';$('downloadPeers').textContent=torrent.numPeers;$('downloadSpeed').textContent=fmt(client.downloadSpeed)+'/s';if(torrent.files[0])$('receiveFile').textContent=torrent.files[0].name+' · '+fmt(torrent.files[0].length);};
+      torrent.on('download',refresh);torrent.on('wire',refresh);torrent.on('done',()=>{refresh();completedFile=torrent.files[0]||null;$('saveFile').disabled=!completedFile;status('receiveStatus','All torrent pieces are downloaded and verified. Choose Save completed file to write the reconstructed file to disk.','ok');$('startDownload').disabled=false;$('stopDownload').disabled=true;});
+      torrent.on('error',err=>{status('receiveStatus','Transfer error: '+err.message,'err');$('startDownload').disabled=false;$('stopDownload').disabled=true;});
+      refresh();status('receiveStatus','Torrent metadata loaded. Discovering peers and receiving verified pieces.','ok');
+    });
+  }catch(e){status('receiveStatus',e.message||'Could not start transfer.','err');$('startDownload').disabled=false;$('stopDownload').disabled=true;}
+});
+$('stopDownload').addEventListener('click',()=>{if(downloadTorrent)cleanupTorrent(downloadTorrent);downloadTorrent=null;completedFile=null;$('startDownload').disabled=false;$('stopDownload').disabled=true;$('saveFile').disabled=true;status('receiveStatus','Transfer cancelled.','warn');});
+$('saveFile').addEventListener('click',async()=>{
+  if(!completedFile){status('receiveStatus','No completed file is ready to save.','warn');return;}
+  try{
+    if(!window.showSaveFilePicker)throw new Error('This browser does not support streaming directly to a chosen file. Use a current desktop Chromium browser for very large files; a memory-based download fallback is intentionally disabled to avoid exhausting RAM.');
+    const handle=await window.showSaveFilePicker({suggestedName:completedFile.name});
+    const writable=await handle.createWritable();
+    status('receiveStatus','Writing verified file pieces to disk… keep this tab open.','warn');
+    await completedFile.stream().pipeTo(writable);
+    status('receiveStatus','File saved successfully: '+completedFile.name+' ('+fmt(completedFile.length)+').','ok');
+  }catch(e){if(e.name==='AbortError'){status('receiveStatus','Save cancelled. Your completed torrent remains available; choose Save completed file to try again.','warn');}else status('receiveStatus',e.message||'Could not save file. Check disk space and browser permissions.','err');}
+});
+async function stopCamera(){scanActive=false;if(scanFrame)cancelAnimationFrame(scanFrame);scanFrame=null;if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;} $('camera').srcObject=null;$('camera').style.display='none';$('scanBtn').disabled=false;$('stopScan').disabled=true;}
+$('stopScan').addEventListener('click',stopCamera);
+$('scanBtn').addEventListener('click',async()=>{
+  if(!('BarcodeDetector' in window)){status('receiveStatus','QR camera scanning is not supported by this browser. Paste the sender magnet link instead.','warn');$('scanHint').textContent='This browser has no BarcodeDetector QR scanner. Paste the magnet link from the sender.';return;}
+  try{
+    const detector=new BarcodeDetector({formats:['qr_code']});cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+    const video=$('camera');video.srcObject=cameraStream;video.style.display='block';await video.play();scanActive=true;$('scanBtn').disabled=true;$('stopScan').disabled=false;status('receiveStatus','Point the camera at the sender QR code.','warn');
+    const tick=async()=>{if(!scanActive)return;try{const codes=await detector.detect(video);if(codes.length&&codes[0].rawValue){const v=codes[0].rawValue;if(v.startsWith('magnet:?')||v.includes('magnet=')){ $('magnetIn').value=v;status('receiveStatus','QR scanned. Press Connect & receive to join the swarm.','ok');await stopCamera();return;}}}catch{}scanFrame=requestAnimationFrame(tick);};tick();
+  }catch(e){await stopCamera();status('receiveStatus','Could not access camera. Check browser permission or paste the magnet link. '+e.message,'err');}
+});
+window.addEventListener('pagehide',()=>{stopCamera();if(client){try{client.destroy();}catch{}}});
+</script>
+</body></html>
