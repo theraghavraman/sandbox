@@ -50,3 +50,16 @@ This repository includes a GitHub Actions workflow that publishes the static sit
 ## Local run
 
 Open **index.html** directly for most features. Some browser APIs, especially Web Crypto and clipboard access, work only on HTTPS or localhost.
+
+
+## Independent studios
+
+The sidebar links to three additional standalone tools, each implemented in its own HTML page with its own CSS and JavaScript. They do not import the Steganography Studio runtime or depend on a shared application state:
+
+- **Digital Forensics Studio** (`forensics.html`): signature triage, entropy, SHA-256/SHA-384, hex viewer/search, printable strings, structural end-marker heuristics, multi-file CSV inventory, JSON report and byte comparison. Detailed in-memory analysis is capped at 128 MiB per file.
+- **Error Correction Studio** (`error-correction.html`): Hamming (7,4), repetition ×3/×5/×7 and raw baselines; random/burst noise; BER and coding-rate metrics; CRC-32; bitstream inspection; Monte Carlo trials and BER sweeps.
+- **Robustness Testing Studio** (`robustness.html`): local image resize/crop/rotate/blur/brightness/contrast/noise and PNG/JPEG/WebP encoding; MAE, PSNR and approximate SSIM; luminance histogram; fragile LSB probe survival; batch stress profiles and JSON/CSV reports.
+
+### Studio isolation contract
+
+Each studio owns its page, styles, controls, state and algorithms. No new studio imports or mutates another studio's JavaScript. Navigation links are the only integration point; each studio can be revised independently by editing its own HTML file. Keep shared shell/navigation changes separate from tool logic. All three run in the browser and do not upload evidence or images to a service. These are research/learning tools; output is heuristic and not a substitute for professional forensic workflows or actual social-platform testing.
