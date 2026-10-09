@@ -66,7 +66,8 @@ const fmt = n => { if (!Number.isFinite(n)) return '—'; const u=['B','KB','MB'
 function status(id,msg,kind=''){ const el=$(id); el.textContent=msg; el.className='status'+(kind?' '+kind:''); }
 function getClient(){ if(!client) client=new WebTorrent({tracker:{}}); if(!WebTorrent.WEBRTC_SUPPORT) throw new Error('WebRTC is not supported in this browser. Try a current Chrome, Edge, Firefox or Safari browser.'); return client; }
 function cleanupTorrent(t){ if(t && client){ try{client.remove(t,()=>{});}catch(e){}} }
-function renderQR(value,box){ box.replaceChildren(); if(!window.QRCode){box.textContent='QR generator failed to load. Use the magnet link instead.';return;} const canvas=document.createElement('canvas'); box.append(canvas); QRCode.toCanvas(canvas,value,{width:240,margin:2,errorCorrectionLevel:'M'},err=>{if(err)box.textContent='Could not create QR. Copy the magnet link instead.';}); }
+function renderQR(value,box){ box.replaceChildren(); if(!window.QRCode){box.textContent='QR generator failed to load. Use the magnet link instead.';return;} const canvas=document.createElement('canvas'); box.append(canvas); QRCode.toCanvas(canvas,value,{width:300,margin:3,errorCorrectionLevel:'M'},err=>{if(err)box.textContent='Could not create QR. Copy the magnet link instead.';}); }
+function receiverPageUrl(magnet){const u=new URL('./redmarkshare.html',window.location.href);u.search='';u.hash='';u.searchParams.set('magnet',magnet);return u.href;}
 $('sendFile').addEventListener('change',()=>{const f=$('sendFile').files[0];$('sendSize').textContent=f?fmt(f.size):'—';});
 $('startSeed').addEventListener('click',()=>{
   const file=$('sendFile').files[0]; if(!file){status('sendStatus','Choose a file first.','warn');return;}
@@ -75,7 +76,7 @@ $('startSeed').addEventListener('click',()=>{
     $('sendQr').textContent='Preparing torrent pieces and metadata…'; $('magnetOut').value=''; $('copyMagnet').disabled=true;
     status('sendStatus','Preparing '+file.name+' ('+fmt(file.size)+'). Keep this page open while metadata is created.');
     client.seed(file,{name:file.name,announce:trackers},torrent=>{
-      seedTorrent=torrent; $('magnetOut').value=torrent.magnetURI; $('copyMagnet').disabled=false; renderQR(torrent.magnetURI,$('sendQr'));
+      seedTorrent=torrent; $('magnetOut').value=torrent.magnetURI; $('copyMagnet').disabled=false; renderQR(receiverPageUrl(torrent.magnetURI),$('sendQr'));
       status('sendStatus','Share is ready. Recipient can scan the QR or paste the magnet link. Keep this tab open to seed the file.','ok');
       torrent.on('wire',()=>updateSeedStats()); torrent.on('upload',updateSeedStats); updateSeedStats();
     });
@@ -119,9 +120,13 @@ $('scanBtn').addEventListener('click',async()=>{
   try{
     const detector=new BarcodeDetector({formats:['qr_code']});cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
     const video=$('camera');video.srcObject=cameraStream;video.style.display='block';await video.play();scanActive=true;$('scanBtn').disabled=true;$('stopScan').disabled=false;status('receiveStatus','Point the camera at the sender QR code.','warn');
-    const tick=async()=>{if(!scanActive)return;try{const codes=await detector.detect(video);if(codes.length&&codes[0].rawValue){const v=codes[0].rawValue;if(v.startsWith('magnet:?')||v.includes('magnet=')){ $('magnetIn').value=v;status('receiveStatus','QR scanned. Press Connect & receive to join the swarm.','ok');await stopCamera();return;}}}catch{}scanFrame=requestAnimationFrame(tick);};tick();
+    const tick=async()=>{if(!scanActive)return;try{const codes=await detector.detect(video);if(codes.length&&codes[0].rawValue){const v=codes[0].rawValue;if(v.startsWith('magnet:?')||v.startsWith('https://')||v.startsWith('http://')){let accepted=false;try{const u=new URL(v);accepted=v.startsWith('magnet:?')||u.searchParams.has('magnet');}catch{}if(accepted){ $('magnetIn').value=v;status('receiveStatus','QR scanned. Press Connect & receive to join the swarm.','ok');await stopCamera();return;}}}}catch{}scanFrame=requestAnimationFrame(tick);};tick();
   }catch(e){await stopCamera();status('receiveStatus','Could not access camera. Check browser permission or paste the magnet link. '+e.message,'err');}
 });
+// When the phone's native camera opens the QR URL, prefill the magnet and start receiving.
+// This lets the recipient use the same published Sandbox page without installing an app.
+const incoming = new URLSearchParams(window.location.search).get('magnet');
+if(incoming){$('magnetIn').value=incoming;status('receiveStatus','Share link opened from QR. Connecting automatically…','ok');setTimeout(()=>$('startDownload').click(),350);}
 window.addEventListener('pagehide',()=>{stopCamera();if(client){try{client.destroy();}catch{}}});
 </script>
 </body></html>
