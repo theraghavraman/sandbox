@@ -63,3 +63,27 @@ The sidebar links to three additional standalone tools, each implemented in its 
 ### Studio isolation contract
 
 Each studio owns its page, styles, controls, state and algorithms. No new studio imports or mutates another studio's JavaScript. Navigation links are the only integration point; each studio can be revised independently by editing its own HTML file. Keep shared shell/navigation changes separate from tool logic. All three run in the browser and do not upload evidence or images to a service. These are research/learning tools; output is heuristic and not a substitute for professional forensic workflows or actual social-platform testing.
+
+
+## The 13 independent destinations
+
+The original Steganography Studio remains intact as its own page. Twelve additional research studios are linked from the sidebar and have standalone HTML pages:
+
+- **Digital Forensics Studio** (`forensics.html`): file signatures, entropy, SHA-256/SHA-384, hex viewer and search, printable strings, end-marker/trailing-data heuristics, multi-file CSV inventory, JSON reports and byte comparison.
+- **Cryptography Lab** (`cryptography.html`): AES-256-GCM text/file encryption, PBKDF2-SHA-256 passphrase derivation, SHA-256/384/512, HMAC-SHA-256, secure random bytes, hex and Base64 conversion.
+- **Image Forensics Studio** (`image-forensics.html`): dimensions, partial JPEG EXIF, SHA-256, RGB/luminance statistics, histogram, recompression-difference visualization and aligned pixel comparison.
+- **Entropy & Information Studio** (`entropy-information.html`): Shannon entropy, frequency tables, information limits, redundancy, gzip size estimates, byte-bigram counts and first-order conditional entropy.
+- **Audio Signal Studio** (`audio-signal.html`): browser audio decoding/playback, waveform/spectrum, peak/RMS/zero-crossing metrics, trim, normalization, PCM WAV export, tone generation and biquad filtering.
+- **Protocol & Packet Lab** (`protocol-packet.html`): offline classic-PCAP Ethernet parser, IPv4/IPv6 and TCP/UDP/ICMP headers, DNS/HTTP indicators, filtering, packet details and CSV/JSON export. PCAPNG and live capture are not supported.
+- **Visual Encoding Studio** (`visual-encoding.html`): RVE1 pixel-image payload encoding with length/CRC, recovery from compatible PNGs, red-channel bit-plane visualization and binary/hex/Base64/Morse/Braille representations.
+- **Binary Diff Studio** (`binary-diff.html`): file hashes, exact equality, length delta, aligned byte differences, common prefix/suffix, changed ranges, hex windows and CSV/JSON reports.
+- **Data Sonification Studio** (`data-sonification.html`): text/file to FSK audio WAV, compatible WAV decoding, byte-to-pitch melody generation and WAV metadata inspection.
+- **File Format Explorer** (`file-format-explorer.html`): signature identification and parsers for PNG/JPEG/PDF/ZIP/RIFF/MP4/ELF/PE/SQLite and more, structure offsets, printable strings, hex slices and JSON reports.
+- **Error Correction Studio** (`error-correction.html`): Hamming (7,4), repetition ×3/×5/×7, raw baseline, random/burst noise, BER, CRC-32, Monte Carlo and BER sweeps.
+- **Robustness Testing Studio** (`robustness.html`): image transforms, PNG/JPEG/WebP output, MAE/PSNR/approximate SSIM, histograms, LSB probe recovery and batch stress profiles.
+
+### Isolation contract
+
+Every studio owns its HTML page, styles, controls, state and algorithms. The pages do not import or mutate another studio's JavaScript; navigation is the integration layer. A feature change should normally touch only that studio's page. The root sidebar and README are shared shell/documentation, so navigation or catalog edits may touch them without changing tool algorithms. Browser processing is the default; no tool uploads evidence to a service.
+
+These tools are experimental. Signature and image-forensics indicators are heuristic; the packet parser is limited to classic Ethernet PCAP; audio codecs depend on browser support; FSK and pixel encodings can fail after transformations; cryptography relies on Web Crypto and strong passphrases. Review each studio's on-page limitations before using it for sensitive or high-stakes work.
