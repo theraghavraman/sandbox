@@ -1,6 +1,6 @@
 # Redmark Forge Sandbox
 
-A browser-first research workspace containing **13 independent destinations**: the original Steganography Studio plus 12 standalone experimental studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
+A browser-first research workspace containing **14 independent destinations**: the original Steganography Studio plus 12 standalone experimental studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
 
 ## Features
 
