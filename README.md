@@ -87,3 +87,17 @@ The original Steganography Studio remains intact as its own page. Twelve additio
 Every studio owns its HTML page, styles, controls, state and algorithms. The pages do not import or mutate another studio's JavaScript; navigation is the integration layer. A feature change should normally touch only that studio's page. The root sidebar and README are shared shell/documentation, so navigation or catalog edits may touch them without changing tool algorithms. Browser processing is the default; no tool uploads evidence to a service.
 
 These tools are experimental. Signature and image-forensics indicators are heuristic; the packet parser is limited to classic Ethernet PCAP; audio codecs depend on browser support; FSK and pixel encodings can fail after transformations; cryptography relies on Web Crypto and strong passphrases. Review each studio's on-page limitations before using it for sensitive or high-stakes work.
+
+## RedmarkShare — torrent-style P2P sharing
+
+`redmarkshare.html` adds a browser-based peer-to-peer transfer page linked from the main sidebar. It uses WebTorrent/WebRTC-compatible peers, creates a magnet link and QR code when sending, and lets a receiver scan a QR code or paste the magnet link to join the swarm. Torrent pieces are verified by the torrent protocol, and downloaded files can be streamed to disk in browsers supporting the File System Access API.
+
+- One selected file is shared as one torrent; chunking and reconstruction are handled by the torrent engine.
+- QR is a handoff for the magnet link, not a storage mechanism.
+- The sender's browser must remain open and keep the original file available while seeding.
+- Browser WebTorrent peers communicate with WebRTC-compatible peers, not all ordinary TCP/UDP BitTorrent peers.
+- Public WebSocket trackers are used for peer discovery; tracker availability and network/NAT conditions affect connectivity.
+- Large-file disk saving requires a browser that supports `showSaveFilePicker` and enough free disk space. This page intentionally avoids a giant in-memory Blob fallback for very large files.
+- This initial version does not guarantee resume after closing/reloading the page, and has not yet been validated with a real >10 GB end-to-end test. Treat it as an experimental implementation until tested across the target browsers and networks.
+- The page loads WebTorrent and QR generation from third-party CDNs. A future production release should pin and self-host audited dependencies and verify tracker availability.
+
