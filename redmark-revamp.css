@@ -1,0 +1,307 @@
+/* Redmark Forge visual refresh — content styling only.
+   Navigation and the Steganography Studio sidebar are intentionally untouched. */
+main {
+  --ink: #202238;
+  --muted: #72758a;
+  --line: rgba(90, 82, 111, .14);
+  --canvas: #f7f5fb;
+  --accent: #ed6a24;
+  --soft: #fff0e4;
+  --paper: rgba(255,255,255,.84);
+  color: var(--ink);
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100vh - 56px);
+  padding: clamp(22px, 3.2vw, 46px) clamp(16px, 3.4vw, 48px) 56px !important;
+  background:
+    radial-gradient(ellipse at 88% 0%, rgba(255, 190, 126, .22), transparent 35%),
+    radial-gradient(ellipse at 8% 18%, rgba(179, 163, 255, .13), transparent 32%),
+    linear-gradient(145deg, #fffaf5 0%, #f8f7fc 48%, #f4f6fc 100%);
+}
+main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .23;
+  background-image: radial-gradient(rgba(83, 73, 110, .19) .65px, transparent .65px);
+  background-size: 17px 17px;
+  mask-image: linear-gradient(to bottom, #000, transparent 78%);
+}
+main h1, main h2, main h3 {
+  color: #202238;
+  text-wrap: balance;
+}
+main h1 {
+  font-size: clamp(2rem, 4vw, 3.5rem) !important;
+  font-weight: 850 !important;
+  letter-spacing: -.065em !important;
+  line-height: 1.04 !important;
+}
+main .page-head,
+main .head {
+  position: relative;
+  margin: 0 0 24px !important;
+  padding: clamp(22px, 3vw, 36px) !important;
+  border: 1px solid rgba(255,255,255,.9);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 91% 12%, rgba(255, 193, 139, .28), transparent 30%),
+    linear-gradient(120deg, rgba(255,255,255,.94), rgba(255,255,255,.66));
+  box-shadow: 0 18px 48px rgba(42, 34, 74, .07), inset 0 1px 0 #fff;
+  overflow: hidden;
+}
+main .page-head::after,
+main .head::after {
+  content: "RF";
+  position: absolute;
+  right: clamp(16px, 4vw, 48px);
+  bottom: -28px;
+  color: rgba(237, 106, 36, .055);
+  font-size: clamp(100px, 16vw, 210px);
+  font-weight: 950;
+  letter-spacing: -.12em;
+  line-height: 1;
+  pointer-events: none;
+}
+main .page-head > *,
+main .head > * { position: relative; z-index: 1; }
+main .eyebrow {
+  color: #d75c1c !important;
+  font-size: 11px !important;
+  font-weight: 800;
+  letter-spacing: .16em !important;
+}
+main .page-head p,
+main .head p {
+  max-width: 850px;
+  color: #707387;
+  font-size: 14px;
+  line-height: 1.8;
+}
+main .head-badge {
+  border: 1px solid rgba(237,106,36,.18);
+  border-radius: 999px;
+  background: #fff2e8;
+  color: #a74b1b;
+  box-shadow: 0 5px 16px rgba(237,106,36,.08);
+}
+main .workspace { gap: 22px; }
+main .method-grid {
+  gap: 11px !important;
+  margin: 0 0 22px !important;
+}
+main .method {
+  min-height: 112px;
+  text-align: left;
+  border: 1px solid rgba(94, 82, 120, .13) !important;
+  border-radius: 18px !important;
+  padding: 16px !important;
+  background: rgba(255,255,255,.78) !important;
+  box-shadow: 0 6px 18px rgba(42,34,74,.035);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+main .method:hover {
+  transform: translateY(-3px);
+  border-color: rgba(237,106,36,.4) !important;
+  box-shadow: 0 12px 26px rgba(42,34,74,.09);
+}
+main .method.active {
+  border-color: rgba(237,106,36,.58) !important;
+  background: linear-gradient(140deg, #fff7f0, #fff 82%) !important;
+  box-shadow: 0 9px 26px rgba(237,106,36,.10), inset 0 0 0 1px rgba(237,106,36,.08);
+}
+main .mi, main .big-icon {
+  border-radius: 13px;
+  background: #fff0e4;
+  color: #d75c1c;
+}
+main .tool-layout { gap: 20px !important; align-items: start; }
+main .panel,
+main .card,
+main .section,
+main .result-card {
+  border: 1px solid rgba(90,82,111,.13) !important;
+  border-radius: 20px !important;
+  background: rgba(255,255,255,.88) !important;
+  box-shadow: 0 12px 34px rgba(42,34,74,.055), inset 0 1px 0 #fff;
+  overflow: hidden;
+}
+main .panel-head,
+main .ph,
+main .panel-header {
+  padding: 18px 21px !important;
+  border-bottom: 1px solid rgba(90,82,111,.10) !important;
+  background: linear-gradient(100deg, rgba(255,248,242,.92), rgba(255,255,255,.6));
+}
+main .panel-head h2,
+main .ph h2 { font-size: 16px; letter-spacing: -.025em; }
+main .panel-body,
+main .pb { padding: clamp(16px, 2vw, 24px) !important; }
+main .notice {
+  border: 1px solid rgba(230,160,85,.28) !important;
+  border-radius: 16px !important;
+  padding: 15px 18px !important;
+  background: linear-gradient(120deg, rgba(255,247,231,.95), rgba(255,255,255,.78)) !important;
+  box-shadow: 0 7px 20px rgba(120,81,10,.035);
+  line-height: 1.7;
+}
+main .notice p { line-height: 1.7; }
+main .pill,
+main .status,
+main .metric,
+main .output,
+main .mono {
+  border-radius: 12px !important;
+}
+main .metric {
+  background: linear-gradient(145deg, #fff, #faf9fd);
+  border-color: rgba(90,82,111,.13) !important;
+  padding: 13px !important;
+}
+main .metric strong { color: #28263f; }
+main .field { gap: 7px; margin-bottom: 16px; }
+main .field label,
+main label,
+main .field-label {
+  color: #44445d;
+  font-size: 12px;
+  font-weight: 750;
+}
+main input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+main select,
+main textarea {
+  max-width: 100%;
+  border: 1px solid rgba(104,98,128,.22) !important;
+  border-radius: 12px !important;
+  background: rgba(255,255,255,.94) !important;
+  color: #25243b !important;
+  padding: 11px 13px !important;
+  box-shadow: inset 0 1px 2px rgba(38,30,66,.025);
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+main input[type="file"] {
+  padding: 9px !important;
+  background: rgba(255,255,255,.76) !important;
+}
+main input[type="file"]::file-selector-button {
+  margin-right: 10px;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 11px;
+  background: #fff0e4;
+  color: #a74b1b;
+  font-weight: 750;
+  cursor: pointer;
+}
+main input:focus-visible,
+main select:focus-visible,
+main textarea:focus-visible {
+  outline: none;
+  border-color: rgba(237,106,36,.75) !important;
+  box-shadow: 0 0 0 4px rgba(237,106,36,.12) !important;
+}
+main textarea { line-height: 1.65; }
+main .btn,
+main button.btn,
+main .btn-row button,
+main button:not(.method):not(.nav-item) {
+  border-radius: 11px;
+  font-weight: 750;
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+main .btn:hover,
+main .btn-row button:hover,
+main button:not(.method):not(.nav-item):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 7px 17px rgba(42,34,74,.10);
+}
+main .btn.orange,
+main button.orange,
+main .btn.primary,
+main button.primary {
+  border-color: transparent !important;
+  background: linear-gradient(115deg, #f0782d, #e75b20) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 15px rgba(237,106,36,.18);
+}
+main .btn.orange:hover,
+main button.orange:hover,
+main .btn.primary:hover,
+main button.primary:hover { filter: saturate(1.08) brightness(1.02); }
+main .status {
+  border: 1px solid rgba(90,82,111,.08);
+  padding: 12px 14px !important;
+  background: rgba(245,246,251,.9);
+}
+main .status.ok, main .status.success {
+  background: #eaf8ef !important;
+  color: #176b43 !important;
+  border-color: #c9ecd5;
+}
+main .status.warn {
+  background: #fff5e6 !important;
+  color: #8b5b00 !important;
+  border-color: #f4dfb8;
+}
+main .status.err, main .status.error {
+  background: #fff0ee !important;
+  color: #b53b32 !important;
+  border-color: #f4cfca;
+}
+main .output, main pre, main code, main .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+main .output, main pre {
+  border: 1px solid rgba(90,82,111,.12);
+  background: #f7f6fb;
+  padding: 14px;
+  overflow-wrap: anywhere;
+}
+main .mono {
+  background: #202236 !important;
+  color: #f1edff !important;
+  border: 1px solid rgba(255,255,255,.08);
+}
+main table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 12px;
+}
+main th {
+  background: #f1eef8;
+  color: #44445d;
+  font-weight: 800;
+}
+main td, main th {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(90,82,111,.10);
+  text-align: left;
+}
+main canvas, main img.preview, main .preview {
+  border-radius: 14px;
+  border-color: rgba(90,82,111,.15) !important;
+}
+main .divider { border-color: rgba(90,82,111,.12); }
+main .footnote, main small, main .hint { line-height: 1.65; }
+@media (max-width: 760px) {
+  main { padding: 18px 13px 36px !important; }
+  main .page-head, main .head { padding: 21px !important; border-radius: 20px; }
+  main .page-head::after, main .head::after { font-size: 105px; right: 10px; bottom: -10px; }
+  main .method-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  main .tool-layout, main .grid { grid-template-columns: minmax(0,1fr) !important; }
+  main .panel-body, main .pb { padding: 15px !important; }
+  main .btn-row, main .row { flex-wrap: wrap; }
+  main .btn-row button, main .row .btn { min-height: 42px; }
+}
+@media (max-width: 420px) {
+  main .method-grid { grid-template-columns: minmax(0,1fr); }
+  main h1 { font-size: 2rem !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  main *, main *::before, main *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
