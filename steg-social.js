@@ -273,4 +273,24 @@ $('socialCopy').addEventListener('click', async () => {
     setStatus('Recovered message copied to clipboard.', 'ok');
   } catch (error) { setStatus(error.message || 'Clipboard access was blocked; select and copy the message manually.', 'warn'); }
 });
+function makeShareCaption() {
+  const value = $('shareLink').value.trim();
+  let parsed;
+  try { parsed = new URL(value); } catch { throw new Error('Paste a complete hosted share URL first.'); }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') throw new Error('Use a web URL from your storage host.');
+  const caption = 'Encrypted file download: ' + parsed.href + '\nI will share the decryption passphrase separately.';
+  $('shareCaption').value = caption;
+  return caption;
+}
+$('prepareShareCaption').addEventListener('click', () => {
+  try { makeShareCaption(); setStatus('Message prepared. The passphrase is intentionally not included; copy the text into Instagram and share the passphrase separately.', 'ok'); }
+  catch (error) { setStatus(error.message || 'Could not prepare the message.', 'error'); }
+});
+$('copyShareCaption').addEventListener('click', async () => {
+  try {
+    const caption = makeShareCaption();
+    await navigator.clipboard.writeText(caption);
+    setStatus('Instagram message copied. The passphrase is intentionally omitted.', 'ok');
+  } catch (error) { setStatus(error.message || 'Could not copy the message. Select the prepared text and copy it manually.', 'warn'); }
+});
 })();

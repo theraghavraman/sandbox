@@ -22,7 +22,7 @@ A browser-first, single-studio workspace for steganography experiments. The side
 1. Open **Secure file share**, choose any file, and enter a strong unique passphrase.
 2. Select **Encrypt complete file** and keep the downloaded .rfsafe package unchanged.
 3. Upload that package to a host that preserves the bytes, such as Drive, Dropbox, or WeTransfer. Check its access permissions and test-download the package.
-4. Put the hosted link in Instagram. Send the passphrase through a different channel.
+4. Paste the hosted URL into the caption helper in **Secure file share**, prepare/copy the message (the passphrase is deliberately omitted), and paste it into Instagram. Send the passphrase through a different channel.
 
 To recover the file, select the downloaded .rfsafe package in the same tool and choose **Decrypt .rfsafe package**. Losing the passphrase means the app cannot recover the original file. Store it safely.
 
