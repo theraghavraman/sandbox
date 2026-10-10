@@ -21,6 +21,9 @@ assert.equal(kb.models.find(m => m.id === "classic-512")?.count, 512);
 assert.equal(kb.models.find(m => m.id === "expanded-2048")?.count, 2048);
 assert.equal(kb.coins.filter(c => c.model === "classic-512" && c.independent).length, 9,
   "Classic model should have nine independent coins");
+assert.equal(kb.coins.find(c => c.id === "coin-consume-blast")?.independent, false, "Animal contrasts are not separate global independent coins");
+assert.equal(kb.coins.find(c => c.id === "coin-play-sleep")?.independent, false, "Animal contrasts are not separate global independent coins");
+assert.equal(kb.coins.filter(c => c.id === "coin-animal-second-savior" || c.id === "coin-animal-last-category").every(c => c.independent), true, "Two animal-stack selection bits must be represented");
 assert.equal(kb.coins.find(c => c.id === "derived-info-energy")?.independent, false,
   "Info/Energy must remain a derived distinction, not an extra independent coin");
 
