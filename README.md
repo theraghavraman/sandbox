@@ -152,3 +152,15 @@ This is a browser-only static application. Cross-origin policy, network filters,
 ### OPS research limitations
 
 This is a research baseline, not a claim of complete capture of every public OPS concept. The official FAQ and community references are attributed sources, not independent proof of the framework's empirical claims. Some material is membership-gated; the project does not copy paid course material, private client information or proprietary diagrams. The current type-code builder validates only a subset of structural conventions; an exhaustive type enumerator should wait until the target version's exact checklist and stack rules are independently verified. OPS is not presented as a clinical diagnostic instrument. See [OPS-RESEARCH.md](OPS-RESEARCH.md) for architecture and provenance notes, and [ops-knowledge-base.json](ops-knowledge-base.json) for the structured corpus.
+
+
+## Personality studios (browser-only)
+
+Three independent pages are available from the main sidebar:
+
+- **Big Five Studio** (`big-five-studio.html`): 14 short self-reflection items across openness, conscientiousness, extraversion, agreeableness and emotional stability; includes reverse-keyed items, dimension summaries, and JSON export.
+- **MBTI Studio** (`mbti-studio.html`): 12 forced-choice items exploring E/I, S/N, T/F and J/P preferences; shows each pair separately and avoids claiming official MBTI status.
+- **DISC Studio** (`disc-studio.html`): 8 scenario-based forced choices across D/I/S/C, scores each style, and handles ties.
+- Shared assessment engine: `personality-core.js`. Results are computed in-browser; users can clear answers, export a JSON report, or print/save a PDF. No account, backend, or automatic persistence is used.
+
+**Validity limitation:** These are original mini-questionnaires for education and self-reflection, not official, licensed, normed, or independently validated instruments. Scores are not population percentiles and should not be used for clinical, hiring, or other high-stakes decisions.
