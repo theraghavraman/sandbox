@@ -1,6 +1,6 @@
 # Redmark Forge Sandbox
 
-A browser-first research workspace containing **20 independent destinations**: the original Steganography Studio, RedmarkShare, OSINT Studio, Web Scraping Studio and 13 further standalone research studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
+A browser-first research workspace containing **21 independent destinations**: the original Steganography Studio, RedmarkShare, OSINT Studio, Web Scraping Studio and 14 further standalone research studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
 
 ## Features
 
