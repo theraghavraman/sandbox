@@ -54,12 +54,13 @@ main{max-width:1180px;margin:auto;padding:32px 18px 60px}.hero{display:flex;alig
 <div class="foot">RedmarkShare is an experimental peer-to-peer transfer tool. Share only files you have permission to distribute.</div>
 </main>
 <script type="module">
-import WebTorrent from 'https://esm.sh/webtorrent@2.6.6?bundle';
+// Official prebuilt browser bundle. The esm.sh build breaks in _onTorrentId
+// ("i.toHex is not a function"), so no info hash, magnet or QR was ever produced.
+import WebTorrent from 'https://cdn.jsdelivr.net/npm/webtorrent@2.6.6/dist/webtorrent.min.js';
 const $ = id => document.getElementById(id);
 const trackers = [
   'wss://tracker.openwebtorrent.com',
-  'wss://tracker.webtorrent.dev',
-  'wss://tracker.btorrent.xyz'
+  'wss://tracker.webtorrent.dev'
 ];
 let client = null, seedTorrent = null, downloadTorrent = null, cameraStream = null, scanFrame = null, scanActive = false, completedFile = null;
 const fmt = n => { if (!Number.isFinite(n)) return '—'; const u=['B','KB','MB','GB','TB']; let i=0; while(n>=1024&&i<u.length-1){n/=1024;i++} return (n<10&&i?n.toFixed(1):Math.round(n))+' '+u[i]; };
