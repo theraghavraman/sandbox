@@ -158,6 +158,13 @@ function validateType(){
  checks.push({ok:!!f1&&!!f2&&f1.axis!==f2.axis,text:"Savior functions use opposite axes (one Observer and one Decider)."});
  checks.push({ok:first!==second,text:"The two selected functions are different."});
  checks.push({ok:stack.length===4&&new Set(stack).size===4&&["P","S","B","C"].every(a=>stack.includes(a)),text:"Animal stack contains P, S, B and C exactly once."});
+ const animalParts={P:["De","Oe"],S:["Di","Oi"],B:["De","Oi"],C:["Di","Oe"]};
+ const components=[...(f1?f1.components:[]),...(f2?f2.components:[])];
+ const d=components.find(x=>x==="Di"||x==="De"),o=components.find(x=>x==="Oi"||x==="Oe");
+ const firstAnimal={"De|Oe":"P","Di|Oi":"S","De|Oi":"B","Di|Oe":"C"}[d+"|"+o];
+ checks.push({ok:!!firstAnimal&&stack[0]===firstAnimal,text:"First animal matches the selected savior-function orientations (common type-code convention)."});
+ const secondPart=f2&&f2.components.find(x=>["Di","De","Oi","Oe"].includes(x));
+ checks.push({ok:!!animalParts[stack[1]]&&animalParts[stack[1]].includes(secondPart),text:"Second animal shares the second savior function orientation component (common type-code convention)."});
  const top=stack.slice(0,2),groups=top.map(a=>(KB.animals.find(x=>x.id===a)||{}).group);
  checks.push({ok:groups[0]&&groups[1]&&groups[0]!==groups[1],text:"First two animals include one Energy animal (P/S) and one Information animal (B/C), per the classic community convention."});
  const code=mod+" – "+first+"/"+second+" – "+stack.slice(0,2)+"/"+stack.slice(2,3)+"("+stack.slice(3)+")";
