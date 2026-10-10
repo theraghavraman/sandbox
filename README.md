@@ -4,7 +4,7 @@ A browser-first research workspace containing **21 independent destinations**: t
 
 ## Features
 
-- **Secure File Share:** encrypts a complete file as a standalone **.rfsafe** package using AES-GCM and a PBKDF2-derived key. Filenames and MIME types are stored inside the encrypted plaintext, not exposed in the package header.
+- **Open Library Studio:** browser-only live search across Project Gutenberg, Open Library and Google Books, with source-linked online reading and available-format downloads. Access labels reflect provider metadata; not every book is legally free to download or available as a PDF.\n- **Secure File Share:** encrypts a complete file as a standalone **.rfsafe** package using AES-GCM and a PBKDF2-derived key. Filenames and MIME types are stored inside the encrypted plaintext, not exposed in the package header.
 - **Byte-preserving sharing workflow:** download the encrypted package, upload it yourself to Google Drive, Dropbox, or WeTransfer, share that hosted link on Instagram, and send the passphrase via a separate channel. The site does not upload files or create external share links.
 - **Experimental Social Signal:** embeds a short UTF-8 message, URL, or key into 8×8 image-block frequency coefficients. Repeated bits and majority voting add redundancy; CRC-32 detects unrecovered errors. Optional AES-GCM encryption can protect the short message.
 - **PNG LSB encode/decode** for binary payloads, with capacity checks and optional AES-GCM encryption.
