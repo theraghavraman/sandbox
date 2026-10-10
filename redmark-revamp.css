@@ -730,3 +730,93 @@ main .footnote, main small, main .hint { color: #827c70; }
     scroll-behavior: auto !important;
   }
 }
+
+
+/* Shared shell polish for independent Sandbox studios. */
+.top {
+  min-height: 66px !important;
+  padding: 10px clamp(13px, 2.6vw, 34px) !important;
+  background: rgba(255,253,248,.94) !important;
+  border-bottom: 1px solid #e9e1d5 !important;
+  box-shadow: 0 5px 24px rgba(64,45,22,.035);
+}
+.mark {
+  width: 39px !important;
+  height: 39px !important;
+  border-radius: 13px !important;
+  background: linear-gradient(145deg, #f8b16d, #ed7837) !important;
+  color: #fffdf8 !important;
+  box-shadow: 0 5px 14px rgba(233,135,66,.23), inset 0 -3px rgba(166,69,21,.12) !important;
+}
+.top .brand, .top .brand strong { color: #28271f !important; }
+.top .brand b { color: #ed7b39 !important; }
+.top nav { gap: 6px !important; }
+.top nav a, .top nav button {
+  border: 1px solid #e9e1d5 !important;
+  border-radius: 10px !important;
+  padding: 7px 10px !important;
+  background: #fffdf8 !important;
+  color: #656055 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  transition: background .16s ease, border-color .16s ease, transform .16s ease !important;
+}
+.top nav a:hover, .top nav button:hover {
+  background: #fff0e2 !important;
+  border-color: #f0cfb1 !important;
+  color: #ac4e1f !important;
+  transform: translateY(-1px);
+}
+.top nav a.active, .top nav button.active {
+  background: #fff0e2 !important;
+  border-color: #efc29e !important;
+  color: #ac4e1f !important;
+}
+main .hero {
+  position: relative;
+  margin: 0 0 24px !important;
+  padding: clamp(22px, 3vw, 37px) !important;
+  border: 1px solid rgba(255,255,255,.96) !important;
+  border-radius: 25px !important;
+  background:
+    radial-gradient(circle at 94% 6%, rgba(255,199,149,.32), transparent 30%),
+    linear-gradient(125deg, rgba(255,253,248,.98), rgba(255,255,255,.72)) !important;
+  box-shadow: 0 17px 46px rgba(67,49,24,.065), inset 0 1px 0 #fff !important;
+  overflow: hidden;
+}
+main .hero::after {
+  content: "RF";
+  position: absolute;
+  right: clamp(16px, 4vw, 48px);
+  bottom: -28px;
+  color: rgba(237,123,57,.055);
+  font-size: clamp(100px, 16vw, 210px);
+  font-weight: 950;
+  letter-spacing: -.12em;
+  line-height: 1;
+  pointer-events: none;
+}
+main .hero > * { position: relative; z-index: 1; }
+main .hero h1, main .head h1 {
+  color: #28271f !important;
+  letter-spacing: -.055em !important;
+}
+main .hero p, main .head p {
+  color: #7b776c !important;
+  line-height: 1.75 !important;
+}
+main .badge {
+  border: 1px solid #f1d5bd !important;
+  border-radius: 12px !important;
+  background: #fff5e9 !important;
+  color: #a7501d !important;
+}
+main .grid { gap: 16px; }
+@media (max-width: 760px) {
+  .top { align-items: flex-start !important; flex-direction: column !important; gap: 9px !important; }
+  .top nav { width: 100%; }
+  .top nav a, .top nav button { max-width: 100%; }
+  main .hero { border-radius: 20px !important; padding: 22px !important; }
+  main .hero::after { font-size: 100px; right: 10px; bottom: -12px; }
+}
