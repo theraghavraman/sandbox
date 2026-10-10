@@ -58,6 +58,13 @@ assert.ok(html.includes("per 1,000 words"), "Signal rates must be normalized by 
 assert.ok(html.includes("Competing hypotheses") || html.includes("Potential tensions / counter-signals"), "Report must surface competing OPS signals");
 assert.ok(html.includes("phrase matching"), "Report must disclose its transparent lexical matching method");
 assert.ok(html.includes("No source text is sent to a server"), "Privacy behavior must be documented in the UI");
+assert.ok(html.includes('id="pane-corpus"') && html.includes('data-tab="corpus"'), "Corpus & Evaluation pane must be present");
+for (const id of ["opsCorpusFile", "opsCorpusSourceUrl", "opsCorpusLicense", "opsCorpusAnnotation", "opsQueryText", "runOpsRetrieval", "runOpsEvaluation", "opsIndependentLabels"]) assert.ok(html.includes('id="' + id + '"'), "Corpus engine control missing: " + id);
+for (const fn of ["normalizeOpsRow", "parseOpsCorpus", "buildOpsIdf", "opsCosine", "scoreOpsQuery", "runOpsEvaluation"]) assert.ok(html.includes("function " + fn + "("), "Corpus engine function missing: " + fn);
+assert.ok(html.includes("TF-IDF") && html.includes("macro-F1") && html.includes("Majority baseline:"), "Retrieval/evaluation must document method and report metrics");
+assert.ok(html.includes("synthetic examples are illustrative") && html.includes("independent human typing/annotation"), "Evaluation must exclude synthetic data and require independent-label confirmation");
+assert.ok(html.includes("aop-dataset-2022-11-10-interview-lines-by-youtube"), "OPS corpus pane should link the discovered public corpus with license caveat");
+
 const animalFor = {"De|Oe":"P","Di|Oi":"S","De|Oi":"B","Di|Oe":"C"};
 const compatiblePairs = [];
 for (const first of kb.functions) for (const second of kb.functions) {
