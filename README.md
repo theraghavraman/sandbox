@@ -1,6 +1,6 @@
 # Redmark Forge Sandbox
 
-A browser-first research workspace containing **16 independent destinations**: the original Steganography Studio, RedmarkShare, the OSINT Studio and 12 further standalone experimental studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
+A browser-first research workspace containing **17 independent destinations**: the original Steganography Studio, RedmarkShare, OSINT Studio, Web Scraping Studio and 13 further standalone research studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
 
 ## Features
 
@@ -128,3 +128,20 @@ These tools are experimental. Signature, steganalysis and image-forensics indica
 ### OSINT Studio limitations and privacy
 
 This is a browser-only static application. Cross-origin policy, network filters, endpoint availability and provider rate limits can prevent external lookups. It does not scrape search results, bypass authentication, perform port scans, or guarantee attribution. Search results and correlations are leads, not proof. External providers receive queries when contacted or opened. Case notes use browser localStorage, are not encrypted, do not synchronize between devices, and may be cleared by the browser. Export important work and protect exported files. Use public sources lawfully and avoid collecting sensitive personal information without a legitimate basis.
+
+
+## OPS Research Lab (browser-only)
+
+`ops-studio.html` is a source-indexed research and architecture workspace for the Objective Personality System (OPS). It is separate from the other studios and does not require a backend or Local Engine.
+
+- **Knowledge base:** `ops-knowledge-base.json` stores paraphrased concepts, dimensions, eight cognitive-function records, four animal records, explicit modelling/research rules, a glossary, source provenance and open research questions.
+- **Versioned model claims:** distinguishes the official FAQ's classic nine-coin / 512-type description from an independent 11-coin / 2,048-configuration claim; it does not silently merge them.
+- **Type-code workbench:** composes a candidate code and runs basic structural checks. It is explicitly not an exhaustive canonical type enumerator or a person-typing verdict.
+- **Concept map:** interactive SVG map for dimensions, functions, animals, model versions and evidence methodology.
+- **Evidence Lab:** creates local case files, observations, support/contradiction notes and exports. Case data is stored in the current browser's localStorage; export important work and avoid unnecessary personal data.
+- **Research sources and gaps:** links to official OPS material and secondary community references, labels source types, and tracks unresolved questions about current rules, expanded dimensions and independent validation.
+- **Exports:** download the corpus JSON, export the workspace/cases, and import a workspace case list.
+
+### OPS research limitations
+
+This is a research baseline, not a claim of complete capture of every public OPS concept. The official FAQ and community references are attributed sources, not independent proof of the framework's empirical claims. Some material is membership-gated; the project does not copy paid course material, private client information or proprietary diagrams. The current type-code builder validates only a subset of structural conventions; an exhaustive type enumerator should wait until the target version's exact checklist and stack rules are independently verified. OPS is not presented as a clinical diagnostic instrument. See [OPS-RESEARCH.md](OPS-RESEARCH.md) for architecture and provenance notes, and [ops-knowledge-base.json](ops-knowledge-base.json) for the structured corpus.
