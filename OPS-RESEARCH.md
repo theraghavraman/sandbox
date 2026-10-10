@@ -18,7 +18,7 @@ Source classes are kept separate:
 ## Versioning: do not silently merge models
 
 ### Classic 512-type description
-The official FAQ describes nine binary coins and 512 possible combinations. The community Starter Kit gives a staged account of the classic model: human-need distinctions, letter distinctions, animal stacks and modalities. The Type Code guide documents a common notation such as `FF – Fe/Se – PC/S(B)`.
+The official FAQ describes nine binary coins and 512 possible combinations. The community Starter Kit gives a staged account of the classic model: human-need distinctions, letter distinctions, animal stacks and modalities. In this corpus, the nine independent binary coins are represented as **3 human-needs + 2 letter + 2 animal + 2 modality coins = 9** (`2^9 = 512`). Information/Energy dominance is retained as a useful **derived distinction**, not counted as an extra independent tenth coin. The Type Code guide documents a common notation such as `FF – Fe/Se – PC/S(B)`.
 
 Sources:
 - https://www.objectivepersonality.com/faq
