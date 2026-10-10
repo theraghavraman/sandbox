@@ -59,6 +59,24 @@ Source:
 
 The type-code workbench is a **research aid, not a complete canonical OPS type enumerator**. It validates basic syntax and selected structural constraints; it does not claim to reconstruct every official checklist, all cross-checks, or all historical revisions. A complete exhaustive enumerator must be built only after the exact target-version rules are sourced and independently checked against a trusted reference implementation.
 
+## Structural coverage report
+
+The in-app **Coverage** tab tracks implementation state separately from research status. The current classic-community-code coverage includes:
+
+- 8/8 cognitive-function records and both modality fields.
+- 4/4 animal symbols.
+- 16/16 animal stacks listed in the cited community guide.
+- Checks that the first animal agrees with the Oe/Oi and De/Di orientations of the savior functions.
+- Checks that the first two animals consist of one information animal (Blast/Consume) and one energy animal (Play/Sleep).
+- Exhaustive structural enumeration: 32 ordered savior-function pairs × 4 compatible stacks per pair × 4 modality combinations = 512 code configurations.
+
+The enumeration confirms that the implemented rules produce the expected count for this selected public type-code convention. It does **not** demonstrate that OPS is empirically valid, and it is not a claim that all current official checklist revisions or paid material are represented. The 2,048 model remains separately marked as research-needed because the two added social dimensions are not yet operationalised here.
+
+Sources for these stack conventions:
+- https://subjectivepersonality.wordpress.com/foundations/ops-starter-kit/info-vs-energy-dominant/
+- https://subjectivepersonality.wordpress.com/2021/04/30/the-objective-personality-type-code/
+- https://app.subjectivepersonality.com/analyzer
+
 ## Evidence and validation policy
 
 1. Every concept should have a source or be marked as a hypothesis.
