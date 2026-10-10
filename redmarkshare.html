@@ -77,21 +77,27 @@ $('startSeed').addEventListener('click',()=>{
     status('sendStatus','Preparing '+file.name+' ('+fmt(file.size)+'). Keep this page open while metadata is created.');
     // Generate the share as soon as WebTorrent has an info hash. Do not wait
     // exclusively for the onseed callback: tracker readiness can delay that callback.
-    const torrent = client.seed(file,{name:file.name,announce:trackers});
-    seedTorrent=torrent;
+    let torrent;
     const publishShare = () => {
-      if (!seedTorrent || seedTorrent !== torrent || !torrent.magnetURI) return;
+      if (!torrent || !seedTorrent || seedTorrent !== torrent || !torrent.magnetURI) return;
       $('magnetOut').value=torrent.magnetURI; $('copyMagnet').disabled=false;
       renderQR(receiverPageUrl(torrent.magnetURI),$('sendQr'));
       status('sendStatus','Share link and QR are ready. Recipient can scan now. Keep this tab open to seed the file.','ok');
     };
+    // The onseed callback is the documented success path; event handlers provide
+    // early readiness when available, while the callback prevents a missed event
+    // from leaving the UI stuck indefinitely.
+    torrent = client.seed(file,{name:file.name,announce:trackers},seededTorrent=>{
+      torrent=seededTorrent; seedTorrent=seededTorrent; publishShare(); updateSeedStats();
+    });
+    seedTorrent=torrent;
     torrent.on('infoHash',publishShare);
+    torrent.on('metadata',publishShare);
     torrent.on('ready',publishShare);
     torrent.on('wire',updateSeedStats); torrent.on('upload',updateSeedStats);
     torrent.on('warning',err=>status('sendStatus','Share warning: '+(err.message||err),'warn'));
     torrent.on('error',err=>{status('sendStatus','Could not create share: '+(err.message||err),'err');$('startSeed').disabled=false;$('stopSeed').disabled=true;});
     client.on('error',err=>{status('sendStatus','WebTorrent client error: '+(err.message||err),'err');$('startSeed').disabled=false;$('stopSeed').disabled=true;});
-    // The returned torrent emits infoHash/ready when its magnet URI is available.
   }catch(e){status('sendStatus',e.message||'Could not create share.','err');$('startSeed').disabled=false;$('stopSeed').disabled=true;}
 });
 function updateSeedStats(){if(!seedTorrent)return;$('seedPeers').textContent=seedTorrent.numPeers;$('uploaded').textContent=fmt(seedTorrent.uploaded||0);}
