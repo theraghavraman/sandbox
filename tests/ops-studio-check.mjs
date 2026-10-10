@@ -53,6 +53,9 @@ assert.ok(html.includes('id="pane-analyze"'), "Input-driven analysis pane must b
 for (const id of ["analysisUrl", "fetchAnalysisUrl", "analysisFile", "analysisText", "runAnalysis", "analysisReport", "exportAnalysisReport"]) assert.ok(html.includes('id="' + id + '"' ) || html.includes(id), "Analysis feature missing: " + id);
 for (const ext of ["pdf", "docx", "html", "csv", "json"]) assert.ok(html.includes('"' + ext + '"' ) || html.includes("." + ext), "Expected source format support: " + ext);
 assert.ok(html.includes("function runInsights()"), "Evidence-led report generator must be present");
+assert.ok(html.includes("negated") && html.includes("possible negation/counter-signal"), "Evidence ledger must surface heuristic negation flags");
+assert.ok(html.includes("per 1,000 words"), "Signal rates must be normalized by sample length and labelled descriptive");
+assert.ok(html.includes("Competing hypotheses") || html.includes("Potential tensions / counter-signals"), "Report must surface competing OPS signals");
 assert.ok(html.includes("phrase matching"), "Report must disclose its transparent lexical matching method");
 assert.ok(html.includes("No source text is sent to a server"), "Privacy behavior must be documented in the UI");
 const animalFor = {"De|Oe":"P","Di|Oi":"S","De|Oi":"B","Di|Oe":"C"};
