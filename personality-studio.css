@@ -1,0 +1,30 @@
+/* Component styles for the Big Five, MBTI and DISC studios (questionnaire + results).
+   Page chrome, hero, panels, notices and buttons come from sandbox-shell.css and redmark-revamp.css. */
+body.rf-page main .grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 20px; align-items: start; }
+body.rf-page main .panel-body > .muted:first-child { margin-top: 0; }
+body.rf-page main .muted { color: #72758a; }
+body.rf-page main .q { margin: 0; padding: 14px 0; border: 0; border-bottom: 1px solid rgba(90, 82, 111, .10); min-width: 0; }
+body.rf-page main .q:last-of-type { border-bottom: 0; }
+body.rf-page main .q legend { padding: 0; margin-bottom: 9px; font-weight: 750; color: #202238; }
+body.rf-page main .opts { display: grid; gap: 7px; }
+body.rf-page main .opt {
+  display: flex; align-items: flex-start; gap: 9px; padding: 10px 12px; cursor: pointer; font-size: 13px;
+  border: 1px solid rgba(104, 98, 128, .22); border-radius: 12px; background: rgba(255, 255, 255, .94);
+  transition: border-color .15s ease, background .15s ease;
+}
+body.rf-page main .opt:hover { border-color: rgba(237, 106, 36, .45); }
+body.rf-page main .opt:has(input:checked) { border-color: rgba(237, 106, 36, .7); background: #fff7f0; }
+body.rf-page main .opt input { accent-color: #ed6a24; margin: 3px 0 0; flex-shrink: 0; }
+body.rf-page main .progress { height: 6px; margin: 10px 0 14px; border-radius: 99px; background: #ece8f2; overflow: hidden; }
+body.rf-page main .progress span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #f0782d, #e75b20); }
+body.rf-page main #count { margin: 0; font-weight: 700; color: #44445d; }
+body.rf-page main .result { display: none; }
+body.rf-page main .result.show { display: block; }
+body.rf-page main .barrow { display: grid; grid-template-columns: 110px minmax(0, 1fr) 42px; gap: 9px; align-items: center; margin: 12px 0; font-size: 12px; }
+body.rf-page main .bar { height: 9px; border-radius: 9px; background: #ece8f2; overflow: hidden; }
+body.rf-page main .bar span { display: block; height: 100%; background: #ed6a24; }
+body.rf-page main .item { margin: 8px 0; padding: 11px 13px; border-radius: 12px; background: #f7f6fb; font-size: 13px; }
+body.rf-page main .btn { margin: 4px 6px 0 0; padding: 10px 14px; border: 1px solid rgba(90, 82, 111, .18); background: #fff; cursor: pointer; }
+body.rf-page main .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+@media (max-width: 900px) { body.rf-page main .grid { grid-template-columns: minmax(0, 1fr); } }
+@media print { body.rf-page main .opt { break-inside: avoid; } #quiz, .notice, .btn { display: none; } body.rf-page main .grid { display: block; } }

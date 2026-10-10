@@ -1,0 +1,221 @@
+/* Redmark Forge Sandbox — shared page shell.
+   One topbar + one sidebar + one set of page-level tokens for every destination.
+   Generated chrome markup lives in tools/apply-shell.mjs; do not hand-edit it inside pages.
+   All selectors are prefixed rf- (or scoped to body.rf-page) so legacy page CSS cannot restyle the chrome. */
+
+:root {
+  --rf-bar: 60px;
+  --rf-side: 252px;
+  --rf-ink: #17202c;
+  --rf-ink2: #344354;
+  --rf-muted: #73808d;
+  --rf-line: #e0e5e9;
+  --rf-canvas: #f3f5f6;
+  --rf-paper: #fff;
+  --rf-accent: #ed6a24;
+  --rf-accent-soft: #fff0e5;
+  --rf-accent-ink: #a94312;
+  --rf-green: #18764c;
+  --rf-display: "Bricolage Grotesque", system-ui, sans-serif;
+  --rf-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --rf-mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body.rf-page {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--rf-canvas);
+  color: var(--rf-ink);
+  font-family: var(--rf-body);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography shared by every page, regardless of legacy inline CSS */
+body.rf-page h1, body.rf-page h2, body.rf-page h3 { font-family: var(--rf-display); }
+body.rf-page button, body.rf-page input, body.rf-page select, body.rf-page textarea { font-family: inherit; }
+body.rf-page :focus-visible { outline: 3px solid rgba(237, 106, 36, .45); outline-offset: 2px; }
+
+/* ---------- Skip link ---------- */
+.rf-skip {
+  position: fixed; left: 12px; top: -60px; z-index: 100;
+  background: var(--rf-ink); color: #fff; padding: 10px 14px; border-radius: 10px;
+  font-weight: 700; text-decoration: none; transition: top .15s ease;
+}
+.rf-skip:focus { top: 10px; }
+
+/* ---------- Topbar ---------- */
+.rf-topbar {
+  height: var(--rf-bar);
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 0 22px;
+  background: rgba(255, 255, 255, .95);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rf-line);
+}
+.rf-topbar .rf-menu-btn {
+  display: none; flex-shrink: 0;
+  width: 40px; height: 40px; padding: 0;
+  border: 1px solid var(--rf-line); border-radius: 10px;
+  background: #fff; color: var(--rf-ink); font-size: 20px; line-height: 1; cursor: pointer;
+}
+.rf-topbar .rf-brand {
+  display: flex; align-items: center; gap: 11px; min-width: 0;
+  color: inherit; text-decoration: none;
+}
+.rf-topbar .rf-mark {
+  width: 35px; height: 35px; flex-shrink: 0; border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--rf-ink); color: #ffd08c;
+  font: 700 13px var(--rf-mono);
+  box-shadow: inset 0 -3px var(--rf-accent);
+}
+.rf-topbar .rf-brand-text { min-width: 0; }
+.rf-topbar .rf-brand-text strong {
+  display: block; font: 800 16px/1.1 var(--rf-display); letter-spacing: -.02em; white-space: nowrap;
+}
+.rf-topbar .rf-brand-text strong span { color: var(--rf-accent); }
+.rf-topbar .rf-brand-text small {
+  display: block; margin-top: 4px; color: var(--rf-muted); font-size: 11px; font-weight: 400;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rf-topbar .rf-top-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.rf-topbar .rf-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 11px; border: 1px solid var(--rf-line); border-radius: 999px;
+  background: #fff; color: var(--rf-ink2);
+  font: 500 11px var(--rf-mono); letter-spacing: .02em; white-space: nowrap;
+}
+.rf-topbar .rf-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--rf-green); }
+
+/* ---------- Sidebar ---------- */
+.rf-side {
+  position: fixed; top: var(--rf-bar); bottom: 0; left: 0; z-index: 30;
+  width: var(--rf-side);
+  display: flex; flex-direction: column;
+  padding: 12px 10px;
+  overflow-y: auto; overscroll-behavior: contain;
+  background: var(--rf-paper);
+  border-right: 1px solid var(--rf-line);
+}
+.rf-side nav.rf-nav { display: flex; flex-direction: column; gap: 0; flex-wrap: nowrap; }
+.rf-side .rf-group {
+  margin: 12px 10px 4px; padding-top: 10px; border-top: 1px solid var(--rf-line);
+  color: #8a959f; font: 500 10px var(--rf-mono); letter-spacing: .12em; text-transform: uppercase;
+}
+.rf-side .rf-group:first-child { margin-top: 2px; padding-top: 0; border-top: 0; }
+.rf-side nav.rf-nav a.rf-link {
+  position: relative; display: flex; align-items: center; gap: 9px;
+  margin: 1px 0; padding: 5px 8px;
+  border: 1px solid transparent; border-radius: 9px; background: transparent;
+  color: var(--rf-ink2); text-decoration: none;
+  font-size: 12px; font-weight: 600; line-height: 1.25;
+}
+.rf-side nav.rf-nav a.rf-link:hover { background: #f7f8f9; border-color: var(--rf-line); }
+.rf-side .rf-ico {
+  display: grid; place-items: center; flex-shrink: 0;
+  width: 24px; height: 24px; border-radius: 7px;
+  background: #f2f4f6; font-size: 14px; line-height: 1;
+}
+.rf-side nav.rf-nav a.rf-link.is-active {
+  background: var(--rf-accent-soft); border-color: transparent;
+  color: var(--rf-accent-ink); font-weight: 750;
+}
+.rf-side nav.rf-nav a.rf-link.is-active::before {
+  content: ""; position: absolute; left: -10px; top: 7px; bottom: 7px; width: 3px;
+  border-radius: 0 3px 3px 0; background: var(--rf-accent);
+}
+.rf-side nav.rf-nav a.rf-link.is-active .rf-ico { background: #ffe1cc; }
+.rf-side .rf-side-foot {
+  margin-top: auto; padding: 14px 10px 6px; border-top: 1px solid var(--rf-line);
+  color: var(--rf-muted); font-size: 11px; line-height: 1.5;
+}
+.rf-side .rf-side-foot strong { display: block; margin-bottom: 4px; color: var(--rf-ink2); font-size: 12px; }
+
+.rf-scrim { display: none; }
+
+/* ---------- Content area: same offset, padding and width on every page ---------- */
+body.rf-page > main {
+  display: block;
+  margin: 0 auto 0 var(--rf-side);
+  width: auto; max-width: 1620px; min-width: 0;
+  min-height: calc(100vh - var(--rf-bar));
+  padding: clamp(22px, 3.2vw, 46px) clamp(16px, 3.4vw, 48px) 56px !important;
+}
+body.rf-page > main:focus { outline: none; }
+
+/* ---------- Shared page hero, eyebrow, badge and notice (same on every page) ---------- */
+body.rf-page main .workspace { max-width: none; margin: 0; }
+body.rf-page main .eyebrow {
+  font-family: var(--rf-mono); font-weight: 600; text-transform: uppercase;
+}
+body.rf-page main .page-head {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; flex-wrap: wrap;
+  max-width: none;
+}
+body.rf-page main .page-head h1 { margin: 7px 0 9px !important; }
+body.rf-page main .page-head p { margin: 0; }
+body.rf-page main .head-badge {
+  white-space: nowrap; padding: 10px 14px; font-size: 12px; font-weight: 700;
+}
+body.rf-page main .notice { margin-bottom: 18px; color: #78510a; }
+/* icon + text layout only when the notice is built from child blocks (home, OSINT, Scraping, personality labs) */
+body.rf-page main .notice:has(> div) { display: flex; gap: 11px; }
+body.rf-page main .notice:has(> div) strong { display: block; margin-bottom: 2px; }
+body.rf-page main .notice:has(> div) p { margin: 0; font-size: 12px; }
+body.rf-page main .notice > div:first-child:not(:last-child) { flex-shrink: 0; }
+/* panel headers: one heading/subheading scale everywhere */
+body.rf-page main .panel-head h2, body.rf-page main .ph h2 { margin: 0; font-size: 16px; }
+body.rf-page main .panel-head p, body.rf-page main .ph p { margin: 4px 0 0; color: #72758a; font-size: 12px; line-height: 1.5; }
+
+/* ---------- Page-level tab strip (used by multi-section labs such as OPS) ---------- */
+body.rf-page main .tabs {
+  display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 20px; padding: 0 0 14px;
+  border-bottom: 1px solid var(--rf-line);
+}
+body.rf-page main .tabs .tab {
+  border: 1px solid var(--rf-line); border-radius: 12px; background: #fff; color: var(--rf-ink2);
+  padding: 8px 10px; font-weight: 700; font-size: 12.5px; cursor: pointer;
+}
+body.rf-page main .tabs .tab:hover { border-color: rgba(237, 106, 36, .4); }
+body.rf-page main .tabs .tab.active {
+  background: var(--rf-accent-soft); border-color: rgba(237, 106, 36, .58); color: var(--rf-accent-ink);
+}
+
+/* ---------- Narrow screens: sidebar becomes a drawer ---------- */
+@media (max-width: 900px) {
+  .rf-topbar { padding: 0 13px; gap: 10px; }
+  .rf-topbar .rf-menu-btn { display: inline-grid; place-items: center; }
+  .rf-topbar .rf-brand { flex: 1; }
+  .rf-topbar .rf-brand-text strong { font-size: 14px; }
+  .rf-topbar .rf-brand-text small { font-size: 10px; }
+  .rf-topbar .rf-top-actions .rf-pill + .rf-pill { display: none; }
+  .rf-side {
+    width: min(86vw, 320px); transform: translateX(-102%); transition: transform .2s ease;
+    box-shadow: none; z-index: 60;
+  }
+  body.rf-nav-open .rf-side { transform: none; box-shadow: 0 0 40px rgba(23, 32, 44, .25); }
+  .rf-scrim {
+    position: fixed; inset: var(--rf-bar) 0 0 0; z-index: 50;
+    background: rgba(23, 32, 44, .42);
+  }
+  body.rf-nav-open .rf-scrim { display: block; }
+  body.rf-nav-open { overflow: hidden; }
+  body.rf-page > main { margin-left: 0; padding: 18px 13px 40px !important; }
+  body.rf-page main .page-head { flex-direction: column; align-items: flex-start; }
+  body.rf-page main .head-badge { display: none; }
+}
+@media (max-width: 520px) {
+  .rf-topbar .rf-top-actions { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rf-side, .rf-skip { transition: none; }
+}
+@media print {
+  .rf-topbar, .rf-side, .rf-scrim, .rf-skip { display: none !important; }
+  body.rf-page > main { margin: 0; padding: 0 !important; }
+}

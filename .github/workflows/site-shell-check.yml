@@ -1,0 +1,38 @@
+name: Site Shell Consistency Check
+on:
+  push:
+    branches: [main]
+    paths:
+      - "*.html"
+      - "sandbox-shell.css"
+      - "sandbox-shell.js"
+      - "redmark-revamp.css"
+      - "personality-studio.css"
+      - "tools/**"
+      - "tests/site-shell-check.mjs"
+      - ".github/workflows/site-shell-check.yml"
+  pull_request:
+    paths:
+      - "*.html"
+      - "sandbox-shell.css"
+      - "sandbox-shell.js"
+      - "redmark-revamp.css"
+      - "personality-studio.css"
+      - "tools/**"
+      - "tests/site-shell-check.mjs"
+      - ".github/workflows/site-shell-check.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify every page uses the shared shell
+        run: node tests/site-shell-check.mjs

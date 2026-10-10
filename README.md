@@ -53,6 +53,16 @@ This repository includes a GitHub Actions workflow that publishes the static sit
 Open **index.html** directly for most features. Some browser APIs, especially Web Crypto and clipboard access, work only on HTTPS or localhost.
 
 
+## Shared page shell (one UI for every destination)
+
+Every page uses the same topbar, grouped sidebar, skip link, mobile drawer, page hero, notice and panel styling. The pieces are:
+
+- `sandbox-shell.css` / `sandbox-shell.js` — chrome, tokens and the mobile drawer.
+- `redmark-revamp.css` — shared content styling (hero card, panels, forms, buttons, tables).
+- `tools/apply-shell.mjs` — the single registry of the 20 destinations; it writes the topbar/sidebar and the shared `<head>` tags (title format, favicon, fonts, stylesheets) into every page.
+
+To add a page, create the HTML (`<body>` + one `<main>`), add one line to `DESTINATIONS` in `tools/apply-shell.mjs`, then run `node tools/apply-shell.mjs`. `node tests/site-shell-check.mjs` (also run in CI) fails if any page drifts from the shell, if a page is missing from the registry, or if legacy navigation reappears.
+
 ## Independent studios
 
 The sidebar links to additional standalone tools, each implemented in its own HTML page with its own CSS and JavaScript. They do not import the Steganography Studio runtime or depend on a shared application state:
