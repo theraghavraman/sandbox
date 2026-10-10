@@ -13,6 +13,7 @@ A browser-first research workspace containing **14 independent destinations**: t
 - **Metadata / structure inspector** with basic signatures and SHA-256.
 - **Visible image watermarking**.
 - Browser-local processing; no app backend or file upload endpoint.
+- **Keyed multi-bit LSB, LSB analyzer, WAV LSB, hidden-data hunter, variation-selector text and Shamir secret sharing** (see the catalog below).
 - Responsive layout and a one-item sidebar.
 
 ## Two different workflows
@@ -65,28 +66,35 @@ The sidebar links to three additional standalone tools, each implemented in its 
 Each studio owns its page, styles, controls, state and algorithms. No new studio imports or mutates another studio's JavaScript. Navigation links are the only integration point; each studio can be revised independently by editing its own HTML file. Keep shared shell/navigation changes separate from tool logic. All three run in the browser and do not upload evidence or images to a service. These are research/learning tools; output is heuristic and not a substitute for professional forensic workflows or actual social-platform testing.
 
 
-## The 13 independent destinations
+## The independent destinations
 
-The original Steganography Studio remains intact as its own page. Twelve additional research studios are linked from the sidebar and have standalone HTML pages:
+The Steganography Studio and RedmarkShare are standalone pages, and twelve research studios are linked from the sidebar. Each has its own HTML page. Every studio keeps its original tools and adds the following.
 
-- **Digital Forensics Studio** (`forensics.html`): file signatures, entropy, SHA-256/SHA-384, hex viewer and search, printable strings, end-marker/trailing-data heuristics, multi-file CSV inventory, JSON reports and byte comparison.
-- **Cryptography Lab** (`cryptography.html`): AES-256-GCM text/file encryption, PBKDF2-SHA-256 passphrase derivation, SHA-256/384/512, HMAC-SHA-256, secure random bytes, hex and Base64 conversion.
-- **Image Forensics Studio** (`image-forensics.html`): dimensions, partial JPEG EXIF, SHA-256, RGB/luminance statistics, histogram, recompression-difference visualization and aligned pixel comparison.
-- **Entropy & Information Studio** (`entropy-information.html`): Shannon entropy, frequency tables, information limits, redundancy, gzip size estimates, byte-bigram counts and first-order conditional entropy.
-- **Audio Signal Studio** (`audio-signal.html`): browser audio decoding/playback, waveform/spectrum, peak/RMS/zero-crossing metrics, trim, normalization, PCM WAV export, tone generation and biquad filtering.
-- **Protocol & Packet Lab** (`protocol-packet.html`): offline classic-PCAP Ethernet parser, IPv4/IPv6 and TCP/UDP/ICMP headers, DNS/HTTP indicators, filtering, packet details and CSV/JSON export. PCAPNG and live capture are not supported.
-- **Visual Encoding Studio** (`visual-encoding.html`): RVE1 pixel-image payload encoding with length/CRC, recovery from compatible PNGs, red-channel bit-plane visualization and binary/hex/Base64/Morse/Braille representations.
-- **Binary Diff Studio** (`binary-diff.html`): file hashes, exact equality, length delta, aligned byte differences, common prefix/suffix, changed ranges, hex windows and CSV/JSON reports.
-- **Data Sonification Studio** (`data-sonification.html`): text/file to FSK audio WAV, compatible WAV decoding, byte-to-pitch melody generation and WAV metadata inspection.
-- **File Format Explorer** (`file-format-explorer.html`): signature identification and parsers for PNG/JPEG/PDF/ZIP/RIFF/MP4/ELF/PE/SQLite and more, structure offsets, printable strings, hex slices and JSON reports.
-- **Error Correction Studio** (`error-correction.html`): Hamming (7,4), repetition ×3/×5/×7, raw baseline, random/burst noise, BER, CRC-32, Monte Carlo and BER sweeps.
-- **Robustness Testing Studio** (`robustness.html`): image transforms, PNG/JPEG/WebP output, MAE/PSNR/approximate SSIM, histograms, LSB probe recovery and batch stress profiles.
+- **Steganography Studio** (`index.html`): the original PNG LSB, appended-payload, zero-width, metadata, watermark, Secure File Share and Social Signal tools, plus:
+  - **Keyed LSB:** any image to lossless PNG, 1–4 bits per channel, channel selection, optional AES-GCM encryption and a passphrase-keyed pixel scatter. Extraction auto-detects the settings.
+  - **LSB analyzer:** bit-plane viewer, RS analysis and chi-square pairs-of-values test, cover-versus-stego PSNR and difference map, and a raw bit extractor with a zsteg-style auto-scan.
+  - **Audio LSB:** hide data in 8/16/24-bit PCM WAV, with SNR reporting.
+  - **Hidden-data hunter:** trailing data and embedded signatures in PNG/JPEG/GIF/ZIP/PDF; hide and reveal payloads in a private PNG chunk, JPEG comments or a ZIP comment.
+  - **Variation-selector text** hiding, with an invisible-character audit.
+  - **Shamir K-of-N** secret sharing.
+- **Digital Forensics Studio** (`forensics.html`): signature triage, entropy and entropy map, hashes, hex viewer and search, strings, end-marker checks, file carving, IOC extractor, XOR probe, multi-hash lab, multi-file inventory, byte comparison and case report.
+- **Cryptography Lab** (`cryptography.html`): AES-256-GCM, PBKDF2/HKDF/scrypt, passphrase generator and strength, RSA/ECDSA/ECDH/Ed25519 with PEM and hybrid file encryption, MD5/SHA-1/SHA-2/SHA-3/CRC, encodings, classical ciphers, TOTP, JWT and X.509/ASN.1 inspectors, Shamir sharing and an AES mode/tamper lab.
+- **Image Forensics Studio** (`image-forensics.html`): metadata and JPEG quality estimation, error-level analysis, noise-consistency map, bit-plane viewer with LSB chi-square steganalysis, copy-move detector, SSIM/PSNR/perceptual-hash similarity.
+- **Entropy & Information Studio** (`entropy-information.html`): Shannon entropy and frequency tables, a randomness test battery, context-order models, Huffman lab, divergence and language identification, and an information calculator.
+- **Audio Signal Studio** (`audio-signal.html`): playback, waveform and spectrum, spectrogram, EBU R128 loudness with true peak, YIN pitch, WAV LSB steganalysis and embedding, effects chain with undo, generators, DTMF/FSK/Morse encode and decode.
+- **Protocol & Packet Lab** (`protocol-packet.html`): classic PCAP and PCAPNG reading, layered dissection (Ethernet/VLAN/ARP/IPv4/IPv6/TCP/UDP/ICMP/DNS/DHCP/NTP/TLS/HTTP and cleartext mail/FTP), checksum verification, conversations, security findings, application-layer views, TCP stream following with HTTP object extraction, a packet builder with PCAP writer, and a hex dissector.
+- **Visual Encoding Studio** (`visual-encoding.html`): RVE1 pixel payloads, QR encoder and reader with damage test, EAN/UPC/ISBN barcodes, colour-grid codec, identicon/randomart, invisible-text steganography and audit, a magic decoder, 1-bit/ASCII/Braille art and a raw pixel byte reader.
+- **Binary Diff Studio** (`binary-diff.html`): hashes, equality, insert/delete-aware edit script, verifiable binary patches, bit-level change analysis, changed ranges, hex windows, text line diff and CSV/JSON reports.
+- **Data Sonification Studio** (`data-sonification.html`): a modem test bench (BFSK/4-FSK/DBPSK with CRC-32, FEC and a channel simulator), series sonifier, picture/text to spectrogram sound, RIFF chunk inspector and file listening.
+- **File Format Explorer** (`file-format-explorer.html`): deep decoders for PNG, JPEG with EXIF, GIF, ZIP, PDF, WAV, MP4, ELF, PE and SQLite, CRC validation, anomaly findings and a coverage map.
+- **Error Correction Studio** (`error-correction.html`): Reed–Solomon lab with file protect and repair, convolutional/Viterbi shootout, interleaving versus bursts, CRC/checksum lab, SECDED extended Hamming, plus the original Hamming/repetition tools and Monte Carlo sweeps.
+- **Robustness Testing Studio** (`robustness.html`): image transforms and re-encoding, quality metrics, a fragile-versus-robust embedding matrix (LSB against keyed spread spectrum across 23 transforms), watermark detector, quality sweep and two-image diff.
 
 ### Isolation contract
 
-Every studio owns its HTML page, styles, controls, state and algorithms. The pages do not import or mutate another studio's JavaScript; navigation is the integration layer. A feature change should normally touch only that studio's page. The root sidebar and README are shared shell/documentation, so navigation or catalog edits may touch them without changing tool algorithms. Browser processing is the default; no tool uploads evidence to a service.
+Every studio owns its HTML page, styles, controls, state and algorithms. The pages do not import or mutate another studio's JavaScript; navigation is the integration layer. A feature change should normally touch only that studio's page. The root sidebar and README are shared shell and documentation, so navigation or catalog edits may touch them without changing tool algorithms. Browser processing is the default; no tool uploads evidence to a service.
 
-These tools are experimental. Signature and image-forensics indicators are heuristic; the packet parser is limited to classic Ethernet PCAP; audio codecs depend on browser support; FSK and pixel encodings can fail after transformations; cryptography relies on Web Crypto and strong passphrases. Review each studio's on-page limitations before using it for sensitive or high-stakes work.
+These tools are experimental. Signature, steganalysis and image-forensics indicators are heuristic; the packet findings are leads, not verdicts; audio codecs depend on browser support; FSK, pixel and LSB encodings fail after lossy transformations; cryptography relies on Web Crypto and strong passphrases. Review each studio's on-page limitations before using it for sensitive or high-stakes work.
 
 ## RedmarkShare — torrent-style P2P sharing
 
@@ -100,8 +108,9 @@ These tools are experimental. Signature and image-forensics indicators are heuri
 - Large-file disk saving requires a browser that supports `showSaveFilePicker` and enough free disk space. This page intentionally avoids a giant in-memory Blob fallback for very large files.
 - This initial version does not guarantee resume after closing/reloading the page, and has not yet been validated with a real >10 GB end-to-end test. Treat it as an experimental implementation until tested across the target browsers and networks.
 - The page loads WebTorrent and QR generation from third-party CDNs. A future production release should pin and self-host audited dependencies and verify tracker availability.
-
-
+- **Torrent toolkit (offline):** creates standard v1 .torrent files and magnet links, inspects any .torrent or magnet, and verifies downloaded files piece by piece against a .torrent. These parts do not need WebTorrent or a network.
+- **Pack & hash:** bundles several files into a stored ZIP, and computes streaming SHA-256 and CRC-32 to compare with the sender's hash.
+- **Connection check:** reports host/STUN/TURN candidate types and measures local WebRTC throughput.
 
 ## OSINT Studio (browser-only)
 
