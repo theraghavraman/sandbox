@@ -77,6 +77,22 @@ Sources for these stack conventions:
 - https://subjectivepersonality.wordpress.com/2021/04/30/the-objective-personality-type-code/
 - https://app.subjectivepersonality.com/analyzer
 
+
+## Input-driven source analysis (first implementation)
+
+The **Analyze Material** tab turns the workspace into an input-driven exploratory report tool. Users can paste text, attempt to fetch a public HTTP(S) URL when its server allows browser CORS access, or upload TXT, Markdown, CSV, JSON, HTML, PDF and DOCX. PDF and DOCX extraction loads third-party browser libraries from a CDN on demand; scanned PDFs without a text layer are not OCR'd by this feature.
+
+The current report generator is deliberately transparent and browser-only:
+- Applies a small, explicit phrase dictionary to the provided text.
+- Shows relative signal counts for OPS function/orientation/animal concepts and selected matching excerpts.
+- Flags possible opposing signal categories as prompts to review, not as actual contradictions.
+- Includes source-length limitations, alternative-explanation questions and interpretation guardrails.
+- Exports the resulting report as a standalone HTML file.
+
+**This is an initial lexical screening tool, not an LLM, full NLP pipeline, personality test or automatic type classifier.** Counts measure matched phrases, not psychological traits, confidence probabilities or validity. A keyword may be quoted, negated, hypothetical or used in a context unrelated to the person's own behaviour; users must inspect each excerpt. URL fetching will often fail for sites that block cross-origin requests, and this implementation intentionally has no server proxy. If a URL cannot be fetched, paste text or upload an authorised copy.
+
+No source text is sent to a backend by the analysis code. The optional PDF.js and Mammoth scripts are fetched from a CDN when those file types are selected. Avoid uploading sensitive/private material without permission, and do not use the output for high-stakes decisions.
+
 ## Evidence and validation policy
 
 1. Every concept should have a source or be marked as a hypothesis.
