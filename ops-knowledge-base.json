@@ -1114,11 +1114,25 @@
         "notes": "First two animals must be one of P/S and one of B/C."
       },
       {
+        "id": "second-animal-component-rule",
+        "name": "Second animal / second savior function link",
+        "status": "research-needed",
+        "coverage": "conflicts with 512 total",
+        "notes": "Requiring the second animal to share the second savior function's orientation component leaves only 256 of the 512 enumerated configurations, and rejects the cited example MF – Ni/Fi – SB/P(C). The workbench therefore shows it as an advisory note, not a validity rule, until a source defines the exact stack-selection rule."
+      },
+      {
         "id": "type-space",
         "name": "Classic type-space arithmetic",
         "status": "testable",
         "coverage": "512 expected",
         "notes": "4 modalities × 32 ordered savior-function pairs × 4 compatible stacks per pair."
+      },
+      {
+        "id": "held-out-evaluation-integrity",
+        "name": "Held-out evaluation integrity checks",
+        "status": "implemented",
+        "coverage": "grouped split + guards",
+        "notes": "Group-level split, near-duplicate removal (cosine >= 0.9), structurally invalid labels excluded, ungrouped rows excluded, synthetic rows blocked, abstentions counted as errors in headline accuracy. Verified by tests/ops-logic-check.mjs including a shuffled-label control."
       },
       {
         "id": "expanded-social-coins",
