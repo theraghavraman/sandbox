@@ -101,3 +101,19 @@ These tools are experimental. Signature and image-forensics indicators are heuri
 - This initial version does not guarantee resume after closing/reloading the page, and has not yet been validated with a real >10 GB end-to-end test. Treat it as an experimental implementation until tested across the target browsers and networks.
 - The page loads WebTorrent and QR generation from third-party CDNs. A future production release should pin and self-host audited dependencies and verify tracker availability.
 
+
+
+## OSINT Studio (browser-only)
+
+`osint.html` adds a standalone OSINT workbench to the Sandbox navigation. It runs in the browser and does not require or use the Local Engine or a backend.
+
+- Public search-query builder for general research, usernames, public documents, mentions and news, with links to search providers.
+- Username search shortcuts for public/indexed web, Reddit, GitHub and YouTube results. These are search links, not automated platform scraping or identity verification.
+- Best-effort public DNS-over-HTTPS and RDAP lookups from the browser, plus a public certificate-transparency search workflow through web search.
+- Local URL structure inspection before opening a URL.
+- Browser-local investigation cases and evidence notes with source URL, timestamps, evidence type and confidence; export to JSON, CSV and Markdown report.
+- Links to the existing Image Forensics, Digital Forensics and File Format Explorer studios rather than duplicating their analysis tools.
+
+### OSINT Studio limitations and privacy
+
+This is a browser-only static application. Cross-origin policy, network filters, endpoint availability and provider rate limits can prevent external lookups. It does not scrape search results, bypass authentication, perform port scans, or guarantee attribution. Search results and correlations are leads, not proof. External providers receive queries when contacted or opened. Case notes use browser localStorage, are not encrypted, do not synchronize between devices, and may be cleared by the browser. Export important work and protect exported files. Use public sources lawfully and avoid collecting sensitive personal information without a legitimate basis.
