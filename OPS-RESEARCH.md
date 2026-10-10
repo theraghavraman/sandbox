@@ -70,7 +70,7 @@ The in-app **Coverage** tab tracks implementation state separately from research
 - Checks that the first two animals consist of one information animal (Blast/Consume) and one energy animal (Play/Sleep).
 - Exhaustive structural enumeration: 32 ordered savior-function pairs × 4 compatible stacks per pair × 4 modality combinations = 512 code configurations.
 
-The enumeration confirms that the implemented rules produce the expected count for this selected public type-code convention. It does **not** demonstrate that OPS is empirically valid, and it is not a claim that all current official checklist revisions or paid material are represented. The 2,048 model remains separately marked as research-needed because the two added social dimensions are not yet operationalised here.
+The enumeration confirms that the implemented rules produce the expected count for this selected public type-code convention. The corpus now distinguishes the two animal-stack selection bits from the descriptive P/S and B/C contrasts, and treats Info/Energy dominance as a derived label. It does **not** demonstrate that OPS is empirically valid, and it is not a claim that all current official checklist revisions or paid material are represented. The 2,048 model remains separately marked as research-needed because the two added social dimensions are not yet operationalised here.
 
 Sources for these stack conventions:
 - https://subjectivepersonality.wordpress.com/foundations/ops-starter-kit/info-vs-energy-dominant/
