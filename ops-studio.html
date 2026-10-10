@@ -130,7 +130,7 @@ main{min-width:0;padding:27px clamp(14px,3vw,42px) 54px;max-width:1550px;width:1
    <div class="panel">
     <div class="panel-head"><div><h2>Corpus & provenance</h2><p class="sub">Import CSV/JSON rows that have text, an OPS label, source metadata and a person/source grouping key.</p></div><span class="pill ok">Browser-only</span></div>
     <p class="sub">Recommended source to investigate: <a href="https://huggingface.co/datasets/ThingsThatDoStuff/aop-dataset-2022-11-10-interview-lines-by-youtube" target="_blank" rel="noopener noreferrer">AOP interview-lines dataset on Hugging Face</a>. Review its dataset card, licensing, annotation method and reuse terms before use. The studio does not copy or redistribute its data.</p>
-    <div class="dropzone"><strong>Import a labelled corpus</strong><p class="sub">CSV or JSON; up to 20,000 rows per import. CSV accepts common OPAI/AOP field names.</p><label class="btn" for="opsCorpusFile">Choose corpus file</label><input id="opsCorpusFile" type="file" accept=".csv,.json,text/csv,application/json" hidden></div>
+    <div class="dropzone"><strong>Import a labelled corpus</strong><p class="sub">CSV or JSON; up to 5,000 rows per import for browser memory safety. CSV accepts common OPAI/AOP field names.</p><label class="btn" for="opsCorpusFile">Choose corpus file</label><input id="opsCorpusFile" type="file" accept=".csv,.json,text/csv,application/json" hidden></div>
     <div class="top-actions" style="margin-top:12px"><button class="btn" id="loadOpsDemo">Load synthetic demo</button><button class="btn" id="exportOpsCorpus">Export normalized corpus</button><button class="btn" id="clearOpsCorpus">Clear corpus</button></div>
     <div id="opsCorpusStatus" class="resultbox" style="margin-top:12px">No corpus loaded. Import a licensed dataset or load the clearly labelled synthetic demo.</div>
     <div class="field" style="margin-top:12px"><label>Expected fields</label><p class="sub">Text: <code>text</code> or <code>transcript</code>; type: <code>ops_type</code>, <code>type</code> or <code>type-128</code>; group: <code>person_id</code>, <code>speaker_id</code>, <code>name</code> or <code>source_id</code>; provenance: source URL/title, license and annotation method. Missing provenance is flagged.</p></div>
@@ -353,7 +353,7 @@ function normalizeOpsRow(row,index){
  const text=firstField(row,["text","transcript","utterance","content","sample"]);
  const type=firstField(row,["ops_type","type-128","type","opsType","full_type","label"]);
  const sourceId=firstField(row,["source_id","video_id","id","line_id","sourceId"]);
- const group=firstField(row,["group_id","person_id","speaker_id","name","person","speaker","source_id","video_id","id"]);
+ const group=firstField(row,["group_id","person_id","name","person","speaker","speaker_id","source_id","video_id","id"]);
  const person=firstField(row,["person_id","name","person","speaker","speaker_id"]);
  const sourceUrl=firstField(row,["source_url","url","video_url","source"]);
  const sourceTitle=firstField(row,["source_title","title","video_title","dataset"]);
@@ -367,7 +367,7 @@ function parseOpsCorpus(raw,filename){
  if(filename.toLowerCase().endsWith(".json")){const data=JSON.parse(raw);rows=Array.isArray(data)?data:(Array.isArray(data.data)?data.data:(Array.isArray(data.rows)?data.rows:null));if(!rows)throw new Error("JSON must contain an array of rows, or a data/rows array.")}
  else rows=csvRows(raw);
  if(!rows.length)throw new Error("No rows were found in this file.");
- const parsed=rows.slice(0,20000).map(normalizeOpsRow).filter(Boolean);
+ const parsed=rows.slice(0,5000).map(normalizeOpsRow).filter(Boolean);
  if(!parsed.length)throw new Error("No usable rows found. Each row needs a text/transcript field and an OPS type label.");
  opsCorpus=parsed;
  opsCorpusMeta={sourceName:filename,sourceUrl:"",license:"Not declared in imported file",annotationMethod:"Not declared in imported file",importedAt:new Date().toISOString(),synthetic:false};
@@ -424,8 +424,8 @@ function opsDimensions(row){
 function scoreOpsQuery(query,rows,k,minSim){
  const usable=rows.map(r=>({...r,dimensions:opsDimensions(r)})).filter(r=>Object.keys(r.dimensions).length&&r.text.length>20);
  if(!usable.length)throw new Error("No rows have parseable OPS labels. Expected examples like MF-Te/Ni-BP/S(C) or MF-Te/Ni-BPSC.");
- const model=buildOpsIdf(usable),q=opsVector(query,model.idf);
- const hits=usable.map(r=>({...r,similarity:opsCosine(q,opsVector(r.text,model.idf))})).filter(r=>r.similarity>=minSim).sort((a,b)=>b.similarity-a.similarity).slice(0,k);
+ const model=buildOpsIdf(usable),q=opsVector(query,model.idf),vectors=usable.map(r=>opsVector(r.text,model.idf));
+ const hits=usable.map((r,i)=>({...r,similarity:opsCosine(q,vectors[i])})).filter(r=>r.similarity>=minSim).sort((a,b)=>b.similarity-a.similarity).slice(0,k);
  const dimensionNames={modality:"Modality",leadFunction:"Lead function",secondFunction:"Second function",observerDecider:"Observer / Decider",diDe:"Di / De orientation",oiOe:"Oi / Oe orientation",animal1:"Animal 1",animal2:"Animal 2",animal3:"Animal 3",animal4:"Animal 4"};
  const dimensions={};
  Object.keys(dimensionNames).forEach(key=>{
@@ -464,8 +464,10 @@ function runOpsEvaluation(){
  const dimensions=["modality","leadFunction","secondFunction","observerDecider","diDe","oiOe","animal1","animal2","animal3","animal4"];
  const totals={},correct={};dimensions.forEach(d=>{totals[d]=0;correct[d]=0});
  let evaluated=0,unknown=0;
+ const trainModel=buildOpsIdf(train),trainVectors=train.map(r=>opsVector(r.text,trainModel.idf));
  test.forEach(row=>{
-  const candidates=train.map(r=>({row:r,sim:opsCosine(opsVector(row.text,buildOpsIdf(train).idf),opsVector(r.text,buildOpsIdf(train).idf))})).sort((a,b)=>b.sim-a.sim).slice(0,5);
+  const q=opsVector(row.text,trainModel.idf);
+  const candidates=train.map((r,i)=>({row:r,sim:opsCosine(q,trainVectors[i])})).sort((a,b)=>b.sim-a.sim).slice(0,5);
   if(!candidates.length||candidates[0].sim<0.02){unknown++;return}evaluated++;
   const votes={};dimensions.forEach(d=>votes[d]={});
   candidates.forEach(c=>{const weight=Math.max(0.001,c.sim);dimensions.forEach(d=>{const label=c.row.dimensions[d];if(label)votes[d][label]=(votes[d][label]||0)+weight})});
