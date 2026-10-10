@@ -223,7 +223,7 @@
       "name": "Information vs Energy dominance",
       "short": "Info / Energy",
       "model": "classic-512",
-      "description": "A framework-level balance distinction based on the animal stack. The classic community explanation associates missing an energy animal with information dominance and missing an information animal with energy dominance.",
+      "description": "A derived distinction associated with the animal stack in the classic community explanation. It is useful to describe a stack, but should not be counted as an additional independent binary coin in the nine-coin / 512 calculation.",
       "values": [
         "Information dominant",
         "Energy dominant"
@@ -232,7 +232,7 @@
         "starter-kit",
         "type-code"
       ],
-      "status": "derived framework distinction"
+      "status": "derived distinction; not an independent tenth classic coin"
     },
     {
       "id": "sensory-modality",
@@ -628,5 +628,215 @@
       "priority": "medium",
       "status": "open"
     }
-  ]
+  ],
+  "coins": [
+    {
+      "id": "coin-gather-organize",
+      "name": "Gather vs Organize",
+      "symbol": "Oe / Oi",
+      "group": "Human needs",
+      "model": "classic-512",
+      "dimensionId": "gather-organize",
+      "independent": true,
+      "summary": "The classic model's observer-side human-need coin: gathering new information (Oe) versus organising/maintaining known information (Oi).",
+      "sourceIds": [
+        "starter-kit"
+      ]
+    },
+    {
+      "id": "coin-self-tribe",
+      "name": "Self vs Tribe",
+      "symbol": "Di / De",
+      "group": "Human needs",
+      "model": "classic-512",
+      "dimensionId": "self-tribe",
+      "independent": true,
+      "summary": "The classic model's decider-side human-need coin: internal identity/reasons (Di) versus external/group calibration (De).",
+      "sourceIds": [
+        "starter-kit"
+      ]
+    },
+    {
+      "id": "coin-observer-decider",
+      "name": "Observer vs Decider",
+      "symbol": "O / D",
+      "group": "Human needs",
+      "model": "classic-512",
+      "dimensionId": "observer-decider",
+      "independent": true,
+      "summary": "The classic model's third human-need coin, used to distinguish which side is treated as the stronger recurring preference.",
+      "sourceIds": [
+        "starter-kit",
+        "official-faq"
+      ]
+    },
+    {
+      "id": "coin-sensing-intuition",
+      "name": "Sensing vs Intuition",
+      "symbol": "S / N",
+      "group": "Letters",
+      "model": "classic-512",
+      "dimensionId": "sensing-intuition",
+      "independent": true,
+      "summary": "Observer-side letter coin used with Oe/Oi to compose the four observer functions.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "coin-thinking-feeling",
+      "name": "Thinking vs Feeling",
+      "symbol": "T / F",
+      "group": "Letters",
+      "model": "classic-512",
+      "dimensionId": "thinking-feeling",
+      "independent": true,
+      "summary": "Decider-side letter coin used with Di/De to compose the four decider functions.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "coin-consume-blast",
+      "name": "Consume vs Blast",
+      "symbol": "C / B",
+      "group": "Animals",
+      "model": "classic-512",
+      "dimensionId": "consume-blast",
+      "independent": true,
+      "summary": "One of the animal distinctions used to construct the classic animal-stack variations.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "coin-play-sleep",
+      "name": "Play vs Sleep",
+      "symbol": "P / S",
+      "group": "Animals",
+      "model": "classic-512",
+      "dimensionId": "play-sleep",
+      "independent": true,
+      "summary": "One of the animal distinctions used to construct the classic animal-stack variations.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "coin-sensory-modality",
+      "name": "Sensory modality",
+      "symbol": "M / F Sensory",
+      "group": "Modalities",
+      "model": "classic-512",
+      "dimensionId": "sensory-modality",
+      "independent": true,
+      "summary": "First modality letter in the common classic type code; technical OPS usage, not gender identity.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "coin-de-modality",
+      "name": "Extroverted-decider modality",
+      "symbol": "M / F De",
+      "group": "Modalities",
+      "model": "classic-512",
+      "dimensionId": "de-modality",
+      "independent": true,
+      "summary": "Second modality letter in the common classic type code; refers to De rather than simply the savior decider.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "derived-info-energy",
+      "name": "Information vs Energy dominance",
+      "symbol": "Info / Energy",
+      "group": "Derived distinction",
+      "model": "classic-512",
+      "dimensionId": "info-energy",
+      "independent": false,
+      "summary": "Represented as a derived distinction associated with the animal stack; do not count it as a tenth independent classic coin.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "coin-social-authority-utility",
+      "name": "Authority vs Utility",
+      "symbol": "A / U",
+      "group": "Expanded social dimensions",
+      "model": "expanded-2048",
+      "dimensionId": "social-authority-utility",
+      "independent": true,
+      "summary": "Additional social dimension in the independent 2,048-configuration model; source and operational definition require further verification.",
+      "sourceIds": [
+        "mahakram-research"
+      ]
+    },
+    {
+      "id": "coin-social-reciprocal-transactional",
+      "name": "Reciprocal-link vs Transactional-spec",
+      "symbol": "R / T",
+      "group": "Expanded social dimensions",
+      "model": "expanded-2048",
+      "dimensionId": "social-reciprocal-transactional",
+      "independent": true,
+      "summary": "Additional social dimension in the independent 2,048-configuration model; source and operational definition require further verification.",
+      "sourceIds": [
+        "mahakram-research"
+      ]
+    }
+  ],
+  "coinArchitecture": {
+    "classicModel": "classic-512",
+    "independentCoinCount": 9,
+    "countCalculation": "3 human-needs + 2 letter + 2 animal + 2 modality coins = 9 independent binary coins; 2^9 = 512",
+    "groups": [
+      {
+        "name": "Human needs",
+        "coinIds": [
+          "coin-gather-organize",
+          "coin-self-tribe",
+          "coin-observer-decider"
+        ]
+      },
+      {
+        "name": "Letters",
+        "coinIds": [
+          "coin-sensing-intuition",
+          "coin-thinking-feeling"
+        ]
+      },
+      {
+        "name": "Animals",
+        "coinIds": [
+          "coin-consume-blast",
+          "coin-play-sleep"
+        ]
+      },
+      {
+        "name": "Modalities",
+        "coinIds": [
+          "coin-sensory-modality",
+          "coin-de-modality"
+        ]
+      }
+    ],
+    "derived": [
+      "derived-info-energy"
+    ],
+    "expandedAddition": [
+      "coin-social-authority-utility",
+      "coin-social-reciprocal-transactional"
+    ],
+    "caveat": "This is a synthesis of the classic model as described by the cited public sources. The exact current official checklist and historical revision boundaries remain an open research question."
+  }
 }
