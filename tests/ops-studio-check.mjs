@@ -49,6 +49,12 @@ for (const stack of kb.validAnimalStacks) {
 }
 assert.ok(html.includes('id="pane-coverage"'), "Coverage report UI must be present");
 assert.ok(html.includes("runExhaustive"), "Exhaustive type-space checker must be present");
+assert.ok(html.includes('id="pane-analyze"'), "Input-driven analysis pane must be present");
+for (const id of ["analysisUrl", "fetchAnalysisUrl", "analysisFile", "analysisText", "runAnalysis", "analysisReport", "exportAnalysisReport"]) assert.ok(html.includes('id="' + id + '"' ) || html.includes(id), "Analysis feature missing: " + id);
+for (const ext of ["pdf", "docx", "html", "csv", "json"]) assert.ok(html.includes('"' + ext + '"' ) || html.includes("." + ext), "Expected source format support: " + ext);
+assert.ok(html.includes("function runInsights()"), "Evidence-led report generator must be present");
+assert.ok(html.includes("phrase matching"), "Report must disclose its transparent lexical matching method");
+assert.ok(html.includes("No source text is sent to a server"), "Privacy behavior must be documented in the UI");
 const animalFor = {"De|Oe":"P","Di|Oi":"S","De|Oi":"B","Di|Oe":"C"};
 const compatiblePairs = [];
 for (const first of kb.functions) for (const second of kb.functions) {
