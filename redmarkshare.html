@@ -239,7 +239,7 @@ $('saveRelay').addEventListener('click',()=>{
 $('testRelay').addEventListener('click',async()=>{
   let cfg; try{cfg=relayFromFields();}catch(e){status('relayStatus',e.message,'warn');return;}
   $('testRelay').disabled=true; status('relayStatus','Testing the relay…');
-  try{ status('relayStatus', await probeRelay(cfg) ? 'Relay works: it accepted these credentials and gave out a relay address.' : 'The relay did not respond with these details. Check the URL, username and credential.', 'ok'); }
+  try{ const ok=await probeRelay(cfg); status('relayStatus', ok ? 'Relay works: it accepted these credentials and gave out a relay address.' : 'The relay did not respond with these details. Check the URL, username and credential.', ok?'ok':'err'); }
   catch(e){ status('relayStatus','Relay test failed: '+(e.message||e),'err'); }
   finally{ $('testRelay').disabled=false; }
 });
