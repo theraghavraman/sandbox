@@ -24,7 +24,7 @@ main{min-width:0;padding:27px clamp(14px,3vw,42px) 54px;max-width:1550px;width:1
 <aside class="side">
  <div class="side-top"><div class="brand">REDMARK FORGE<small>OPS RESEARCH LAB</small></div><a class="back" href="./index.html">← Sandbox</a></div>
  <nav class="side-nav" aria-label="OPS Lab sections">
-  <a class="active" href="#overview" data-tab="overview">Overview</a><a href="#knowledge" data-tab="knowledge">Knowledge Base</a><a href="#builder" data-tab="builder">Type Workbench</a><a href="#map" data-tab="map">Concept Map</a><a href="#cases" data-tab="cases">Evidence Lab</a><a href="#sources" data-tab="sources">Sources & Gaps</a>
+  <a class="active" href="#overview" data-tab="overview">Overview</a><a href="#knowledge" data-tab="knowledge">Knowledge Base</a><a href="#builder" data-tab="builder">Type Workbench</a><a href="#map" data-tab="map">Concept Map</a><a href="#cases" data-tab="cases">Evidence Lab</a><a href="#sources" data-tab="sources">Sources & Gaps</a><a href="#coverage" data-tab="coverage">Coverage</a>
  </nav>
  <div class="side-note">Local-first research workspace.<br>Cases stay in this browser unless exported.<br><br><span class="mono">OPS CORPUS v1.0.0</span></div>
 </aside>
@@ -32,7 +32,7 @@ main{min-width:0;padding:27px clamp(14px,3vw,42px) 54px;max-width:1550px;width:1
  <div class="topline"><div><div class="eyebrow">Research / Model / Compare</div><h1>Objective Personality System</h1><p class="lede">A source-indexed knowledge base and architecture workbench for studying OPS concepts, comparing model versions, constructing exploratory type codes and recording evidence without treating hypotheses as diagnoses.</p></div><div class="top-actions"><button class="btn" id="downloadKb">Download knowledge JSON</button><button class="btn primary" id="exportAll">Export workspace</button><label class="btn" for="importFile">Import workspace</label><input id="importFile" type="file" accept=".json,application/json" hidden></div></div>
  <div class="notice"><strong>Research status, not a verdict.</strong> The official FAQ describes nine binary coins and 512 types. An independent page describes an expanded 11-coin/2,048-configuration model. This lab preserves both claims with provenance; it does not present OPS as a clinically validated diagnostic instrument.</div>
  <div class="stats"><div class="stat"><strong id="statConcepts">—</strong><span>Knowledge entries</span></div><div class="stat"><strong id="statSources">—</strong><span>Sources catalogued</span></div><div class="stat"><strong id="statRules">—</strong><span>Explicit rules</span></div><div class="stat"><strong id="statGaps">—</strong><span>Open research questions</span></div></div>
- <div class="tabs" role="tablist"><button class="tab active" data-tab="overview">Overview</button><button class="tab" data-tab="knowledge">Knowledge Base</button><button class="tab" data-tab="builder">Type Workbench</button><button class="tab" data-tab="map">Concept Map</button><button class="tab" data-tab="cases">Evidence Lab</button><button class="tab" data-tab="sources">Sources & Gaps</button></div>
+ <div class="tabs" role="tablist"><button class="tab active" data-tab="overview">Overview</button><button class="tab" data-tab="knowledge">Knowledge Base</button><button class="tab" data-tab="builder">Type Workbench</button><button class="tab" data-tab="map">Concept Map</button><button class="tab" data-tab="cases">Evidence Lab</button><button class="tab" data-tab="sources">Sources & Gaps</button><button class="tab" data-tab="coverage">Coverage</button></div>
 
  <section class="pane active" id="pane-overview">
   <div class="grid2">
@@ -102,6 +102,14 @@ main{min-width:0;padding:27px clamp(14px,3vw,42px) 54px;max-width:1550px;width:1
   </div>
  </section>
 
+ <section class="pane" id="pane-coverage">
+  <div class="panel"><div class="panel-head"><div><h2>Rule coverage & validation</h2><p class="sub">What is encoded, what is testable, and what remains unverified.</p></div><span class="pill" id="coverageModel">Classic community code</span></div>
+   <div class="stats" id="coverageStats"></div>
+   <div class="notice">Coverage means the studio explicitly implements or tracks a rule. It does not establish that the framework is scientifically valid or that all current official materials have been captured.</div>
+   <div id="coverageList" class="list"></div>
+   <div class="panel" style="margin-top:14px"><div class="panel-head"><div><h3>Exhaustive structural enumeration</h3><p class="sub">Check the classic type-code space against the currently encoded rules.</p></div><button class="btn primary" id="runExhaustive">Run 512-space check</button></div><div id="exhaustiveResult" class="resultbox">Run the check to enumerate compatible function pairs, animal stacks and modality combinations.</div></div>
+  </div>
+ </section>
  <section class="pane" id="pane-sources">
   <div class="grid2">
    <div class="panel"><div class="panel-head"><div><h2>Source library</h2><p class="sub">Open the original material. Source type is explicitly labelled.</p></div></div><input class="search" id="sourceSearch" placeholder="Filter sources…"><div id="sourceList"></div></div>
@@ -157,7 +165,7 @@ function renderModels(){
 function populateBuilder(){
  const functions=KB.functions||[];
  ["leadFn","secondFn"].forEach(id=>{$(id).innerHTML=functions.map(f=>'<option value="'+esc(f.id)+'">'+esc(f.id+" — "+f.name)+'</option>').join("")});
- const animals=["PSBC","PSCB","PBSC","PBCS","PCSB","PCBS","SPBC","SPCB","SBPC","SBCP","SCBP","SCPB","BPSC","BPCS","BSPC","BSCP","BCPS","BCSP","CPSB","CPBS","CSBP","CSPB","CBPS","CBSP"];
+ const animals=KB.validAnimalStacks||["SCBP","SCPB","SBCP","SBPC","PCSB","PCBS","PBSC","PBCS","CSBP","CSPB","CPSB","CPBS","BSCP","BSPC","BPSC","BPCS"];
  $("animalStack").innerHTML=animals.map(a=>'<option value="'+a+'">'+a.slice(0,2)+' / '+a.slice(2)+'</option>').join("");
  $("leadFn").value="Fe";$("secondFn").value="Se";$("animalStack").value="PCSB";
 }
@@ -168,6 +176,7 @@ function validateType(){
  checks.push({ok:!!f1&&!!f2&&f1.axis!==f2.axis,text:"Savior functions use opposite axes (one Observer and one Decider)."});
  checks.push({ok:first!==second,text:"The two selected functions are different."});
  checks.push({ok:stack.length===4&&new Set(stack).size===4&&["P","S","B","C"].every(a=>stack.includes(a)),text:"Animal stack contains P, S, B and C exactly once."});
+ checks.push({ok:(KB.validAnimalStacks||[]).includes(stack),text:"Animal stack is one of the 16 stacks listed by the selected classic community reference."});
  const animalParts={P:["De","Oe"],S:["Di","Oi"],B:["De","Oi"],C:["Di","Oe"]};
  const components=[...(f1?f1.components:[]),...(f2?f2.components:[])];
  const d=components.find(x=>x==="Di"||x==="De"),o=components.find(x=>x==="Oi"||x==="Oe");
@@ -191,6 +200,35 @@ function addToCase(text,code){
  c.observations=c.observations||[];c.hypotheses=c.hypotheses||[];
  if(code&&!c.hypotheses.some(h=>h.code===code))c.hypotheses.push({id:"hyp-"+Date.now(),code,notes:text||"",confidence:$("candidateConfidence").value,created:new Date().toISOString()});
  c.observations.push({id:"obs-"+Date.now(),text:text||"Candidate constructed in the type workbench.",relation:"neutral",candidate:code||"",created:new Date().toISOString()});persistCases();renderCases();renderCaseSelect();
+}
+function renderCoverage(){
+ const report=KB.coverageReport;
+ if(!report){$("coverageList").innerHTML='<div class="empty">Coverage report not loaded.</div>';return}
+ const rows=report.coverage||[];
+ const implemented=rows.filter(x=>x.status==="implemented").length;
+ const pending=rows.filter(x=>x.status==="research-needed").length;
+ $("coverageStats").innerHTML='<div class="stat"><strong>'+rows.length+'</strong><span>Tracked areas</span></div><div class="stat"><strong>'+implemented+'</strong><span>Implemented</span></div><div class="stat"><strong>'+rows.filter(x=>x.status==="testable").length+'</strong><span>Testable claims</span></div><div class="stat"><strong>'+pending+'</strong><span>Research needed</span></div>';
+ $("coverageList").innerHTML=rows.map(x=>'<article class="entry"><div class="meta"><span class="pill '+(x.status==="implemented"?"ok":x.status==="research-needed"?"warn":"")+'">'+esc(x.status)+'</span><span class="pill">'+esc(x.coverage)+'</span></div><h3>'+esc(x.name)+'</h3><p>'+esc(x.notes)+'</p></article>').join("");
+ $("runExhaustive").onclick=runExhaustive;
+}
+function runExhaustive(){
+ const funcs=KB.functions||[],stacks=KB.validAnimalStacks||[];
+ const animalFor={"De|Oe":"P","Di|Oi":"S","De|Oi":"B","Di|Oe":"C"};
+ const validPairs=[];
+ for(const first of funcs)for(const second of funcs){
+  if(first.axis===second.axis||first.id===second.id)continue;
+  const components=[...first.components,...second.components];
+  const d=components.find(x=>x==="Di"||x==="De"),o=components.find(x=>x==="Oi"||x==="Oe");
+  const lead=animalFor[d+"|"+o];
+  const compatible=stacks.filter(stack=>stack[0]===lead);
+  if(lead&&compatible.length===4)validPairs.push({first:first.id,second:second.id,lead,stacks:compatible});
+ }
+ const modalities=["MM","MF","FM","FF"];
+ const total=validPairs.reduce((n,p)=>n+p.stacks.length*modalities.length,0);
+ const allStacksValid=stacks.length===16&&new Set(stacks).size===16&&stacks.every(s=>s.length===4&&new Set(s).size===4&&["P","S","B","C"].every(a=>s.includes(a))&&((["P","S"].includes(s[0])&&["B","C"].includes(s[1]))||(["B","C"].includes(s[0])&&["P","S"].includes(s[1]))));
+ const pairCoverage=validPairs.length===32&&validPairs.every(p=>p.stacks.length===4);
+ const ok=allStacksValid&&pairCoverage&&total===512;
+ $("exhaustiveResult").innerHTML='<div class="meta"><span class="pill '+(ok?"ok":"bad")+'">'+(ok?"PASS":"REVIEW REQUIRED")+'</span><span class="pill">'+total+' generated configurations</span></div><p><strong>Ordered savior-function pairs:</strong> '+validPairs.length+' / 32 expected</p><p><strong>Valid animal stacks:</strong> '+stacks.length+' / 16 expected</p><p><strong>Compatible stacks per function pair:</strong> '+(pairCoverage?"4 each":"unexpected distribution")+'</p><p><strong>Modality combinations:</strong> '+modalities.length+'</p><p class="sub">Calculation: '+validPairs.length+' function pairs × 4 compatible stacks × '+modalities.length+' modalities = '+total+'. This is a structural enumeration of the selected public classic code convention, not a validated psychological taxonomy.</p>';
 }
 function renderCaseSelect(){
  const sel=$("observationCase"),old=sel.value;
@@ -253,7 +291,7 @@ async function init(){
  loadCases();
  try{const r=await fetch("./ops-knowledge-base.json",{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);KB=await r.json()}catch(e){console.warn("Could not load ops-knowledge-base.json",e);$("knowledgeList").innerHTML='<div class="notice">The separate knowledge JSON could not be loaded. Open this page through GitHub Pages or a local HTTP server, rather than file://.</div>'}
  $("statConcepts").textContent=allEntries().length;$("statSources").textContent=KB.sources.length;$("statRules").textContent=KB.rules.length;$("statGaps").textContent=KB.researchQuestions.length;$("corpusVersion").textContent=KB.schemaVersion;
- renderKnowledge();renderSources();renderModels();populateBuilder();renderCases();renderCaseSelect();validateType();
+ renderKnowledge();renderSources();renderModels();renderCoverage();populateBuilder();renderCases();renderCaseSelect();validateType();
  const tab=location.hash.replace("#","");if(tab&&document.querySelector('[data-tab="'+tab+'"]'))showTab(tab);
 }
 init();
