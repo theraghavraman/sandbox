@@ -1,6 +1,6 @@
 # Redmark Forge Sandbox
 
-A browser-first research workspace containing **14 independent destinations**: the original Steganography Studio plus 12 standalone experimental studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
+A browser-first research workspace containing **15 independent destinations**: the original Steganography Studio, RedmarkShare, the OSINT Studio and 12 further standalone experimental studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
 
 ## Features
 
@@ -57,6 +57,7 @@ Open **index.html** directly for most features. Some browser APIs, especially We
 
 The sidebar links to three additional standalone tools, each implemented in its own HTML page with its own CSS and JavaScript. They do not import the Steganography Studio runtime or depend on a shared application state:
 
+- **OSINT Studio** (`osint.html`): browser-only OSINT workbench — query builder, username shortcuts, DNS-over-HTTPS and RDAP lookups, URL inspection and local case notes with export (details in the OSINT section below).
 - **Digital Forensics Studio** (`forensics.html`): signature triage, entropy, SHA-256/SHA-384, hex viewer/search, printable strings, structural end-marker heuristics, multi-file CSV inventory, JSON report and byte comparison. Detailed in-memory analysis is capped at 128 MiB per file.
 - **Error Correction Studio** (`error-correction.html`): Hamming (7,4), repetition ×3/×5/×7 and raw baselines; random/burst noise; BER and coding-rate metrics; CRC-32; bitstream inspection; Monte Carlo trials and BER sweeps.
 - **Robustness Testing Studio** (`robustness.html`): local image resize/crop/rotate/blur/brightness/contrast/noise and PNG/JPEG/WebP encoding; MAE, PSNR and approximate SSIM; luminance histogram; fragile LSB probe survival; batch stress profiles and JSON/CSV reports.
