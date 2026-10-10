@@ -1,0 +1,632 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "Objective Personality System Research Corpus",
+  "created": "2026-10-10",
+  "scope": "Browser-first research and modelling reference. Summaries are paraphrases, not official OPS definitions.",
+  "notice": "OPS is a typology framework, not a clinically validated diagnostic instrument. Distinguish framework claims, secondary explanations, hypotheses and independently validated evidence.",
+  "models": [
+    {
+      "id": "classic-512",
+      "name": "Classic 512-type model",
+      "status": "historical / source-backed baseline",
+      "description": "The official FAQ and several long-running community references describe nine binary coins and 512 possible type combinations. The classic public type code commonly combines two modality letters, two savior functions and an animal stack.",
+      "count": 512,
+      "calculation": "2^9",
+      "sourceIds": [
+        "official-faq",
+        "official-origin",
+        "starter-kit",
+        "type-code"
+      ],
+      "caveat": "Do not assume that every public source uses the same counting convention or the same revision of the checklist."
+    },
+    {
+      "id": "expanded-2048",
+      "name": "Expanded 2,048-configuration claim",
+      "status": "secondary-source claim / requires independent confirmation",
+      "description": "A separate research page describes eleven binary dimensions: nine cognitive coins plus two social dimensions, giving 2,048 configurations. This is represented as a distinct model rather than silently merged into the classic model.",
+      "count": 2048,
+      "calculation": "2^11",
+      "sourceIds": [
+        "mahakram-research"
+      ],
+      "caveat": "The page itself states that there are zero peer-reviewed papers on OPS. Treat the expanded taxonomy and its empirical claims as claims to investigate, not as settled consensus or an official replacement."
+    }
+  ],
+  "sources": [
+    {
+      "id": "official-home",
+      "title": "Objective Personality — official website",
+      "publisher": "Objective Personality",
+      "kind": "primary",
+      "url": "https://www.objectivepersonality.com/",
+      "accessed": "2026-10-10",
+      "notes": "Primary source for the creators' own framing, resources and services. Some learning materials are membership-gated."
+    },
+    {
+      "id": "official-faq",
+      "title": "FAQ — Objective Personality",
+      "publisher": "Objective Personality",
+      "kind": "primary",
+      "url": "https://www.objectivepersonality.com/faq",
+      "accessed": "2026-10-10",
+      "notes": "Describes the creators' independent-operator typing process, nine binary coins, the 512-type space, and their own account of inter-operator agreement. These are claims made by the source, not independent validation."
+    },
+    {
+      "id": "official-origin",
+      "title": "The Beginnings and Origin",
+      "publisher": "Objective Personality",
+      "kind": "primary",
+      "url": "https://www.objectivepersonality.com/stories",
+      "accessed": "2026-10-10",
+      "notes": "Creators' account of the framework's development and their stated rationale for binary dimensions and repeatable typing."
+    },
+    {
+      "id": "starter-kit",
+      "title": "OPS Starter Kit",
+      "publisher": "Subjective Personality",
+      "kind": "secondary community guide",
+      "url": "https://subjectivepersonality.wordpress.com/foundations/ops-starter-kit/",
+      "accessed": "2026-10-10",
+      "notes": "Accessible overview of human-need coins, letters, animals, modalities and the classic 512-type progression. Not the official OPS organisation."
+    },
+    {
+      "id": "type-code",
+      "title": "The Objective Personality Type Code",
+      "publisher": "Subjective Personality",
+      "kind": "secondary community guide",
+      "url": "https://subjectivepersonality.wordpress.com/2021/04/30/the-objective-personality-type-code/",
+      "accessed": "2026-10-10",
+      "notes": "Explains the common code layout, function relationships, animal-stack conventions and examples. Treat as a community explanation of a particular version."
+    },
+    {
+      "id": "analyzer",
+      "title": "OPS Type Analyzer",
+      "publisher": "Subjective Personality",
+      "kind": "community tool",
+      "url": "https://app.subjectivepersonality.com/analyzer",
+      "accessed": "2026-10-10",
+      "notes": "Useful comparative implementation reference for code fields and compatibility warnings. Its existence does not establish scientific validity or official status."
+    },
+    {
+      "id": "mahakram-research",
+      "title": "Research — Mahakram",
+      "publisher": "Mahakram",
+      "kind": "independent research claim",
+      "url": "https://www.mahakram.in/research",
+      "accessed": "2026-10-10",
+      "notes": "Describes an 11-binary-coin, 2,048-configuration model and explicitly notes zero peer-reviewed OPS papers. Store as a separate claim pending verification."
+    },
+    {
+      "id": "subjective-home",
+      "title": "Subjective Personality resources",
+      "publisher": "Subjective Personality",
+      "kind": "secondary community resource",
+      "url": "https://subjectivepersonality.wordpress.com/",
+      "accessed": "2026-10-10",
+      "notes": "Provides a community glossary, type database and explanatory articles. Individual pages may be dated and should be version-labelled."
+    }
+  ],
+  "dimensions": [
+    {
+      "id": "gather-organize",
+      "name": "Gather vs Organize",
+      "short": "Oe / Oi",
+      "model": "classic-512",
+      "description": "The community guide frames this contrast as acquiring new information and variety (Oe) versus organising or stabilising known information (Oi).",
+      "values": [
+        "Oe — Gather",
+        "Oi — Organize"
+      ],
+      "sourceIds": [
+        "starter-kit"
+      ],
+      "status": "framework concept; interpretation varies by source"
+    },
+    {
+      "id": "self-tribe",
+      "name": "Self vs Tribe",
+      "short": "Di / De",
+      "model": "classic-512",
+      "description": "The community guide frames this contrast as prioritising internally owned identity/reasons (Di) versus calibrating decisions around other people or shared group values (De).",
+      "values": [
+        "Di — Self",
+        "De — Tribe"
+      ],
+      "sourceIds": [
+        "starter-kit"
+      ],
+      "status": "framework concept; not a clinical construct"
+    },
+    {
+      "id": "observer-decider",
+      "name": "Observer vs Decider",
+      "short": "O / D",
+      "model": "classic-512",
+      "description": "A framework-level distinction concerning whether observer-side information patterns or decider-side evaluation patterns are treated as the more dominant recurring concern. Exact operationalisation depends on the version/checklist.",
+      "values": [
+        "Observer lead",
+        "Decider lead"
+      ],
+      "sourceIds": [
+        "starter-kit",
+        "official-faq"
+      ],
+      "status": "framework concept; requires a version-specific operational definition"
+    },
+    {
+      "id": "sensing-intuition",
+      "name": "Sensing vs Intuition",
+      "short": "S / N",
+      "model": "classic-512",
+      "description": "Letter distinction used alongside Oe/Oi to describe observer functions. Avoid treating simplified internet descriptions as sufficient typing criteria.",
+      "values": [
+        "Sensing",
+        "Intuition"
+      ],
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ],
+      "status": "framework concept"
+    },
+    {
+      "id": "thinking-feeling",
+      "name": "Thinking vs Feeling",
+      "short": "T / F",
+      "model": "classic-512",
+      "description": "Letter distinction used alongside Di/De to describe decider functions. These labels refer to the framework's function vocabulary, not a claim that a person lacks the opposite capacity.",
+      "values": [
+        "Thinking",
+        "Feeling"
+      ],
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ],
+      "status": "framework concept"
+    },
+    {
+      "id": "consume-blast",
+      "name": "Consume vs Blast",
+      "short": "C / B",
+      "model": "classic-512",
+      "description": "The framework groups these as information animals: taking in/working through information (Consume) and organising/communicating information outward (Blast), according to the community guide.",
+      "values": [
+        "Consume",
+        "Blast"
+      ],
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ],
+      "status": "animal distinction"
+    },
+    {
+      "id": "play-sleep",
+      "name": "Play vs Sleep",
+      "short": "P / S",
+      "model": "classic-512",
+      "description": "The framework groups these as energy animals: interactive engagement (Play) and inward processing/restoration (Sleep), according to community explanations.",
+      "values": [
+        "Play",
+        "Sleep"
+      ],
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ],
+      "status": "animal distinction"
+    },
+    {
+      "id": "info-energy",
+      "name": "Information vs Energy dominance",
+      "short": "Info / Energy",
+      "model": "classic-512",
+      "description": "A framework-level balance distinction based on the animal stack. The classic community explanation associates missing an energy animal with information dominance and missing an information animal with energy dominance.",
+      "values": [
+        "Information dominant",
+        "Energy dominant"
+      ],
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ],
+      "status": "derived framework distinction"
+    },
+    {
+      "id": "sensory-modality",
+      "name": "Sensory modality",
+      "short": "M/F Sensory",
+      "model": "classic-512",
+      "description": "A modality dimension concerning the framework's proposed way of holding or moving sensory information. Masculine/feminine are technical labels in this system and should not be conflated with gender identity.",
+      "values": [
+        "Masculine sensory",
+        "Feminine sensory"
+      ],
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ],
+      "status": "framework claim; operational details vary"
+    },
+    {
+      "id": "de-modality",
+      "name": "Extroverted-decider modality",
+      "short": "M/F De",
+      "model": "classic-512",
+      "description": "A modality dimension applied to the extroverted decider function in the common type code. It is not simply a label for whichever decider function is savior.",
+      "values": [
+        "Masculine De",
+        "Feminine De"
+      ],
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ],
+      "status": "framework claim; operational details vary"
+    },
+    {
+      "id": "social-authority-utility",
+      "name": "Authority vs Utility",
+      "short": "Social coin A/U",
+      "model": "expanded-2048",
+      "description": "An additional social dimension named in the independent 2,048-configuration model. Its operational definition and status should be verified against primary documentation before being used as a validated rule.",
+      "values": [
+        "Authority lead",
+        "Utility lead"
+      ],
+      "sourceIds": [
+        "mahakram-research"
+      ],
+      "status": "secondary-source claim; verify"
+    },
+    {
+      "id": "social-reciprocal-transactional",
+      "name": "Reciprocal-link vs Transactional-spec",
+      "short": "Social coin R/T",
+      "model": "expanded-2048",
+      "description": "An additional social dimension named in the independent 2,048-configuration model. Stored separately from the classic model pending stronger source confirmation.",
+      "values": [
+        "Reciprocal-link",
+        "Transactional-spec"
+      ],
+      "sourceIds": [
+        "mahakram-research"
+      ],
+      "status": "secondary-source claim; verify"
+    }
+  ],
+  "functions": [
+    {
+      "id": "Se",
+      "name": "Extraverted Sensing",
+      "axis": "Observer",
+      "components": [
+        "Oe",
+        "S"
+      ],
+      "summary": "In the OPS/Jung-derived vocabulary, combines outward gathering with sensing. This is a framework description, not a measured cognitive mechanism.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "Si",
+      "name": "Introverted Sensing",
+      "axis": "Observer",
+      "components": [
+        "Oi",
+        "S"
+      ],
+      "summary": "Combines organising/known information with sensing in the framework's function vocabulary.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "Ne",
+      "name": "Extraverted Intuition",
+      "axis": "Observer",
+      "components": [
+        "Oe",
+        "N"
+      ],
+      "summary": "Combines outward gathering with intuition in the framework's function vocabulary.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "Ni",
+      "name": "Introverted Intuition",
+      "axis": "Observer",
+      "components": [
+        "Oi",
+        "N"
+      ],
+      "summary": "Combines organising/known information with intuition in the framework's function vocabulary.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "Te",
+      "name": "Extraverted Thinking",
+      "axis": "Decider",
+      "components": [
+        "De",
+        "T"
+      ],
+      "summary": "Combines tribe/external evaluation with thinking in the framework's function vocabulary.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "Ti",
+      "name": "Introverted Thinking",
+      "axis": "Decider",
+      "components": [
+        "Di",
+        "T"
+      ],
+      "summary": "Combines self/internal evaluation with thinking in the framework's function vocabulary.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "Fe",
+      "name": "Extraverted Feeling",
+      "axis": "Decider",
+      "components": [
+        "De",
+        "F"
+      ],
+      "summary": "Combines tribe/external evaluation with feeling in the framework's function vocabulary.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "Fi",
+      "name": "Introverted Feeling",
+      "axis": "Decider",
+      "components": [
+        "Di",
+        "F"
+      ],
+      "summary": "Combines self/internal evaluation with feeling in the framework's function vocabulary.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    }
+  ],
+  "animals": [
+    {
+      "id": "P",
+      "name": "Play",
+      "group": "Energy",
+      "summary": "Community explanations describe interactive, outward engagement involving observer and decider processes.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "S",
+      "name": "Sleep",
+      "group": "Energy",
+      "summary": "Community explanations describe inward processing and conserving energy.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "B",
+      "name": "Blast",
+      "group": "Information",
+      "summary": "Community explanations describe organising and communicating information outward.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "C",
+      "name": "Consume",
+      "group": "Information",
+      "summary": "Community explanations describe taking in and processing information.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "rule-model-version",
+      "name": "Keep model versions separate",
+      "level": "provenance",
+      "statement": "A type-space size is valid only relative to an explicitly selected model version and its dimension set. Never merge the classic nine-coin description with the expanded eleven-coin claim without documenting the mapping.",
+      "testable": true,
+      "sourceIds": [
+        "official-faq",
+        "mahakram-research"
+      ]
+    },
+    {
+      "id": "rule-functions",
+      "name": "Function composition",
+      "level": "structural",
+      "statement": "The common community model composes observer functions from Oe/Oi plus S/N, and decider functions from Di/De plus T/F.",
+      "testable": true,
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "rule-animal-uniqueness",
+      "name": "Animal stack uniqueness",
+      "level": "structural",
+      "statement": "A complete animal stack, when modelled as a permutation, contains each of P, S, B and C exactly once.",
+      "testable": true,
+      "sourceIds": [
+        "type-code"
+      ]
+    },
+    {
+      "id": "rule-savior-balance",
+      "name": "Classic savior-animal balance",
+      "level": "structural",
+      "statement": "The classic community guide describes the first two savior animals as one energy animal (P/S) and one information animal (B/C). Apply only where the selected type-code convention supports this rule.",
+      "testable": true,
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "id": "rule-evidence",
+      "name": "Conclusions require linked evidence",
+      "level": "research-method",
+      "statement": "Every case hypothesis should link to dated observations, context, alternative explanations and counterevidence. A label or self-description alone is not sufficient evidence in the OPS operator model.",
+      "testable": true,
+      "sourceIds": [
+        "official-faq",
+        "starter-kit"
+      ]
+    },
+    {
+      "id": "rule-confidence",
+      "name": "Confidence is not probability",
+      "level": "research-method",
+      "statement": "The workspace's confidence field is a researcher's confidence in a hypothesis, not a calibrated probability that a type is correct.",
+      "testable": true,
+      "sourceIds": []
+    },
+    {
+      "id": "rule-no-clinical-diagnosis",
+      "name": "No clinical diagnosis",
+      "level": "safety",
+      "statement": "OPS labels must not be used to diagnose mental-health conditions, infer protected traits, or make high-stakes decisions about a person.",
+      "testable": true,
+      "sourceIds": [
+        "official-faq"
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Savior",
+      "definition": "OPS term for a preferred or over-relied-upon side of a dimension, as described by the framework.",
+      "sourceIds": [
+        "starter-kit",
+        "official-origin"
+      ]
+    },
+    {
+      "term": "Demon",
+      "definition": "OPS term for the less-preferred or resisted opposite side of a dimension. It is a framework metaphor, not a moral judgement.",
+      "sourceIds": [
+        "starter-kit",
+        "official-origin"
+      ]
+    },
+    {
+      "term": "Jumper",
+      "definition": "A community term for a type pattern where the usual order of observer/decider saviors is reversed relative to a common MBTI-style expectation. Exact meaning should be checked against the selected version.",
+      "sourceIds": [
+        "starter-kit"
+      ]
+    },
+    {
+      "term": "Type code",
+      "definition": "A compact notation commonly combining modality letters, two savior functions and an animal stack.",
+      "sourceIds": [
+        "type-code",
+        "analyzer"
+      ]
+    },
+    {
+      "term": "Operator typing",
+      "definition": "The official FAQ describes independent operators separately typing the same subject and then comparing their results.",
+      "sourceIds": [
+        "official-faq"
+      ]
+    },
+    {
+      "term": "Cross-check",
+      "definition": "A secondary clue or consistency test used to compare a proposed type against other observations or type components. It is not proof on its own.",
+      "sourceIds": [
+        "official-faq",
+        "starter-kit"
+      ]
+    },
+    {
+      "term": "Modality",
+      "definition": "OPS technical label for a proposed way of handling information. The masculine/feminine terms used by the framework should not be interpreted as a statement about a person's gender identity.",
+      "sourceIds": [
+        "starter-kit",
+        "type-code"
+      ]
+    },
+    {
+      "term": "Animal stack",
+      "definition": "The ordered sequence of Play, Sleep, Blast and Consume in a type code; conventions and compatibility need to be tied to a model version.",
+      "sourceIds": [
+        "type-code",
+        "analyzer"
+      ]
+    }
+  ],
+  "researchQuestions": [
+    {
+      "id": "rq-1",
+      "question": "What is the current official checklist and how has it changed from the published nine-coin description?",
+      "priority": "high",
+      "status": "open"
+    },
+    {
+      "id": "rq-2",
+      "question": "Which exact version defines the commonly cited animal-stack compatibility rules?",
+      "priority": "high",
+      "status": "open"
+    },
+    {
+      "id": "rq-3",
+      "question": "What primary source documents the two additional social coins in the 2,048-configuration model?",
+      "priority": "high",
+      "status": "open"
+    },
+    {
+      "id": "rq-4",
+      "question": "Are published operator-agreement figures independently reproducible with a preregistered protocol and an accessible dataset?",
+      "priority": "high",
+      "status": "open"
+    },
+    {
+      "id": "rq-5",
+      "question": "Which claims about health, genetics, appearance or demographic traits have independent peer-reviewed support?",
+      "priority": "high",
+      "status": "open"
+    },
+    {
+      "id": "rq-6",
+      "question": "What is the reuse/licensing status of individual community diagrams, datasets, celebrity type records and paid training materials?",
+      "priority": "medium",
+      "status": "open"
+    }
+  ]
+}
