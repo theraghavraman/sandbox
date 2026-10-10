@@ -6,6 +6,13 @@
 <section class="panel"><div class="ph"><h2>03 · Bitstream microscope</h2><p>Compare source, encoded, damaged and decoded bit sequences.</p></div><div class="pb"><div class="field"><label for="which">View stream</label><select id="which"><option value="source">Source</option><option value="encoded">Encoded / transmitted</option><option value="damaged">After channel noise</option><option value="decoded">Decoded</option></select></div><div id="stream" class="output">Run a simulation first.</div><div class="hint">Only the first 2,048 bits are displayed. Export contains aggregate metrics and message text, not a forensic proof of communication.</div></div></section>
 <section class="panel"><div class="ph"><h2>04 · Monte Carlo experiment</h2><p>Repeat the current setup across independent random trials.</p></div><div class="pb"><div class="row"><div class="field" style="flex:1"><label for="trials">Trial count</label><select id="trials"><option>25</option><option selected>100</option><option>250</option><option>500</option><option>1000</option></select></div><button class="btn orange" id="monte">Run Monte Carlo</button></div><div id="monteOut" class="status">No trials run yet.</div><div class="hint">For burst channels, the burst location is randomized each trial. Monte Carlo estimates depend on message length and trial count.</div></div></section>
 <section class="panel full"><div class="ph"><h2>05 · BER sweep & coding comparison</h2><p>Compare residual BER at multiple channel noise levels using repeated trials.</p></div><div class="pb"><div class="row"><div class="field" style="flex:1"><label for="sweepTrials">Trials per noise point</label><select id="sweepTrials"><option>10</option><option selected>30</option><option>75</option><option>150</option></select></div><button class="btn orange" id="sweep">Run BER sweep (0–20%)</button></div><canvas id="chart" class="chart" width="900" height="240" aria-label="BER sweep chart"></canvas><div id="sweepOut" class="output">Run a sweep to compare the selected code at 0%, 2%, 4% … 20% bit-flip probability.</div></div></section>
+<!--EXT-PANELS-->
+<section class="panel full"><div class="ph"><h2>06 · Reed–Solomon lab (GF(2⁸), byte symbols)</h2><p>The code behind QR codes, CDs and deep-space links. Encode, damage whole bytes (errors at unknown places, erasures at known places), then decode with Berlekamp–Massey, Chien search and Forney. Guaranteed when 2·errors + erasures ≤ parity bytes.</p></div><div class="pb"><div class="field"><label for="r-msg">Message</label><textarea id="r-msg" style="min-height:60px">Reed–Solomon survives whole bytes lost: Redmark Forge Sandbox.</textarea></div><div class="row"><div class="field" style="width:130px"><label for="r-nsym">Parity bytes</label><select id="r-nsym"><option>4</option><option selected>8</option><option>16</option><option>32</option><option>64</option></select></div><div class="field" style="width:130px"><label for="r-nerr">Unknown errors</label><input id="r-nerr" type="number" min="0" max="64" value="3"></div><div class="field" style="width:130px"><label for="r-nera">Erasures (known)</label><input id="r-nera" type="number" min="0" max="64" value="2"></div><button class="btn orange" id="r-go">Encode → corrupt → decode</button><button class="btn" id="r-cap">Capability cliff test</button></div><div id="r-out" class="output" style="margin-top:8px">Results appear here.</div><h3 style="font-size:13px;margin:14px 0 6px">Protect or repair a file</h3><div class="row"><input id="r-file" type="file"><button class="btn" id="r-prot">Protect (.rsf)</button><button class="btn" id="r-rep">Repair a .rsf</button><button class="btn" id="r-self">Self-test: damage a copy &amp; repair</button></div><div id="r-fout" class="status">Splits the file into RS(255, 255−parity) blocks. A protected file survives up to parity/2 corrupted bytes in every 255-byte block.</div></div></section>
+<section class="panel full"><div class="ph"><h2>07 · Code shootout: convolutional + Viterbi vs block codes</h2><p>Uncoded, repetition ×3, Hamming(7,4), and rate-½ convolutional codes (K=3 octal 7,5 and K=7 octal 171,133) with hard-decision Viterbi decoding, over a binary symmetric channel. Compared per channel bit-flip probability, so lower-rate codes spend more bandwidth.</p></div><div class="pb"><div class="row"><div class="field" style="width:150px"><label for="v-trials">Trials per point (4000 bits)</label><select id="v-trials"><option>2</option><option selected>5</option><option>15</option></select></div><button class="btn orange" id="v-go">Run shootout</button></div><canvas id="v-chart" class="chart" width="900" height="300" aria-label="BER versus channel flip probability for several codes"></canvas><div id="v-out" class="output" style="margin-top:8px">Residual bit error rate (log scale; zero errors are drawn at the 1/(bits tested) floor).</div></div></section>
+<section class="panel"><div class="ph"><h2>08 · Interleaving vs burst errors</h2><p>Hamming(7,4) fixes one error per codeword, so a burst kills it. A block interleaver spreads the burst over many codewords. Uses the message from panel 01.</p></div><div class="pb"><div class="row"><div class="field" style="width:120px"><label for="i-depth">Interleave depth</label><select id="i-depth"><option>1</option><option>4</option><option selected>8</option><option>16</option><option>32</option></select></div><div class="field" style="width:120px"><label for="i-burst">Burst length (bits)</label><input id="i-burst" type="number" min="1" max="200" value="8"></div><button class="btn orange" id="i-go">Compare (300 trials)</button></div><div id="i-out" class="output" style="margin-top:8px">Depth 1 means no interleaving. Bursts up to the depth are fully corrected.</div></div></section>
+<section class="panel"><div class="ph"><h2>09 · Checksum &amp; CRC lab</h2><p>Common CRCs with published check values, Adler-32, Fletcher-16 and the Internet checksum; plus a test of how many corruptions each one misses.</p></div><div class="pb"><div class="field"><label for="k-in">Input (text, or hex if ticked)</label><textarea id="k-in" style="min-height:60px">123456789</textarea></div><div class="row"><label class="hint" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="k-hex"> input is hex</label><button class="btn orange" id="k-go">Compute all</button></div><div id="k-out" class="output" style="margin-top:8px">Results appear here.</div><div class="row" style="margin-top:8px"><div class="field" style="width:190px"><label for="k-alg">Algorithm to stress</label><select id="k-alg"></select></div><div class="field" style="width:100px"><label for="k-bits">Bits flipped</label><input id="k-bits" type="number" min="1" max="64" value="2"></div><div class="field" style="width:120px"><label for="k-kind">Pattern</label><select id="k-kind"><option value="rand">random bits</option><option value="burst">contiguous burst</option></select></div><button class="btn orange" id="k-test">Test 20,000 corruptions</button></div><div id="k-tout" class="status">Counts corruptions that leave the checksum unchanged.</div></div></section>
+<section class="panel full"><div class="ph"><h2>10 · SECDED: extended Hamming, any size</h2><p>Single-error-correct, double-error-detect (as in ECC memory). Choose the number of parity bits r: n = 2ʳ, k = 2ʳ − r − 1. (8,4), (16,11), (32,26), (64,57), (128,120).</p></div><div class="pb"><div class="row"><div class="field" style="width:140px"><label for="h-r">Parity bits r</label><select id="h-r"><option>3</option><option>4</option><option>5</option><option>6</option><option selected>7</option></select></div><div class="field" style="flex:1;min-width:220px"><label for="h-data">Data bits (blank = random)</label><input id="h-data" class="mono" placeholder="e.g. 1011"></div><div class="field" style="width:200px"><label for="h-flip">Flip codeword positions (comma list)</label><input id="h-flip" value="5, 77"></div><button class="btn orange" id="h-go">Encode → flip → decode</button><button class="btn" id="h-all">Exhaustive 1- &amp; 2-bit test</button></div><div id="h-out" class="output" style="margin-top:8px">Results appear here.</div></div></section>
+<!--/EXT-PANELS-->
 </div></main><script>
 (()=>{'use strict';const $=id=>document.getElementById(id);let last=null;
 const enc=new TextEncoder(),dec=new TextDecoder(),crc32=a=>{let c=0xffffffff;for(let b of a){c^=b;for(let j=0;j<8;j++)c=(c>>>1)^((c&1)?0xedb88320:0)}return((c^0xffffffff)>>>0).toString(16).padStart(8,'0')},bitsOf=a=>Array.from(a,b=>b.toString(2).padStart(8,'0')).join(''),fromBits=s=>{let a=new Uint8Array(Math.floor(s.length/8));for(let i=0;i<a.length;i++)a[i]=parseInt(s.slice(i*8,i*8+8),2);return a},say=(s,k='')=>{$('status').textContent=s;$('status').className='status '+k},save=(b,n)=>{let u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
@@ -24,4 +31,134 @@ function draw(points){let c=$('chart'),g=c.getContext('2d'),w=c.width,h=c.height
 $('sweep').onclick=()=>{let n=+$('sweepTrials').value,mode=scheme(),channel=$('channel').value,msg=$('message').value,points=[];for(let j=0;j<=10;j++){let p=j*.02,errors=0,bits=0,success=0;for(let i=0;i<n;i++){let r=transmit(msg,mode,channel,p,+$('burst').value);errors+=r.residualBits;bits+=r.sourceBits;if(r.exact)success++}points.push({p,ber:bits?errors/bits:0,success})}draw(points);$('sweepOut').textContent='Noise probability | Residual BER | Exact recovery\n'+points.map(x=>(x.p*100).toFixed(0)+'% | '+(x.ber*100).toFixed(4)+'% | '+x.success+'/'+n).join('\n');};
 draw([]);run(0,'random');
 })();
-</script></body></html>
+</script><!--EXT-SCRIPT--><script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);const enc=new TextEncoder(),dec=new TextDecoder();
+const hex=a=>Array.from(a,b=>b.toString(16).padStart(2,'0')).join('');
+const ri=n=>Math.floor(Math.random()*n);
+const save=(b,n)=>{const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
+const sample=(n,k)=>{const s=new Set();while(s.size<k)s.add(ri(n));return [...s]};
+/* ---------- GF(256), poly 0x11d ---------- */
+const EXP=new Uint8Array(512),LOG=new Uint8Array(256);{let x=1;for(let i=0;i<255;i++){EXP[i]=x;LOG[x]=i;x<<=1;if(x&256)x^=0x11d}for(let i=255;i<512;i++)EXP[i]=EXP[i-255]}
+const mul=(a,b)=>a&&b?EXP[LOG[a]+LOG[b]]:0,div=(a,b)=>a?EXP[LOG[a]+255-LOG[b]]:0,inv=a=>EXP[255-LOG[a]];
+const gen=ns=>{let g=[1];for(let i=0;i<ns;i++){const n=new Array(g.length+1).fill(0);for(let j=0;j<g.length;j++){n[j]^=g[j];n[j+1]^=mul(g[j],EXP[i])}g=n}return g}; // high-degree first
+const genCache={};const G=ns=>genCache[ns]||(genCache[ns]=gen(ns));
+function rsEnc(msg,ns){const g=G(ns),out=new Uint8Array(msg.length+ns);out.set(msg);for(let i=0;i<msg.length;i++){const c=out[i];if(c)for(let j=1;j<g.length;j++)out[i+j]^=mul(g[j],c)}out.set(msg);return out}
+function synd(c,ns){const s=new Array(ns).fill(0);for(let j=0;j<ns;j++){let y=0;const a=EXP[j];for(let i=0;i<c.length;i++)y=mul(y,a)^c[i];s[j]=y}return s}
+// returns {ok,fixed,positions}
+function rsDec(rx,ns,erasures=[]){const c=Uint8Array.from(rx),n=c.length;erasures.forEach(p=>c[p]=0);let S=synd(c,ns);if(S.every(v=>!v))return{ok:true,data:c.slice(0,n-ns),fixed:0,pos:[]};
+ if(erasures.length>ns)return{ok:false,reason:'more erasures than parity bytes'};
+ // erasure locator (ascending powers)
+ let C=[1];for(const p of erasures){const X=EXP[(n-1-p)%255],N=new Array(C.length+1).fill(0);for(let i=0;i<C.length;i++){N[i]^=C[i];N[i+1]^=mul(C[i],X)}C=N}
+ const rho=erasures.length;let B=C.slice(),L=rho,m=1,b=1;
+ for(let k=rho;k<ns;k++){let d=S[k];for(let i=1;i<=L&&i<C.length;i++)d^=mul(C[i],S[k-i]);
+  if(d===0){m++;continue}
+  const T=C.slice(),coef=div(d,b);while(C.length<B.length+m)C.push(0);for(let i=0;i<B.length;i++)C[i+m]^=mul(coef,B[i]);
+  if(2*L<=k+rho){L=k+1+rho-L;B=T;b=d;m=1}else m++}
+ while(C.length>1&&C[C.length-1]===0)C.pop();
+ const deg=C.length-1;if(deg!==L&&deg>ns)return{ok:false,reason:'locator degree too large'};
+ // Chien search
+ const pos=[];for(let p=0;p<n;p++){const Xi=EXP[(255-((n-1-p)%255))%255];let y=0,xp=1;for(let i=0;i<C.length;i++){y^=mul(C[i],xp);xp=mul(xp,Xi)}if(y===0)pos.push(p)}
+ if(pos.length!==deg)return{ok:false,reason:'uncorrectable: locator roots ≠ degree (too many errors)'};
+ // evaluator Ω = S·Λ mod x^ns
+ const Om=new Array(ns).fill(0);for(let i=0;i<C.length;i++)for(let j=0;j<ns&&i+j<ns;j++)Om[i+j]^=mul(C[i],S[j]);
+ for(const p of pos){const X=EXP[(n-1-p)%255],Xi=inv(X);let om=0,xp=1;for(let i=0;i<ns;i++){om^=mul(Om[i],xp);xp=mul(xp,Xi)}
+  let lp=0;xp=1;for(let i=1;i<C.length;i+=2){lp^=mul(C[i],xp);xp=mul(xp,mul(Xi,Xi))}
+  if(!lp)return{ok:false,reason:'derivative vanished'};c[p]^=mul(X,div(om,lp))}
+ if(synd(c,ns).some(v=>v))return{ok:false,reason:'residual syndrome ≠ 0 (decoding failure)'};
+ return{ok:true,data:c.slice(0,n-ns),fixed:pos.length,pos}}
+/* ---------- RS demo ---------- */
+function rsDemo(){const ns=+$('r-nsym').value,ne=+$('r-nerr').value,nx=+$('r-nera').value;let msg=enc.encode($('r-msg').value);
+ if(msg.length>255-ns)msg=msg.slice(0,255-ns);const cw=rsEnc(msg,ns),n=cw.length;
+ if(ne+nx>n)return $('r-out').textContent='Too many damaged bytes for a '+n+'-byte codeword.';
+ const ps=sample(n,ne+nx),errP=ps.slice(0,ne),erP=ps.slice(ne),rx=Uint8Array.from(cw);
+ errP.forEach(p=>rx[p]^=1+ri(255));erP.forEach(p=>rx[p]=ri(256));
+ const res=rsDec(rx,ns,erP);const ok=res.ok&&res.data.length===msg.length&&res.data.every((v,i)=>v===msg[i]);
+ const budget=2*ne+nx;
+ let o='RS('+n+','+msg.length+') · '+ns+' parity bytes · corrects t = '+(ns>>1)+' unknown errors, or '+ns+' erasures, or any mix with 2e+r ≤ '+ns+'\n'+
+  'damage: '+ne+' errors + '+nx+' erasures → 2e+r = '+budget+(budget<=ns?'  (within guarantee)':'  (BEYOND guarantee)')+'\n\n'+
+  'sent    '+hex(cw)+'\nreceived '+hex(rx)+'\n'+'         '+Array.from(rx,(v,i)=>erP.includes(i)?'XX':errP.includes(i)?'EE':'  ').join('')+'   (EE error, XX erasure)\n\n';
+ if(res.ok){o+=(ok?'✔ decoded exactly':'✘ MISDECODED (wrong data accepted — happens beyond the guarantee)')+' · corrected '+res.fixed+' byte(s) at positions ['+res.pos.sort((a,b)=>a-b).join(', ')+']\n'+(ok?'':'')+'text: '+dec.decode(res.data)}
+ else o+='✘ decoder gave up: '+res.reason;
+ $('r-out').textContent=o}
+function rsCap(){const ns=+$('r-nsym').value,msg=new Uint8Array(40).map(()=>ri(256));const cw=rsEnc(msg,ns);let o='RS('+cw.length+','+msg.length+'), '+ns+' parity bytes. 200 random trials per row (erasures = 0):\n\nerrors | exactly fixed | detected failure | silent miscorrection\n-------+---------------+------------------+---------------------\n';
+ for(let e=0;e<=(ns>>1)+4;e++){let g=0,f=0,w=0;for(let t=0;t<200;t++){const rx=Uint8Array.from(cw);sample(cw.length,e).forEach(p=>rx[p]^=1+ri(255));const r=rsDec(rx,ns);if(!r.ok)f++;else if(r.data.every((v,i)=>v===msg[i]))g++;else w++}
+  o+=String(e).padStart(6)+' | '+String(g).padStart(13)+' | '+String(f).padStart(16)+' | '+String(w).padStart(8)+(e===(ns>>1)?'   ← t: last guaranteed row':'')+'\n'}
+ $('r-out').textContent=o}
+$('r-go').onclick=rsDemo;$('r-cap').onclick=rsCap;
+/* ---------- RS file ---------- */
+const MAG=[0x52,0x53,0x46,0x31];
+function protect(data,ns){const k=255-ns,nb=Math.ceil(data.length/k)||1;const parts=[];for(let b=0;b<nb;b++)parts.push(rsEnc(data.subarray(b*k,(b+1)*k),ns));const tot=parts.reduce((a,p)=>a+p.length,0),out=new Uint8Array(9+tot);out.set(MAG);out[4]=ns;new DataView(out.buffer).setUint32(5,data.length,true);let o=9;parts.forEach(p=>{out.set(p,o);o+=p.length});return out}
+function repair(buf){if(buf.length<9||MAG.some((v,i)=>buf[i]!==v))throw Error('not an RSF1 file');const ns=buf[4],len=new DataView(buf.buffer,buf.byteOffset).getUint32(5,true),k=255-ns;const out=new Uint8Array(len);let o=9,w=0,fixed=0,bad=0,blocks=0;
+ while(w<len){const dl=Math.min(k,len-w),n=dl+ns;if(o+n>buf.length)throw Error('file truncated');const r=rsDec(buf.subarray(o,o+n),ns);blocks++;if(r.ok){out.set(r.data,w);fixed+=r.fixed}else{out.set(buf.subarray(o,o+dl),w);bad++}o+=n;w+=dl}
+ return{out,fixed,bad,blocks,ns}}
+const getFile=async()=>{const f=$('r-file').files[0];if(!f)throw Error('choose a file first');return{f,data:new Uint8Array(await f.arrayBuffer())}};
+const fs=(s,k)=>{$('r-fout').textContent=s;$('r-fout').className='status '+(k||'')};
+$('r-prot').onclick=async()=>{try{const{f,data}=await getFile();const ns=+$('r-nsym').value,p=protect(data,ns);save(new Blob([p]),f.name+'.rsf');fs('Protected '+data.length.toLocaleString()+' B → '+p.length.toLocaleString()+' B (+'+((p.length/Math.max(1,data.length)-1)*100).toFixed(1)+'%), '+ns+' parity bytes per 255-byte block. Survives '+(ns>>1)+' bad bytes per block.','ok')}catch(e){fs(e.message,'err')}};
+$('r-rep').onclick=async()=>{try{const{f,data}=await getFile();const r=repair(data);save(new Blob([r.out]),f.name.replace(/\.rsf$/,'')||'repaired.bin');fs('Repaired '+r.blocks+' block(s): '+r.fixed+' byte(s) corrected, '+r.bad+' block(s) unrecoverable. Parity '+r.ns+'.',r.bad?'warn':'ok')}catch(e){fs(e.message,'err')}};
+$('r-self').onclick=async()=>{try{const{data}=await getFile();const ns=+$('r-nsym').value,p=protect(data,ns),t=ns>>1;const dmg=Uint8Array.from(p);let hit=0;const k=255;for(let o=9;o<dmg.length;o+=k){const n=Math.min(k,dmg.length-o);for(const q of sample(n,Math.min(t,n))){dmg[o+q]^=1+ri(255);hit++}}
+ const r=repair(dmg),same=r.out.length===data.length&&r.out.every((v,i)=>v===data[i]);fs('Corrupted '+hit+' bytes ('+t+' per block, the maximum) → repaired '+r.fixed+' bytes. Result '+(same?'IDENTICAL to the original ✔':'DIFFERENT ✘'),same?'ok':'err')}catch(e){fs(e.message,'err')}};
+/* ---------- bit-level codes for shootout ---------- */
+const par=x=>{x^=x>>16;x^=x>>8;x^=x>>4;x^=x>>2;x^=x>>1;return x&1};
+function ham74Enc(d){const o=[];for(let i=0;i<d.length;i+=4){const c=[0,0,0,d[i],0,d[i+1],d[i+2],d[i+3]];c[1]=c[3]^c[5]^c[7];c[2]=c[3]^c[6]^c[7];c[4]=c[5]^c[6]^c[7];for(let j=1;j<8;j++)o.push(c[j])}return o}
+function ham74Dec(r){const o=[];for(let i=0;i+7<=r.length;i+=7){const c=[0,...r.slice(i,i+7)],s=(c[1]^c[3]^c[5]^c[7])+2*(c[2]^c[3]^c[6]^c[7])+4*(c[4]^c[5]^c[6]^c[7]);if(s)c[s]^=1;o.push(c[3],c[5],c[6],c[7])}return o}
+function convEnc(bits,K,gs){const o=[];let s=0;for(const u of bits.concat(Array(K-1).fill(0))){const reg=(u<<(K-1))|s;for(const g of gs)o.push(par(reg&g));s=reg>>1}return o}
+function viterbi(rx,K,gs){const R=gs.length,S=1<<(K-1),T=rx.length/R;let pm=new Float64Array(S).fill(1e9);pm[0]=0;const prev=new Uint8Array(T*S);
+ const outs=[];for(let s=0;s<S;s++)for(let u=0;u<2;u++){const reg=(u<<(K-1))|s;outs[reg]=gs.map(g=>par(reg&g))}
+ for(let t=0;t<T;t++){const np=new Float64Array(S).fill(1e9);for(let s=0;s<S;s++){if(pm[s]>=1e9)continue;for(let u=0;u<2;u++){const reg=(u<<(K-1))|s,ns=reg>>1;let d=0;const o=outs[reg];for(let r=0;r<R;r++)d+=o[r]!==rx[t*R+r]?1:0;const m=pm[s]+d;if(m<np[ns]){np[ns]=m;prev[t*S+ns]=s}}}pm=np}
+ const bits=new Array(T);let st=0;for(let t=T-1;t>=0;t--){bits[t]=st>>(K-2);st=prev[t*S+st]}return bits.slice(0,T-(K-1))}
+const CODES=[
+ {n:'Uncoded',c:'#73808d',r:1,e:d=>d.slice(),d:r=>r},
+ {n:'Repetition ×3',c:'#2f9e6b',r:1/3,e:d=>d.flatMap(b=>[b,b,b]),d:r=>{const o=[];for(let i=0;i+3<=r.length;i+=3)o.push(r[i]+r[i+1]+r[i+2]>1?1:0);return o}},
+ {n:'Hamming(7,4)',c:'#c68a00',r:4/7,e:ham74Enc,d:ham74Dec},
+ {n:'Conv K=3 (7,5)',c:'#3b7dd8',r:.5,e:d=>convEnc(d,3,[7,5]),d:r=>viterbi(r,3,[7,5])},
+ {n:'Conv K=7 (171,133)',c:'#ed6a24',r:.5,e:d=>convEnc(d,7,[0o171,0o133]),d:r=>viterbi(r,7,[0o171,0o133])}];
+function shoot(){const trials=+$('v-trials').value,N=4000,ps=[.005,.01,.02,.03,.05,.08,.1,.15];const res=CODES.map(()=>[]);
+ for(const p of ps)CODES.forEach((c,ci)=>{let err=0;for(let t=0;t<trials;t++){const d=Array.from({length:N},()=>ri(2)),tx=c.e(d).map(b=>Math.random()<p?b^1:b),rx=c.d(tx);for(let i=0;i<N;i++)if(rx[i]!==d[i])err++}res[ci].push(err/(N*trials))});
+ const cv=$('v-chart'),g=cv.getContext('2d'),w=cv.width,h=cv.height,floor=1/(N*trials),lo=Math.log10(floor)-.2,hi=0;g.clearRect(0,0,w,h);g.font='11px system-ui';g.fillStyle='#66717d';g.strokeStyle='#dfe5e9';
+ const X=i=>50+(w-70)*i/(ps.length-1),Y=v=>10+(h-50)*(hi-Math.log10(Math.max(v,floor)))/(hi-lo);
+ for(let e=0;e>=Math.floor(lo);e--){const y=Y(Math.pow(10,e));g.beginPath();g.moveTo(45,y);g.lineTo(w-10,y);g.stroke();g.fillText('1e'+e,6,y+4)}
+ ps.forEach((p,i)=>g.fillText((p*100)+'%',X(i)-10,h-26));g.fillText('channel bit-flip probability →',w/2-60,h-8);
+ CODES.forEach((c,ci)=>{g.strokeStyle=g.fillStyle=c.c;g.lineWidth=2;g.beginPath();res[ci].forEach((v,i)=>{i?g.lineTo(X(i),Y(v)):g.moveTo(X(i),Y(v))});g.stroke();res[ci].forEach((v,i)=>{g.beginPath();g.arc(X(i),Y(v),3,0,7);g.fill()});g.fillRect(60+ci*150,h-44,10,3);g.fillStyle='#17202c';g.fillText(c.n+' (R='+c.r.toFixed(2)+')',74+ci*150,h-40)});
+ $('v-out').textContent='Residual BER (≈ errors / '+(N*trials).toLocaleString()+' bits; floor '+floor.toExponential(1)+')\n'+'p      '+CODES.map(c=>c.n.padEnd(20)).join('')+'\n'+ps.map((p,i)=>(p*100).toFixed(1).padStart(4)+'%  '+CODES.map((c,ci)=>(res[ci][i]||0).toExponential(2).padEnd(20)).join('')).join('\n')}
+$('v-go').onclick=()=>{$('v-out').textContent='Running…';setTimeout(shoot,30)};
+/* ---------- interleaving ---------- */
+function interleaveTrial(srcBits,D,L){const cw=ham74Enc(srcBits),blk=D*7,pad=(blk-cw.length%blk)%blk,a=cw.concat(Array(pad).fill(0)),tx=new Array(a.length);
+ // rows = codewords (7 bits), transmit column by column
+ for(let b=0;b<a.length;b+=blk)for(let r=0;r<D;r++)for(let c=0;c<7;c++)tx[b+c*D+r]=a[b+r*7+c];
+ const st=ri(Math.max(1,tx.length-L+1));for(let i=st;i<st+L&&i<tx.length;i++)tx[i]^=1;
+ const rx=new Array(a.length);for(let b=0;b<a.length;b+=blk)for(let r=0;r<D;r++)for(let c=0;c<7;c++)rx[b+r*7+c]=tx[b+c*D+r];
+ const d=ham74Dec(rx.slice(0,cw.length));let e=0;for(let i=0;i<srcBits.length;i++)if(d[i]!==srcBits[i])e++;return e}
+$('i-go').onclick=()=>{const bytes=enc.encode($('message').value||'x'),bits=[];bytes.forEach(b=>{for(let i=7;i>=0;i--)bits.push((b>>i)&1)});while(bits.length%4)bits.push(0);
+ const L=+$('i-burst').value,D=+$('i-depth').value,T=300;const run=d=>{let ok=0,errs=0;for(let t=0;t<T;t++){const e=interleaveTrial(bits,d,L);if(!e)ok++;errs+=e}return{ok,errs:errs/T}};
+ const a=run(1),b=run(D);$('i-out').textContent='Message '+bytes.length+' bytes · Hamming(7,4) · burst of '+L+' flipped bits · '+T+' trials\n\ndepth 1 (no interleaving): '+a.ok+'/'+T+' exact · mean wrong bits '+a.errs.toFixed(2)+'\ndepth '+D+':'+' '.repeat(Math.max(1,18-String(D).length))+b.ok+'/'+T+' exact · mean wrong bits '+b.errs.toFixed(2)+'\n\n'+(L<=D?'Burst ≤ depth: each codeword sees at most one flipped bit, so every error is correctable.':'Burst longer than the depth: some codewords see 2+ flips and cannot be corrected. Raise the depth.')+'\nCost: delay of '+D+' codewords ('+D*7+' bits) and no change in code rate.'};
+/* ---------- CRC lab ---------- */
+const rev=(x,w)=>{let r=0;for(let i=0;i<w;i++)if(x&(1<<i))r|=1<<(w-1-i);return r>>>0};
+function crc(data,w,poly,init,refin,refout,xo){const mask=w===32?0xffffffff:(1<<w)-1,top=2**(w-1);let reg=init>>>0;for(let b of data){if(refin)b=rev(b,8);reg=(reg^((b<<(w-8))>>>0))>>>0;for(let i=0;i<8;i++)reg=(((reg&top)?((reg<<1)^poly):(reg<<1))&mask)>>>0;}if(refout)reg=rev(reg,w);return((reg^xo)&mask)>>>0}
+const adler=a=>{let x=1,y=0;for(const b of a){x=(x+b)%65521;y=(y+x)%65521}return((y<<16)|x)>>>0};
+const fletcher=a=>{let x=0,y=0;for(const b of a){x=(x+b)%255;y=(y+x)%255}return(y<<8)|x};
+const inet=a=>{let s=0;for(let i=0;i<a.length;i+=2)s+=(a[i]<<8)|(a[i+1]||0);while(s>>>16)s=(s&0xffff)+(s>>>16);return(~s)&0xffff};
+const ALG=[['CRC-8',8,0x07,0,0,0,0,0xf4],['CRC-8/MAXIM',8,0x31,0,1,1,0,0xa1],['CRC-16/CCITT-FALSE',16,0x1021,0xffff,0,0,0,0x29b1],['CRC-16/XMODEM',16,0x1021,0,0,0,0,0x31c3],['CRC-16/ARC',16,0x8005,0,1,1,0,0xbb3d],['CRC-16/MODBUS',16,0x8005,0xffff,1,1,0,0x4b37],['CRC-32 (zip/png)',32,0x04c11db7,0xffffffff,1,1,0xffffffff,0xcbf43926],['CRC-32C (iSCSI)',32,0x1edc6f41,0xffffffff,1,1,0xffffffff,0xe3069283],['CRC-32/BZIP2',32,0x04c11db7,0xffffffff,0,0,0xffffffff,0xfc891918],['CRC-32/MPEG-2',32,0x04c11db7,0xffffffff,0,0,0,0x0376e6e7]];
+const FUN={};ALG.forEach(a=>FUN[a[0]]=d=>crc(d,a[1],a[2],a[3],a[4],a[5],a[6]));FUN['Adler-32']=adler;FUN['Fletcher-16']=fletcher;FUN['Internet checksum (RFC 1071)']=inet;FUN['XOR of bytes']=d=>d.reduce((a,b)=>a^b,0);FUN['Parity bit']=d=>d.reduce((a,b)=>a^par(b),0);
+const RIN={};ALG.forEach(a=>RIN[a[0]]=a[4]);const WID={'Adler-32':32,'Fletcher-16':16,'Internet checksum (RFC 1071)':16,'XOR of bytes':8,'Parity bit':1};ALG.forEach(a=>WID[a[0]]=a[1]);
+$('k-alg').innerHTML=Object.keys(FUN).map(n=>'<option>'+n+'</option>').join('');
+const kin=()=>{const t=$('k-in').value;if($('k-hex').checked){const h=t.replace(/[^0-9a-f]/gi,'');if(h.length%2)throw Error('odd number of hex digits');return Uint8Array.from(h.match(/../g)||[],x=>parseInt(x,16))}return enc.encode(t)};
+$('k-go').onclick=()=>{try{const d=kin(),chk=enc.encode('123456789');let o='Input: '+d.length+' byte(s)\n\n'+'algorithm'.padEnd(30)+'value        self-test (“123456789”)\n';
+ for(const n in FUN){const v=FUN[n](d),w=WID[n],hx=v.toString(16).padStart(Math.ceil(w/4),'0');const ref=ALG.find(a=>a[0]===n);const st=ref?(FUN[n](chk)===ref[7]?'✔ matches published check '+ref[7].toString(16).padStart(ref[1]/4,'0'):'✘ MISMATCH'):n==='Adler-32'?(adler(chk)===0x091e01de?'✔ matches 091e01de':'✘'):n==='Fletcher-16'?(fletcher(chk)===0x1ede?'✔ matches 1ede':'✘'):'';o+=n.padEnd(30)+hx.padEnd(13)+st+'\n'}$('k-out').textContent=o}catch(e){$('k-out').textContent=e.message}};
+$('k-test').onclick=()=>{try{let d=kin();if(!d.length)d=enc.encode('x');if(d.length>64)d=d.slice(0,64);const n=$('k-alg').value,f=FUN[n],k=Math.min(+$('k-bits').value,d.length*8),kind=$('k-kind').value,T=20000,ref=f(d);let miss=0;
+ for(let t=0;t<T;t++){const x=Uint8Array.from(d);let bits;if(kind==='burst'){const L=k,st=ri(d.length*8-L+1);bits=[st];if(L>1)bits.push(st+L-1);for(let i=1;i<L-1;i++)if(ri(2))bits.push(st+i);bits=bits.map(i=>(i>>3)*8+(RIN[n]===0?7-(i&7):(i&7)))} else bits=sample(d.length*8,k);bits.forEach(b=>x[b>>3]^=1<<(b&7));if(f(x)===ref)miss++}
+ const w=WID[n];$('k-tout').textContent=n+' on '+d.length+' byte(s): '+miss+' of '+T.toLocaleString()+' '+(kind==='burst'?'bursts of length '+k:k+'-bit random corruptions')+' went undetected ('+(100*miss/T).toFixed(3)+'%). Random-error expectation for a '+w+'-bit check ≈ '+(100/Math.pow(2,w)).toPrecision(2)+'%.'+(kind==='burst'&&WID[n]>=k&&n.startsWith('CRC')?' A CRC of width '+w+' detects every burst of length ≤ '+w+' — expect 0.':'');$('k-tout').className='status'}catch(e){$('k-tout').textContent=e.message}};
+/* ---------- SECDED ---------- */
+function secEnc(data,r){const n=1<<r,c=new Array(n).fill(0);let di=0;for(let p=1;p<n;p++)if(p&(p-1))c[p]=data[di++]||0;for(let i=0;i<r;i++){let x=0;for(let p=1;p<n;p++)if((p>>i)&1&&p!==(1<<i))x^=c[p];c[1<<i]=x}c[0]=c.slice(1).reduce((a,b)=>a^b,0);return c}
+function secDec(c,r){const n=1<<r;let s=0,P=0;for(let p=0;p<n;p++){if(c[p]){P^=1;if(p)s^=p}}const o=c.slice();let verdict;if(!s&&!P)verdict={k:'ok',t:'no error detected'};else if(P){const at=s;o[at]^=1;verdict={k:'fix',t:at===0?'single error in the overall parity bit — corrected':'single error at position '+at+' — corrected',at}}else verdict={k:'dbl',t:'double error detected (syndrome '+s+', overall parity even) — NOT correctable'};
+ const d=[];for(let p=1;p<n;p++)if(p&(p-1))d.push(o[p]);return{...verdict,data:d,s,P}}
+$('h-go').onclick=()=>{const r=+$('h-r').value,n=1<<r,k=n-r-1;let ds=$('h-data').value.replace(/[^01]/g,'');const data=Array.from({length:k},(_,i)=>ds.length?+ds[i%ds.length]:ri(2));const cw=secEnc(data,r),rx=cw.slice();const fl=[...new Set($('h-flip').value.split(/[,\s]+/).filter(Boolean).map(Number))].filter(x=>x>=0&&x<n);fl.forEach(p=>rx[p]^=1);const res=secDec(rx,r);const same=res.data.every((v,i)=>v===data[i]);
+ const row=a=>a.join('').replace(/(.{8})/g,'$1 ');
+ $('h-out').textContent='Extended Hamming ('+n+','+k+') · rate '+(k/n).toFixed(3)+' · '+(r+1)+' check bits\n\ndata       '+row(data)+'\ncodeword   '+row(cw)+'\nreceived   '+row(rx)+'\nflipped    ['+fl.join(', ')+']\n\nsyndrome '+res.s+' · overall parity '+(res.P?'odd':'even')+'\n→ '+res.t+'\n'+(res.k==='dbl'?'data recovered: no (decoder refuses to guess)':'data recovered: '+(same?'yes ✔ identical':'NO ✘ — miscorrection (3+ errors look like a single error)'))};
+$('h-all').onclick=()=>{const r=+$('h-r').value,n=1<<r,k=n-r-1,data=Array.from({length:k},()=>ri(2)),cw=secEnc(data,r);let s1=0,s2d=0,s2w=0,tot2=0;
+ for(let a=0;a<n;a++){const x=cw.slice();x[a]^=1;const q=secDec(x,r);if(q.data.every((v,i)=>v===data[i]))s1++;for(let b=a+1;b<n;b++){const y=cw.slice();y[a]^=1;y[b]^=1;const z=secDec(y,r);tot2++;if(z.k==='dbl')s2d++;else s2w++}}
+ let t3=0,m3=0,d3=0;for(let t=0;t<2000;t++){const y=cw.slice();sample(n,3).forEach(p=>y[p]^=1);const z=secDec(y,r);t3++;if(z.k==='dbl')d3++;else if(!z.data.every((v,i)=>v===data[i]))m3++}
+ $('h-out').textContent='SECDED ('+n+','+k+'), exhaustive over every error pattern:\n\n1-bit errors: '+s1+' / '+n+' corrected ('+(100*s1/n).toFixed(1)+'%)\n2-bit errors: '+s2d+' / '+tot2+' flagged as uncorrectable ('+(100*s2d/tot2).toFixed(1)+'%), silently miscorrected: '+s2w+'\n3-bit errors (2,000 random): '+m3+' silently miscorrected, '+d3+' flagged — SECDED only promises to catch up to 2.'};
+})();
+</script><!--/EXT-SCRIPT-->
+</body></html>
