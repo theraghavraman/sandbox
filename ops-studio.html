@@ -228,7 +228,7 @@ function download(name,data,type){const blob=new Blob([data],{type:type||"applic
 function exportWorkspace(){download("ops-research-workspace-"+new Date().toISOString().slice(0,10)+".json",JSON.stringify({exportVersion:1,exportedAt:new Date().toISOString(),knowledgeBase:KB,cases:cases},null,2),"application/json")}
 $("knowledgeSearch").addEventListener("input",renderKnowledge);$("knowledgeKind").addEventListener("change",renderKnowledge);$("knowledgeModel").addEventListener("change",renderKnowledge);$("sourceSearch").addEventListener("input",renderSources);
 function parseCandidateCode(raw){
- const m=String(raw||"").trim().match(/^([MF]{2})\\s*[–-]\\s*([A-Z][a-z])\\s*\\/\\s*([A-Z][a-z])\\s*[–-]\\s*([PSBC]{2})\\s*\\/\\s*([PSBC])\\s*\\(\\s*([PSBC])\\s*\\)$/);
+ const m=String(raw||"").trim().match(/^([MF]{2})\s*[–-]\s*([A-Z][a-z])\s*\/\s*([A-Z][a-z])\s*[–-]\s*([PSBC]{2})\s*\/\s*([PSBC])\s*\(\s*([PSBC])\s*\)$/);
  return m?{modalities:m[1],first:m[2],second:m[3],stack:m[4]+m[5]+m[6]}:null;
 }
 $("compareCandidates").addEventListener("click",()=>{
