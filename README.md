@@ -1,6 +1,6 @@
 # Redmark Forge Sandbox
 
-A browser-first research workspace containing **17 independent destinations**: the original Steganography Studio, RedmarkShare, OSINT Studio, Web Scraping Studio and 13 further standalone research studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
+A browser-first research workspace containing **20 independent destinations**: the original Steganography Studio, RedmarkShare, OSINT Studio, Web Scraping Studio and 13 further standalone research studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
 
 ## Features
 
@@ -164,3 +164,10 @@ Three independent pages are available from the main sidebar:
 - Shared assessment engine: `personality-core.js`. Results are computed in-browser; users can clear answers, export a JSON report, or print/save a PDF. No account, backend, or automatic persistence is used.
 
 **Validity limitation:** These are original mini-questionnaires for education and self-reflection, not official, licensed, normed, or independently validated instruments. Scores are not population percentiles and should not be used for clinical, hiring, or other high-stakes decisions.
+
+
+## Personality studios — research-backed framing
+
+The Big Five, MBTI-style, and DISC studios include an in-page **Research, Method & Provenance** panel and use the shared `personality-core.js` engine. `personality-knowledge-base.json` records source type, links, supported claims, and limits; `PERSONALITY-RESEARCH.md` explains methodology and the validation roadmap. The studios disclose that they are original exploratory mini-questionnaires, not official/normed/validated instruments. Big Five indices are not percentiles; MBTI pair uncertainty is surfaced; DISC forced-choice scores are explicitly ipsative. Research about a model is not treated as validation of this implementation.
+
+Validation: `node tests/personality-studios-check.mjs` checks source provenance, required caveats, page-to-engine wiring, and integrity of the research metadata. It does not validate psychological measurement.
