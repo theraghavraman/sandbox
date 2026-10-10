@@ -58,11 +58,15 @@ Open **index.html** directly for most features. Some browser APIs, especially We
 The sidebar links to additional standalone tools, each implemented in its own HTML page with its own CSS and JavaScript. They do not import the Steganography Studio runtime or depend on a shared application state:
 
 - **OSINT Studio** (`osint.html`): browser-only OSINT workbench — query builder, in-page mini browser, Wikipedia knowledge results, DNS-over-HTTPS and RDAP lookups, URL inspection and local case notes with export. Some websites block iframe embedding, so this is not a full Chrome replacement.
-- **OPS Research Lab:** source-indexed OPS concepts, classic 512-space structural checks, evidence notes, and an input-driven analysis tab for URL/text/file intake and exportable exploratory reports (lexical screening, not automatic personality typing).
+- **OPS Research Lab:** source-indexed OPS concepts, classic 512-space structural checks, evidence notes, and an input-driven analysis tab for URL/text/file intake and exportable exploratory reports (lexical screening, not automatic personality typing). It now also has a **Corpus & Evaluation** tab for provenance-aware CSV/JSON import, local TF-IDF unigram/bigram retrieval, per-dimension similarity-weighted candidate scoring, uncertainty flags, and group-held-out evaluation with accuracy, macro-F1 and majority-class baseline. Synthetic demo examples are excluded from evaluation; imported data stays in browser memory unless exported.
 - **Web Scraping Studio** (`web-scraping.html`): browser-only extraction from uploaded HTML or CORS-permitted public pages; extracts links, headings, table rows, image metadata, page metadata or custom CSS-selector matches; previews results and exports CSV/JSON. It does not execute target-page scripts or bypass access controls.
 - **Digital Forensics Studio** (`forensics.html`): signature triage, entropy, SHA-256/SHA-384, hex viewer/search, printable strings, structural end-marker heuristics, multi-file CSV inventory, JSON report and byte comparison. Detailed in-memory analysis is capped at 128 MiB per file.
 - **Error Correction Studio** (`error-correction.html`): Hamming (7,4), repetition ×3/×5/×7 and raw baselines; random/burst noise; BER and coding-rate metrics; CRC-32; bitstream inspection; Monte Carlo trials and BER sweeps.
 - **Robustness Testing Studio** (`robustness.html`): local image resize/crop/rotate/blur/brightness/contrast/noise and PNG/JPEG/WebP encoding; MAE, PSNR and approximate SSIM; luminance histogram; fragile LSB probe survival; batch stress profiles and JSON/CSV reports.
+
+### OPS corpus provenance caveat
+
+The public [AOP interview-lines dataset](https://huggingface.co/datasets/ThingsThatDoStuff/aop-dataset-2022-11-10-interview-lines-by-youtube) contains OPS-labelled YouTube transcript lines, but its visible dataset card does not declare a license. The app links to it as a research lead; it does not bundle or redistribute the dataset. Check reuse terms with the publisher before importing it. Corpus scores are agreement with provided labels, not proof of psychological validity.
 
 ### Studio isolation contract
 
