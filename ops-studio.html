@@ -70,7 +70,13 @@ main{min-width:0;padding:27px clamp(14px,3vw,42px) 54px;max-width:1550px;width:1
     <div class="field"><label for="builderNotes">Notes / source reference</label><textarea id="builderNotes" placeholder="Why are you considering this configuration? Record observations and source references, not assumptions."></textarea></div>
     <div class="top-actions"><button class="btn primary" id="validateType">Check configuration</button><button class="btn" id="saveCandidate">Save to case notes</button><button class="btn" id="copyType">Copy code</button></div>
    </div>
-   <div class="panel"><div class="panel-head"><div><h2>Configuration report</h2><p class="sub">Basic structure checks only; not proof of a correct type.</p></div></div><div class="resultbox" id="typeResult"><strong>FF – Fe/Se – PC/S(B)</strong><p class="sub">Example format from a secondary community guide.</p></div><div id="typeChecks" class="checklist" style="margin-top:12px"></div><div class="notice" style="margin-top:13px;margin-bottom:0">A syntactically plausible code is not evidence that a person has that type. Use the Evidence Lab to record competing hypotheses and counterexamples.</div></div>
+   <div class="panel"><div class="panel-head"><div><h2>Configuration report</h2><p class="sub">Basic structure checks only; not proof of a correct type.</p></div></div><div class="resultbox" id="typeResult"><strong>FF – Fe/Se – PC/S(B)</strong><p class="sub">Example format from a secondary community guide.</p></div><div id="typeChecks" class="checklist" style="margin-top:12px"></div><div class="notice" style="margin-top:13px;margin-bottom:0">A syntactically plausible code is not evidence that a person has that type. Use the Evidence Lab to record competing hypotheses and counterexamples.</div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+    <h3>Compare two candidates</h3><p class="sub" style="margin-bottom:12px">Compare code components without assuming either candidate is correct.</p>
+    <div class="field"><label for="compareCodeA">Candidate A</label><input id="compareCodeA" placeholder="FF – Fe/Se – PC/S(B)"></div>
+    <div class="field"><label for="compareCodeB">Candidate B</label><input id="compareCodeB" placeholder="MF – Ni/Fi – SB/P(C)"></div>
+    <button class="btn" id="compareCandidates">Compare candidates</button><div id="compareResult" style="margin-top:12px"></div>
+   </div>
   </div>
  </section>
 
@@ -178,6 +184,8 @@ function addToCase(text,code){
  const target=$("observationCase").value;
  let c=cases.find(x=>x.id===target);
  if(!c){c={id:"case-"+Date.now(),name:"Unassigned workbench notes",context:"Created from type workbench",created:new Date().toISOString(),observations:[],hypotheses:[]};cases.unshift(c)}
+ c.observations=c.observations||[];c.hypotheses=c.hypotheses||[];
+ if(code&&!c.hypotheses.some(h=>h.code===code))c.hypotheses.push({id:"hyp-"+Date.now(),code,notes:text||"",created:new Date().toISOString()});
  c.observations.push({id:"obs-"+Date.now(),text:text||"Candidate constructed in the type workbench.",relation:"neutral",candidate:code||"",created:new Date().toISOString()});persistCases();renderCases();renderCaseSelect();
 }
 function renderCaseSelect(){
@@ -188,7 +196,7 @@ function renderCaseSelect(){
 }
 function renderCases(){
  $("caseCount").textContent=cases.length+" cases";
- $("caseList").innerHTML=cases.map(c=>'<article class="case-card"><h3>'+esc(c.name)+'</h3><p>'+esc(c.context||"No context note")+'</p><p>'+c.observations.length+' observations · '+c.hypotheses.length+' saved candidates · created '+esc(new Date(c.created).toLocaleDateString())+'</p>'+(c.observations.length?'<div class="list">'+c.observations.slice().reverse().map(o=>'<div class="entry"><div class="meta"><span class="pill '+(o.relation==="contradicts"?"bad":o.relation==="supports"?"ok":"")+'">'+esc(o.relation)+'</span>'+(o.candidate?'<span class="pill">'+esc(o.candidate)+'</span>':"")+'</div><p>'+esc(o.text)+'</p><p class="src">'+esc(new Date(o.created).toLocaleString())+'</p></div>').join("")+'</div>':"")+'<div class="case-tools"><button class="btn small" data-case-export="'+esc(c.id)+'">Export case</button><button class="btn small" data-case-delete="'+esc(c.id)+'">Delete case</button></div></article>').join("")||'<div class="empty">No cases yet. Create a case to start recording evidence.</div>';
+ $("caseList").innerHTML=cases.map(c=>{c.observations=c.observations||[];c.hypotheses=c.hypotheses||[];return '<article class="case-card"><h3>'+esc(c.name)+'</h3><p>'+esc(c.context||"No context note")+'</p><p>'+c.observations.length+' observations · '+c.hypotheses.length+' saved candidates · created '+esc(new Date(c.created).toLocaleDateString())+'</p>'+(c.hypotheses.length?'<div class="list">'+c.hypotheses.map(h=>'<div class="entry"><div class="meta"><span class="pill warn">Candidate hypothesis</span></div><p><strong class="mono">'+esc(h.code)+'</strong></p>'+(h.notes?'<p>'+esc(h.notes)+'</p>':"")+'</div>').join("")+'</div>':"")+(c.observations.length?'<div class="list">'+c.observations.slice().reverse().map(o=>'<div class="entry"><div class="meta"><span class="pill '+(o.relation==="contradicts"?"bad":o.relation==="supports"?"ok":"")+'">'+esc(o.relation)+'</span>'+(o.candidate?'<span class="pill">'+esc(o.candidate)+'</span>':"")+'</div><p>'+esc(o.text)+'</p><p class="src">'+esc(new Date(o.created).toLocaleString())+'</p></div>').join("")+'</div>':"")+'<div class="case-tools"><button class="btn small" data-case-export="'+esc(c.id)+'">Export case</button><button class="btn small" data-case-delete="'+esc(c.id)+'">Delete case</button></div></article>'}).join("")||'<div class="empty">No cases yet. Create a case to start recording evidence.</div>';
  $("caseList").querySelectorAll("[data-case-export]").forEach(b=>b.onclick=()=>download("ops-case-"+b.dataset.caseExport+".json",JSON.stringify(cases.find(c=>c.id===b.dataset.caseExport),null,2),"application/json"));
  $("caseList").querySelectorAll("[data-case-delete]").forEach(b=>b.onclick=()=>{if(confirm("Delete this local case? Export it first if you need a copy.")){cases=cases.filter(c=>c.id!==b.dataset.caseDelete);persistCases();renderCases();renderCaseSelect()}});
 }
@@ -219,6 +227,16 @@ function drawMap(){
 function download(name,data,type){const blob=new Blob([data],{type:type||"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function exportWorkspace(){download("ops-research-workspace-"+new Date().toISOString().slice(0,10)+".json",JSON.stringify({exportVersion:1,exportedAt:new Date().toISOString(),knowledgeBase:KB,cases:cases},null,2),"application/json")}
 $("knowledgeSearch").addEventListener("input",renderKnowledge);$("knowledgeKind").addEventListener("change",renderKnowledge);$("knowledgeModel").addEventListener("change",renderKnowledge);$("sourceSearch").addEventListener("input",renderSources);
+function parseCandidateCode(raw){
+ const m=String(raw||"").trim().match(/^([MF]{2})\\s*[–-]\\s*([A-Z][a-z])\\s*\\/\\s*([A-Z][a-z])\\s*[–-]\\s*([PSBC]{2})\\s*\\/\\s*([PSBC])\\s*\\(\\s*([PSBC])\\s*\\)$/);
+ return m?{modalities:m[1],first:m[2],second:m[3],stack:m[4]+m[5]+m[6]}:null;
+}
+$("compareCandidates").addEventListener("click",()=>{
+ const a=parseCandidateCode($("compareCodeA").value),b=parseCandidateCode($("compareCodeB").value);
+ if(!a||!b){$("compareResult").innerHTML='<div class="notice">Could not parse one or both codes. Use the common format, for example FF – Fe/Se – PC/S(B).</div>';return}
+ const rows=[["Modalities",a.modalities,b.modalities],["First savior function",a.first,b.first],["Second savior function",a.second,b.second],["Animal stack",a.stack,b.stack]];
+ $("compareResult").innerHTML='<div class="list">'+rows.map(r=>'<div class="entry"><div class="meta"><span class="pill">'+esc(r[0])+'</span><span class="pill '+(r[1]===r[2]?"ok":"warn")+'">'+(r[1]===r[2]?"Same":"Different")+'</span></div><p><strong>A:</strong> '+esc(r[1])+' &nbsp; <strong>B:</strong> '+esc(r[2])+'</p></div>').join("")+'</div><p class="sub">Structural comparison only. No evidence-based type probability is calculated.</p>';
+});
 $("validateType").addEventListener("click",validateType);
 $("copyType").addEventListener("click",()=>{const r=validateType();if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(r.code).then(()=>alert("Code copied.")).catch(()=>prompt("Copy the code:",r.code));else prompt("Copy the code:",r.code)});
 $("saveCandidate").addEventListener("click",()=>{const r=validateType();const note=$("builderNotes").value.trim();addToCase(note||"Candidate generated in the type-code workbench.",r.code)});
