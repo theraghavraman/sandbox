@@ -91,8 +91,7 @@ $('startSeed').addEventListener('click',()=>{
     torrent.on('warning',err=>status('sendStatus','Share warning: '+(err.message||err),'warn'));
     torrent.on('error',err=>{status('sendStatus','Could not create share: '+(err.message||err),'err');$('startSeed').disabled=false;$('stopSeed').disabled=true;});
     client.on('error',err=>{status('sendStatus','WebTorrent client error: '+(err.message||err),'err');$('startSeed').disabled=false;$('stopSeed').disabled=true;});
-    // Also keep the callback for compatibility with WebTorrent versions that signal readiness here.
-    client.seed(file,{name:file.name,announce:trackers},()=>{});
+    // The returned torrent emits infoHash/ready when its magnet URI is available.
   }catch(e){status('sendStatus',e.message||'Could not create share.','err');$('startSeed').disabled=false;$('stopSeed').disabled=true;}
 });
 function updateSeedStats(){if(!seedTorrent)return;$('seedPeers').textContent=seedTorrent.numPeers;$('uploaded').textContent=fmt(seedTorrent.uploaded||0);}
