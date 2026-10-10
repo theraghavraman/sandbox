@@ -140,6 +140,8 @@ This is a browser-only static application. Cross-origin policy, network filters,
 - **Concept map:** interactive SVG map for dimensions, functions, animals, model versions and evidence methodology.
 - **Evidence Lab:** creates local case files, observations, support/contradiction notes and exports. Case data is stored in the current browser's localStorage; export important work and avoid unnecessary personal data.
 - **Research sources and gaps:** links to official OPS material and secondary community references, labels source types, and tracks unresolved questions about current rules, expanded dimensions and independent validation.
+- **Coverage report:** tracks implemented rules versus unresolved claims and includes an exhaustive structural enumeration of the classic public code convention: 32 ordered savior-function pairs × 4 compatible animal stacks × 4 modalities = 512 configurations.
+- **Animal-stack validation:** uses the 16 valid stacks listed by the cited community guide, rather than allowing all 24 mathematical permutations. The source is secondary and version-specific; this is not presented as an official or scientific validation.
 - **Exports:** download the corpus JSON, export the workspace/cases, and import a workspace case list.
 
 ### OPS research limitations
