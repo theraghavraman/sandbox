@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17202c">
+<meta name="description" content="OPS Research Lab: source-indexed knowledge base, type-code workbench, visual map, research notes and evidence cases.">
+<title>OPS Research Lab · Redmark Forge Sandbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17202c;--ink2:#344354;--mute:#697786;--paper:#f5f3ee;--card:#fffefa;--line:#deded7;--orange:#e77b2c;--orange2:#fff0e3;--blue:#315e83;--blue2:#e9f1f7;--green:#2e7357;--green2:#e7f4ec;--red:#a83e35;--red2:#fff0ee;--shadow:0 14px 38px #17202c0b}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Figtree,system-ui,sans-serif;line-height:1.5}a{color:var(--blue)}button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #e77b2c66;outline-offset:2px}
+.shell{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:100vh}.side{background:var(--ink);color:#f7f4ed;padding:22px 15px;display:flex;flex-direction:column;gap:18px}.brand{font-family:"Bricolage Grotesque",sans-serif;font-size:21px;font-weight:800;line-height:1.08}.brand small{display:block;color:#e9a66e;font:600 11px Fira Code,monospace;letter-spacing:.12em;margin-top:8px}.back{color:#d9e1e9;text-decoration:none;font-size:13px}.side-nav{display:flex;flex-direction:column;gap:5px}.side-nav a{color:#d9e1e9;text-decoration:none;padding:9px 10px;border-radius:9px;font-size:13px}.side-nav a.active,.side-nav a:hover{background:#ffffff14;color:white}.side-note{margin-top:auto;color:#b9c5cf;font-size:12px;border-top:1px solid #ffffff22;padding-top:14px}
+main{min-width:0;padding:27px clamp(14px,3vw,42px) 54px;max-width:1550px;width:100%;margin:auto}.topline{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}.eyebrow{font:600 11px Fira Code,monospace;color:var(--orange);text-transform:uppercase;letter-spacing:.12em}h1,h2,h3{font-family:"Bricolage Grotesque",sans-serif;line-height:1.12;margin:0}h1{font-size:clamp(29px,4vw,45px);letter-spacing:-.035em;margin:8px 0 9px}h2{font-size:23px;letter-spacing:-.02em}h3{font-size:16px}.lede{max-width:800px;color:var(--mute);margin:0 0 22px}.top-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:white;color:var(--ink);padding:9px 12px;border-radius:10px;font-weight:700;font-size:12px}.btn.primary{background:var(--orange);border-color:var(--orange);color:#211b16}.btn.dark{background:var(--ink);color:white;border-color:var(--ink)}.btn.small{padding:6px 9px;font-size:11px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:22px 0}.stat,.panel,.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.stat{padding:14px}.stat strong{display:block;font:800 25px "Bricolage Grotesque",sans-serif}.stat span{color:var(--mute);font-size:12px}
+.tabs{display:flex;gap:6px;overflow:auto;padding:5px 0 12px;margin-bottom:9px;border-bottom:1px solid var(--line)}.tab{white-space:nowrap;border:1px solid transparent;background:transparent;padding:9px 12px;border-radius:10px;font-size:13px;font-weight:700;color:var(--mute)}.tab.active{background:var(--ink);color:white}.pane{display:none}.pane.active{display:block}.grid2{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:14px}.panel{padding:18px;min-width:0}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.sub{color:var(--mute);font-size:13px;margin:7px 0 0}.pill{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;background:var(--blue2);color:var(--blue);font-size:11px;font-weight:700}.pill.warn{background:var(--orange2);color:#92501e}.pill.ok{background:var(--green2);color:var(--green)}.pill.bad{background:var(--red2);color:var(--red)}
+.search{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:11px 12px;margin-bottom:12px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.filters select,.field select,.field input,.field textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;background:white;color:var(--ink)}.filters select{width:auto;max-width:100%}.list{display:grid;gap:9px}.entry{border:1px solid var(--line);border-radius:12px;padding:13px;background:#fff}.entry h3{margin:5px 0}.entry p{font-size:13px;color:var(--ink2);margin:6px 0}.entry .meta{display:flex;gap:6px;flex-wrap:wrap}.entry .src{font-size:11px;color:var(--mute)}.entry-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.field{display:grid;gap:6px;margin:0 0 12px}.field label{font-size:12px;font-weight:700;color:var(--ink2)}.field textarea{min-height:95px;resize:vertical}.field small{color:var(--mute);font-size:11px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.notice{border:1px solid #f0c9a7;background:var(--orange2);border-radius:12px;padding:12px 14px;font-size:12px;color:#704019;margin-bottom:14px}.muted{color:var(--mute)}.mono{font-family:"Fira Code",monospace}.resultbox{background:#f3f4f4;border:1px solid var(--line);border-radius:12px;padding:14px;overflow-wrap:anywhere}.resultbox strong{font:700 17px Fira Code,monospace}.checklist{display:grid;gap:7px}.check{display:flex;gap:8px;align-items:flex-start;font-size:13px;padding:8px 10px;border-radius:9px;background:#f4f4f0}.check::before{content:"•";font-size:20px;line-height:14px;color:var(--green)}.check.fail::before{color:var(--red)}.source-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;border-bottom:1px solid var(--line);padding:12px 0}.source-row:last-child{border-bottom:0}.source-row p{margin:5px 0;color:var(--mute);font-size:12px}.source-row a{font-size:12px;overflow-wrap:anywhere}.canvas-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fbfaf7}.canvas-wrap svg{display:block;min-width:700px;width:100%;height:490px}.node{cursor:pointer}.node rect{fill:#fffefa;stroke:#d9d8cf;stroke-width:1.5}.node text{fill:#17202c;font:600 12px Figtree,sans-serif;pointer-events:none}.node:hover rect,.node:focus rect{stroke:#e77b2c;stroke-width:2.5}.legend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.legend span{font-size:11px;padding:4px 8px;border-radius:7px;background:#eee}.case-card{border:1px solid var(--line);padding:12px;border-radius:12px;margin-bottom:9px;background:white}.case-card h3{margin-bottom:6px}.case-card p{font-size:12px;color:var(--mute);margin:4px 0}.case-tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.footer{border-top:1px solid var(--line);margin-top:25px;padding-top:14px;color:var(--mute);font-size:11px}.empty{padding:20px;text-align:center;color:var(--mute);font-size:13px}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.side{padding:12px 14px;gap:10px}.side-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:17px}.brand small{font-size:9px}.side-nav{flex-direction:row;overflow-x:auto}.side-nav a{white-space:nowrap}.side-note{display:none}main{padding-top:18px}.grid2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:14px}}@media(max-width:480px){.formgrid{grid-template-columns:1fr}.stats{gap:7px}.stat{padding:11px}.stat strong{font-size:21px}.top-actions{width:100%}.btn{flex:1}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="side">
+ <div class="side-top"><div class="brand">REDMARK FORGE<small>OPS RESEARCH LAB</small></div><a class="back" href="./index.html">← Sandbox</a></div>
+ <nav class="side-nav" aria-label="OPS Lab sections">
+  <a class="active" href="#overview" data-tab="overview">Overview</a><a href="#knowledge" data-tab="knowledge">Knowledge Base</a><a href="#builder" data-tab="builder">Type Workbench</a><a href="#map" data-tab="map">Concept Map</a><a href="#cases" data-tab="cases">Evidence Lab</a><a href="#sources" data-tab="sources">Sources & Gaps</a>
+ </nav>
+ <div class="side-note">Local-first research workspace.<br>Cases stay in this browser unless exported.<br><br><span class="mono">OPS CORPUS v1.0.0</span></div>
+</aside>
+<main>
+ <div class="topline"><div><div class="eyebrow">Research / Model / Compare</div><h1>Objective Personality System</h1><p class="lede">A source-indexed knowledge base and architecture workbench for studying OPS concepts, comparing model versions, constructing exploratory type codes and recording evidence without treating hypotheses as diagnoses.</p></div><div class="top-actions"><button class="btn" id="downloadKb">Download knowledge JSON</button><button class="btn primary" id="exportAll">Export workspace</button><label class="btn" for="importFile">Import workspace</label><input id="importFile" type="file" accept=".json,application/json" hidden></div></div>
+ <div class="notice"><strong>Research status, not a verdict.</strong> The official FAQ describes nine binary coins and 512 types. An independent page describes an expanded 11-coin/2,048-configuration model. This lab preserves both claims with provenance; it does not present OPS as a clinically validated diagnostic instrument.</div>
+ <div class="stats"><div class="stat"><strong id="statConcepts">—</strong><span>Knowledge entries</span></div><div class="stat"><strong id="statSources">—</strong><span>Sources catalogued</span></div><div class="stat"><strong id="statRules">—</strong><span>Explicit rules</span></div><div class="stat"><strong id="statGaps">—</strong><span>Open research questions</span></div></div>
+ <div class="tabs" role="tablist"><button class="tab active" data-tab="overview">Overview</button><button class="tab" data-tab="knowledge">Knowledge Base</button><button class="tab" data-tab="builder">Type Workbench</button><button class="tab" data-tab="map">Concept Map</button><button class="tab" data-tab="cases">Evidence Lab</button><button class="tab" data-tab="sources">Sources & Gaps</button></div>
+
+ <section class="pane active" id="pane-overview">
+  <div class="grid2">
+   <div class="panel"><div class="panel-head"><div><h2>Research architecture</h2><p class="sub">Trace concepts from source → definition → rule → hypothesis.</p></div><span class="pill ok">Browser-first</span></div>
+    <div class="list">
+     <div class="entry"><div class="meta"><span class="pill">01 · Sources</span><span class="pill">Provenance</span></div><h3>Source catalogue</h3><p>Official creator statements are separated from community guides, community tools and independent claims. Each record has a direct link and notes.</p><button class="btn small" data-go="sources">Open sources</button></div>
+     <div class="entry"><div class="meta"><span class="pill">02 · Domain model</span><span class="pill">Versioned</span></div><h3>Concepts & constraints</h3><p>Functions, animals, dimensions, glossary terms and explicit rules live in a structured JSON corpus. Version conflicts stay visible.</p><button class="btn small" data-go="knowledge">Explore knowledge</button></div>
+     <div class="entry"><div class="meta"><span class="pill">03 · Modelling</span><span class="pill">Exploratory</span></div><h3>Type workbench</h3><p>Compose a candidate code, inspect the selected inputs and see basic checks. This first version is not an exhaustive canonical type enumerator.</p><button class="btn small" data-go="builder">Open workbench</button></div>
+     <div class="entry"><div class="meta"><span class="pill">04 · Evidence</span><span class="pill">Local cases</span></div><h3>Hypotheses with counterevidence</h3><p>Save observations, support/contradict links, alternative interpretations and follow-up questions. Keep confidence distinct from calibrated probability.</p><button class="btn small" data-go="cases">Open evidence lab</button></div>
+    </div>
+   </div>
+   <div class="panel"><div class="panel-head"><div><h2>Model versions</h2><p class="sub">Compare claims without silently merging them.</p></div></div><div id="modelCards" class="list"></div><div class="notice" style="margin-top:12px;margin-bottom:0">Priority gap: verify the current official checklist and exact animal-stack compatibility rules before implementing an exhaustive generator.</div></div>
+  </div>
+ </section>
+
+ <section class="pane" id="pane-knowledge">
+  <div class="panel"><div class="panel-head"><div><h2>Knowledge base</h2><p class="sub">Search the corpus by term, definition, source or model.</p></div><span class="pill" id="knowledgeCount">0 entries</span></div>
+   <input class="search" id="knowledgeSearch" placeholder="Search functions, coins, animals, rules, glossary…" aria-label="Search knowledge base">
+   <div class="filters"><select id="knowledgeKind"><option value="all">All categories</option><option value="dimensions">Dimensions / coins</option><option value="functions">Cognitive functions</option><option value="animals">Animals</option><option value="rules">Rules</option><option value="glossary">Glossary</option><option value="models">Model versions</option></select><select id="knowledgeModel"><option value="all">All model versions</option><option value="classic-512">Classic 512</option><option value="expanded-2048">Expanded 2,048 claim</option></select></div>
+   <div id="knowledgeList" class="list"></div>
+  </div>
+ </section>
+
+ <section class="pane" id="pane-builder">
+  <div class="grid2">
+   <div class="panel"><div class="panel-head"><div><h2>Type-code workbench</h2><p class="sub">Compose and document a candidate. This is not a typing test.</p></div><span class="pill warn">Experimental</span></div>
+    <div class="formgrid">
+     <div class="field"><label for="sensMod">Sensory modality (first code letter)</label><select id="sensMod"><option value="M">M — Masculine sensory</option><option value="F">F — Feminine sensory</option></select></div>
+     <div class="field"><label for="deMod">Extroverted decider modality (second letter)</label><select id="deMod"><option value="M">M — Masculine De</option><option value="F" selected>F — Feminine De</option></select></div>
+     <div class="field"><label for="leadFn">First savior function</label><select id="leadFn"></select></div>
+     <div class="field"><label for="secondFn">Second savior function</label><select id="secondFn"></select></div>
+     <div class="field"><label for="animalStack">Animal stack (four unique animals)</label><select id="animalStack"></select></div>
+     <div class="field"><label for="modelVersion">Interpretation model</label><select id="modelVersion"><option value="classic-512">Classic 512 — community code convention</option><option value="expanded-2048">Expanded 2,048 — dimensions not fully modelled</option></select></div>
+    </div>
+    <div class="field"><label for="builderNotes">Notes / source reference</label><textarea id="builderNotes" placeholder="Why are you considering this configuration? Record observations and source references, not assumptions."></textarea></div>
+    <div class="top-actions"><button class="btn primary" id="validateType">Check configuration</button><button class="btn" id="saveCandidate">Save to case notes</button><button class="btn" id="copyType">Copy code</button></div>
+   </div>
+   <div class="panel"><div class="panel-head"><div><h2>Configuration report</h2><p class="sub">Basic structure checks only; not proof of a correct type.</p></div></div><div class="resultbox" id="typeResult"><strong>FF – Fe/Se – PC/S(B)</strong><p class="sub">Example format from a secondary community guide.</p></div><div id="typeChecks" class="checklist" style="margin-top:12px"></div><div class="notice" style="margin-top:13px;margin-bottom:0">A syntactically plausible code is not evidence that a person has that type. Use the Evidence Lab to record competing hypotheses and counterexamples.</div></div>
+  </div>
+ </section>
+
+ <section class="pane" id="pane-map">
+  <div class="panel"><div class="panel-head"><div><h2>Concept map</h2><p class="sub">A navigable overview of how the corpus groups OPS concepts. Select a node to inspect its record.</p></div><span class="pill">Interactive SVG</span></div><div class="legend"><span>Foundations</span><span>Functions</span><span>Animals</span><span>Model versions</span><span>Method & evidence</span></div><div class="canvas-wrap"><svg id="conceptMap" viewBox="0 0 980 490" role="img" aria-label="Interactive OPS concept map"></svg></div><div id="mapDetail" class="entry" style="margin-top:12px"><h3>Choose a concept</h3><p>Select any node in the map to see its description and source links.</p></div></div>
+ </section>
+
+ <section class="pane" id="pane-cases">
+  <div class="grid2">
+   <div class="panel"><div class="panel-head"><div><h2>Research case files</h2><p class="sub">Stored in this browser only. Use fictional or anonymised labels when possible.</p></div><span class="pill">Local storage</span></div>
+    <div class="field"><label for="caseName">Case label</label><input id="caseName" placeholder="e.g. Case A — interview 01"></div>
+    <div class="field"><label for="caseContext">Context and consent / provenance notes</label><textarea id="caseContext" placeholder="What is the material, where did it come from, and what is the scope of this analysis?"></textarea></div>
+    <button class="btn primary" id="createCase">Create case</button>
+    <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+    <div class="panel-head"><div><h3>Add an observation</h3><p class="sub">Use behavioural descriptions, not trait labels alone.</p></div></div>
+    <div class="field"><label for="observationCase">Case</label><select id="observationCase"></select></div>
+    <div class="field"><label for="observationText">Observation and context</label><textarea id="observationText" placeholder="Describe what happened, when, and in what context. Separate direct observation from interpretation."></textarea></div>
+    <div class="formgrid"><div class="field"><label for="observationRelation">Relation to hypothesis</label><select id="observationRelation"><option value="supports">Supports a candidate</option><option value="contradicts">Contradicts a candidate</option><option value="neutral">Neutral / context only</option></select></div><div class="field"><label for="observationCandidate">Candidate code (optional)</label><input id="observationCandidate" placeholder="e.g. FF – Fe/Se – PC/S(B)"></div></div>
+    <button class="btn" id="addObservation">Add observation</button>
+   </div>
+   <div class="panel"><div class="panel-head"><div><h2>Saved cases</h2><p class="sub">Review observations, alternatives and open questions.</p></div><span class="pill" id="caseCount">0 cases</span></div><div id="caseList" class="list"></div></div>
+  </div>
+ </section>
+
+ <section class="pane" id="pane-sources">
+  <div class="grid2">
+   <div class="panel"><div class="panel-head"><div><h2>Source library</h2><p class="sub">Open the original material. Source type is explicitly labelled.</p></div></div><input class="search" id="sourceSearch" placeholder="Filter sources…"><div id="sourceList"></div></div>
+   <div class="panel"><div class="panel-head"><div><h2>Research gaps</h2><p class="sub">Open questions that prevent overclaiming completeness.</p></div></div><div id="gapList" class="list"></div><div class="notice" style="margin-top:13px;margin-bottom:0">The corpus is a researched starting baseline, not a claim that all OPS material has been captured. Primary sources may be gated, change over time, or not publish enough detail to reproduce every rule.</div></div>
+  </div>
+ </section>
+
+ <div class="footer">OPS Research Lab · Corpus version <span id="corpusVersion">1.0.0</span> · Browser-local workspace · Not affiliated with or endorsed by Objective Personality. <a href="./OPS-RESEARCH.md">Read architecture notes</a>.</div>
+</main>
+</div>
+<script>
+(function(){
+"use strict";
+const FALLBACK={schemaVersion:"1.0.0",models:[],sources:[],dimensions:[],functions:[],animals:[],rules:[],glossary:[],researchQuestions:[]};
+let KB=FALLBACK;
+let cases=[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const allEntries=()=>[
+...KB.dimensions.map(x=>({...x,kind:"dimensions",title:x.name})),
+...KB.functions.map(x=>({...x,kind:"functions",title:x.id+" — "+x.name})),
+...KB.animals.map(x=>({...x,kind:"animals",title:x.id+" — "+x.name})),
+...KB.rules.map(x=>({...x,kind:"rules",title:x.name})),
+...KB.glossary.map(x=>({...x,kind:"glossary",title:x.term})),
+...KB.models.map(x=>({...x,kind:"models",title:x.name}))
+];
+function loadCases(){try{cases=JSON.parse(localStorage.getItem("redmarkOpsCases")||"[]");if(!Array.isArray(cases))cases=[]}catch(e){cases=[]}}
+function persistCases(){try{localStorage.setItem("redmarkOpsCases",JSON.stringify(cases));return true}catch(e){alert("Browser storage is unavailable or full. Export the workspace to preserve your work.");return false}}
+function sourceById(id){return KB.sources.find(s=>s.id===id)}
+function sourceLinks(ids){return (ids||[]).map(id=>{const s=sourceById(id);return s?'<a href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer">'+esc(s.title)+'</a>':""}).filter(Boolean).join(" · ")}
+function showTab(name){document.querySelectorAll("[data-tab]").forEach(el=>el.classList.toggle("active",el.dataset.tab===name));document.querySelectorAll(".pane").forEach(el=>el.classList.toggle("active",el.id==="pane-"+name));if(name==="map")drawMap();if(location.hash!=="#"+name)history.replaceState(null,"","#"+name)}
+document.querySelectorAll("[data-tab]").forEach(el=>el.addEventListener("click",e=>{e.preventDefault();showTab(el.dataset.tab)}));
+document.querySelectorAll("[data-go]").forEach(el=>el.addEventListener("click",()=>showTab(el.dataset.go)));
+function card(entry){const ids=entry.sourceIds||[];return '<article class="entry"><div class="meta"><span class="pill">'+esc(entry.kind||"entry")+'</span>'+(entry.model?'<span class="pill warn">'+esc(entry.model)+'</span>':"")+'</div><h3>'+esc(entry.title||entry.name||entry.id)+'</h3><p>'+esc(entry.description||entry.summary||entry.statement||entry.notes||"")+'</p>'+(entry.status?'<p class="muted"><strong>Status:</strong> '+esc(entry.status)+'</p>':"")+(ids.length?'<div class="src">Sources: '+sourceLinks(ids)+'</div>':"")+'</article>'}
+function renderKnowledge(){
+ const q=$("knowledgeSearch").value.toLowerCase().trim(),kind=$("knowledgeKind").value,model=$("knowledgeModel").value;
+ const filtered=allEntries().filter(x=>(kind==="all"||x.kind===kind)&&(model==="all"||!x.model||x.model===model)&&(!q||[x.title,x.name,x.id,x.description,x.summary,x.statement,x.definition,x.status].join(" ").toLowerCase().includes(q)));
+ $("knowledgeCount").textContent=filtered.length+" entries";
+ $("knowledgeList").innerHTML=filtered.length?filtered.map(card).join(""):'<div class="empty">No entries match this search.</div>';
+}
+function renderSources(){
+ const q=($("sourceSearch")?.value||"").toLowerCase().trim();
+ const rows=KB.sources.filter(s=>!q||[s.title,s.publisher,s.kind,s.notes,s.url].join(" ").toLowerCase().includes(q));
+ $("sourceList").innerHTML=rows.map(s=>'<div class="source-row"><div><strong>'+esc(s.title)+'</strong><p>'+esc(s.publisher)+' · '+esc(s.kind)+' · accessed '+esc(s.accessed||"not recorded")+'</p><p>'+esc(s.notes)+'</p><a href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer">'+esc(s.url)+'</a></div><span class="pill">'+esc(s.kind.split(" ")[0])+'</span></div>').join("")||'<div class="empty">No matching sources.</div>';
+ $("gapList").innerHTML=(KB.researchQuestions||[]).map(g=>'<article class="entry"><div class="meta"><span class="pill warn">'+esc(g.priority)+'</span><span class="pill">'+esc(g.status)+'</span></div><p><strong>'+esc(g.id.toUpperCase())+'</strong> · '+esc(g.question)+'</p></article>').join("");
+}
+function renderModels(){
+ $("modelCards").innerHTML=KB.models.map(m=>'<article class="entry"><div class="meta"><span class="pill">'+esc(m.status)+'</span><span class="pill warn">'+esc(m.calculation)+'</span></div><h3>'+esc(m.name)+'</h3><p>'+esc(m.description)+'</p><p class="src">Count: '+esc(m.count)+' · Sources: '+sourceLinks(m.sourceIds)+'</p><p class="muted">'+esc(m.caveat||"")+'</p></article>').join("");
+}
+function populateBuilder(){
+ const functions=KB.functions||[];
+ ["leadFn","secondFn"].forEach(id=>{$(id).innerHTML=functions.map(f=>'<option value="'+esc(f.id)+'">'+esc(f.id+" — "+f.name)+'</option>').join("")});
+ const animals=["PSBC","PSCB","PBSC","PBCS","PCSB","PCBS","SPBC","SPCB","SBPC","SBCP","SCBP","SCPB","BPSC","BPCS","BSPC","BSCP","BCPS","BCSP","CPSB","CPBS","CSBP","CSPB","CBPS","CBSP"];
+ $("animalStack").innerHTML=animals.map(a=>'<option value="'+a+'">'+a.slice(0,2)+' / '+a.slice(2)+'</option>').join("");
+ $("leadFn").value="Fe";$("secondFn").value="Se";$("animalStack").value="PCSB";
+}
+function validateType(){
+ const mod=$("sensMod").value+$("deMod").value,first=$("leadFn").value,second=$("secondFn").value,stack=$("animalStack").value,model=$("modelVersion").value;
+ const f1=KB.functions.find(f=>f.id===first),f2=KB.functions.find(f=>f.id===second);
+ const checks=[];
+ checks.push({ok:!!f1&&!!f2&&f1.axis!==f2.axis,text:"Savior functions use opposite axes (one Observer and one Decider)."});
+ checks.push({ok:first!==second,text:"The two selected functions are different."});
+ checks.push({ok:stack.length===4&&new Set(stack).size===4&&["P","S","B","C"].every(a=>stack.includes(a)),text:"Animal stack contains P, S, B and C exactly once."});
+ const top=stack.slice(0,2),groups=top.map(a=>(KB.animals.find(x=>x.id===a)||{}).group);
+ checks.push({ok:groups[0]&&groups[1]&&groups[0]!==groups[1],text:"First two animals include one Energy animal (P/S) and one Information animal (B/C), per the classic community convention."});
+ const code=mod+" – "+first+"/"+second+" – "+stack.slice(0,2)+"/"+stack.slice(2,3)+"("+stack.slice(3)+")";
+ $("typeResult").innerHTML="<strong>"+esc(code)+"</strong><p class='sub'>Model: "+esc(model==="classic-512"?"Classic 512":"Expanded 2,048 claim")+". Configuration syntax is a research note, not a verified person-type result.</p><p class='src'>"+esc((f1?f1.summary:"")+" "+(f2?f2.summary:""))+"</p>";
+ $("typeChecks").innerHTML=checks.map(c=>'<div class="check '+(c.ok?"":"fail")+'">'+(c.ok?"PASS":"REVIEW")+" — "+esc(c.text)+'</div>').join("");
+ if(model==="expanded-2048")$("typeChecks").insertAdjacentHTML("beforeend",'<div class="check fail">The expanded model includes two additional social dimensions that this workbench does not yet encode. The displayed code is not a complete 2,048-configuration code.</div>');
+ if(!checks.every(c=>c.ok))$("typeResult").insertAdjacentHTML("beforeend","<p class='muted'>One or more basic checks failed. Review the selected components and the model-specific rules.</p>");
+ return {code,model,checks};
+}
+function addToCase(text,code){
+ const target=$("observationCase").value;
+ let c=cases.find(x=>x.id===target);
+ if(!c){c={id:"case-"+Date.now(),name:"Unassigned workbench notes",context:"Created from type workbench",created:new Date().toISOString(),observations:[],hypotheses:[]};cases.unshift(c)}
+ c.observations.push({id:"obs-"+Date.now(),text:text||"Candidate constructed in the type workbench.",relation:"neutral",candidate:code||"",created:new Date().toISOString()});persistCases();renderCases();renderCaseSelect();
+}
+function renderCaseSelect(){
+ const sel=$("observationCase"),old=sel.value;
+ sel.innerHTML=cases.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join("");
+ if(old&&cases.some(c=>c.id===old))sel.value=old;
+ if(!cases.length)sel.innerHTML='<option value="">Create a case first</option>';
+}
+function renderCases(){
+ $("caseCount").textContent=cases.length+" cases";
+ $("caseList").innerHTML=cases.map(c=>'<article class="case-card"><h3>'+esc(c.name)+'</h3><p>'+esc(c.context||"No context note")+'</p><p>'+c.observations.length+' observations · '+c.hypotheses.length+' saved candidates · created '+esc(new Date(c.created).toLocaleDateString())+'</p>'+(c.observations.length?'<div class="list">'+c.observations.slice().reverse().map(o=>'<div class="entry"><div class="meta"><span class="pill '+(o.relation==="contradicts"?"bad":o.relation==="supports"?"ok":"")+'">'+esc(o.relation)+'</span>'+(o.candidate?'<span class="pill">'+esc(o.candidate)+'</span>':"")+'</div><p>'+esc(o.text)+'</p><p class="src">'+esc(new Date(o.created).toLocaleString())+'</p></div>').join("")+'</div>':"")+'<div class="case-tools"><button class="btn small" data-case-export="'+esc(c.id)+'">Export case</button><button class="btn small" data-case-delete="'+esc(c.id)+'">Delete case</button></div></article>').join("")||'<div class="empty">No cases yet. Create a case to start recording evidence.</div>';
+ $("caseList").querySelectorAll("[data-case-export]").forEach(b=>b.onclick=()=>download("ops-case-"+b.dataset.caseExport+".json",JSON.stringify(cases.find(c=>c.id===b.dataset.caseExport),null,2),"application/json"));
+ $("caseList").querySelectorAll("[data-case-delete]").forEach(b=>b.onclick=()=>{if(confirm("Delete this local case? Export it first if you need a copy.")){cases=cases.filter(c=>c.id!==b.dataset.caseDelete);persistCases();renderCases();renderCaseSelect()}});
+}
+function mapConcepts(){
+ const nodes=[];
+ (KB.models||[]).forEach((m,i)=>nodes.push({id:m.id,label:m.count+" · "+m.name,kind:"Model",desc:m.description,sources:m.sourceIds,x:150+i*330,y:70}));
+ (KB.dimensions||[]).slice(0,10).forEach((d,i)=>nodes.push({id:d.id,label:d.name,kind:"Dimension",desc:d.description,sources:d.sourceIds,x:90+(i%5)*195,y:170+Math.floor(i/5)*105}));
+ (KB.functions||[]).forEach((f,i)=>nodes.push({id:f.id,label:f.id+" · "+f.name,kind:"Function",desc:f.summary,sources:f.sourceIds,x:100+(i%4)*195,y:330+Math.floor(i/4)*68}));
+ (KB.animals||[]).forEach((a,i)=>nodes.push({id:a.id,label:a.id+" · "+a.name,kind:"Animal",desc:a.summary,sources:a.sourceIds,x:100+i*195,y:455}));
+ nodes.push({id:"evidence-method",label:"Evidence & validation",kind:"Method",desc:"Record observations, source provenance, alternative hypotheses and counterevidence. Framework-internal consistency is not the same as external validation.",sources:["official-faq"],x:810,y:330});
+ return nodes;
+}
+function drawMap(){
+ const svg=$("conceptMap");if(!svg||!KB.dimensions.length)return;
+ const nodes=mapConcepts();
+ const byId=Object.fromEntries(nodes.map(n=>[n.id,n]));
+ const links=[];
+ nodes.filter(n=>n.kind==="Dimension").forEach(n=>links.push(["classic-512",n.id]));
+ nodes.filter(n=>n.kind==="Function").forEach(n=>links.push(["gather-organize",n.id],["self-tribe",n.id]));
+ nodes.filter(n=>n.kind==="Animal").forEach(n=>links.push(["info-energy",n.id]));
+ links.push(["classic-512","expanded-2048"],["classic-512","evidence-method"]);
+ let out="";
+ links.forEach(l=>{const a=byId[l[0]],b=byId[l[1]];if(a&&b)out+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="#d8d5cb" stroke-width="1.3"/>'});
+ nodes.forEach(n=>{const width=Math.min(178,Math.max(100,n.label.length*6.2+22)),x=Math.max(3,Math.min(980-width-3,n.x-width/2)),y=n.y-19;out+='<g class="node" tabindex="0" role="button" data-node="'+esc(n.id)+'"><rect x="'+x+'" y="'+y+'" width="'+width+'" height="38" rx="9"/><text x="'+(x+width/2)+'" y="'+(y+23)+'" text-anchor="middle">'+esc(n.label.length>25?n.label.slice(0,23)+"…":n.label)+'</text></g>'});
+ svg.innerHTML=out;
+ svg.querySelectorAll("[data-node]").forEach(el=>{const activate=()=>{const n=byId[el.dataset.node];$("mapDetail").innerHTML='<div class="meta"><span class="pill">'+esc(n.kind)+'</span></div><h3>'+esc(n.label)+'</h3><p>'+esc(n.desc||"")+'</p><div class="src">Sources: '+sourceLinks(n.sources)+'</div>';};el.addEventListener("click",activate);el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();activate()}})});
+}
+function download(name,data,type){const blob=new Blob([data],{type:type||"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function exportWorkspace(){download("ops-research-workspace-"+new Date().toISOString().slice(0,10)+".json",JSON.stringify({exportVersion:1,exportedAt:new Date().toISOString(),knowledgeBase:KB,cases:cases},null,2),"application/json")}
+$("knowledgeSearch").addEventListener("input",renderKnowledge);$("knowledgeKind").addEventListener("change",renderKnowledge);$("knowledgeModel").addEventListener("change",renderKnowledge);$("sourceSearch").addEventListener("input",renderSources);
+$("validateType").addEventListener("click",validateType);
+$("copyType").addEventListener("click",()=>{const r=validateType();if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(r.code).then(()=>alert("Code copied.")).catch(()=>prompt("Copy the code:",r.code));else prompt("Copy the code:",r.code)});
+$("saveCandidate").addEventListener("click",()=>{const r=validateType();const note=$("builderNotes").value.trim();addToCase(note||"Candidate generated in the type-code workbench.",r.code)});
+$("createCase").addEventListener("click",()=>{const name=$("caseName").value.trim();if(!name){alert("Enter a case label first.");return}cases.unshift({id:"case-"+Date.now(),name,context:$("caseContext").value.trim(),created:new Date().toISOString(),observations:[],hypotheses:[]});persistCases();$("caseName").value="";$("caseContext").value="";renderCases();renderCaseSelect()});
+$("addObservation").addEventListener("click",()=>{const id=$("observationCase").value,text=$("observationText").value.trim();if(!id||!text){alert("Select a case and enter an observation.");return}const c=cases.find(x=>x.id===id);if(!c)return;c.observations.push({id:"obs-"+Date.now(),text,relation:$("observationRelation").value,candidate:$("observationCandidate").value.trim(),created:new Date().toISOString()});persistCases();$("observationText").value="";$("observationCandidate").value="";renderCases()});
+$("downloadKb").addEventListener("click",()=>download("ops-knowledge-base.json",JSON.stringify(KB,null,2),"application/json"));
+$("exportAll").addEventListener("click",exportWorkspace);
+$("importFile").addEventListener("change",async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text());if(obj.knowledgeBase&&Array.isArray(obj.cases)){if(confirm("Importing will replace the current local case list. Continue?")){cases=obj.cases;persistCases();renderCases();renderCaseSelect();alert("Workspace cases imported. The current research corpus remains the built-in version; use the downloaded corpus separately if needed.")}}else if(Array.isArray(obj)){if(confirm("Import this JSON as a case list?")){cases=obj;persistCases();renderCases();renderCaseSelect()}}else alert("Unrecognised workspace JSON format.")}catch(err){alert("Could not parse this JSON file: "+err.message)}e.target.value=""});
+async function init(){
+ loadCases();
+ try{const r=await fetch("./ops-knowledge-base.json",{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);KB=await r.json()}catch(e){console.warn("Could not load ops-knowledge-base.json",e);$("knowledgeList").innerHTML='<div class="notice">The separate knowledge JSON could not be loaded. Open this page through GitHub Pages or a local HTTP server, rather than file://.</div>'}
+ $("statConcepts").textContent=allEntries().length;$("statSources").textContent=KB.sources.length;$("statRules").textContent=KB.rules.length;$("statGaps").textContent=KB.researchQuestions.length;$("corpusVersion").textContent=KB.schemaVersion;
+ renderKnowledge();renderSources();renderModels();populateBuilder();renderCases();renderCaseSelect();validateType();
+ const tab=location.hash.replace("#","");if(tab&&document.querySelector('[data-tab="'+tab+'"]'))showTab(tab);
+}
+init();
+})();
+</script>
+</body>
+</html>
