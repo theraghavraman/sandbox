@@ -93,6 +93,26 @@ The current report generator is deliberately transparent and browser-only:
 
 No source text is sent to a backend by the analysis code. The optional PDF.js and Mammoth scripts are fetched from a CDN when those file types are selected. Avoid uploading sensitive/private material without permission, and do not use the output for high-stakes decisions.
 
+## Provenance-tracked corpus, retrieval and held-out evaluation
+
+The **Corpus & Evaluation** tab adds an in-browser baseline for working with an OPS-labelled corpus. It accepts CSV/JSON rows with text/transcript, OPS type label, grouping key, source metadata, license and annotation-method fields. It can normalize common OPAI/AOP column names, export a normalized corpus, and retain per-example provenance in retrieved evidence.
+
+### Retrieval and scoring method
+
+- Builds TF-IDF vectors over unigrams and bigrams and ranks examples by cosine similarity. This is a transparent lexical retrieval baseline, not neural semantic embeddings.
+- Parses supported classic OPS type-code forms and aggregates similarity-weighted neighbour labels separately for modality, lead/second function, Observer/Decider, Di/De, Oi/Oe and each animal position.
+- Displays the top label, vote share, top-two margin, competing labels, source metadata and explicit uncertainty flags. Vote shares are not calibrated probabilities.
+- Keeps imported data in page memory; no corpus is automatically uploaded or persisted. Explicit JSON export is available.
+- Includes clearly marked synthetic examples to test the UI only; synthetic rows are blocked from evaluation.
+
+### Evaluation protocol and limitations
+
+The evaluation workflow assigns complete grouping keys to one side of a deterministic held-out split, then reports per-dimension accuracy, macro-F1 and a training-majority baseline. It requires dataset/source URL, license/reuse metadata, annotation-method metadata and an explicit operator confirmation that labels are independently assigned and the split avoids leakage. The confirmation is a safeguard, not machine verification. The grouping key should be the person when the same person appears in multiple interviews; if speaker IDs are video-specific, grouping only by speaker ID can leak a person across splits. Inspect duplicates and source identity before accepting results.
+
+The public [AOP interview-lines dataset](https://huggingface.co/datasets/ThingsThatDoStuff/aop-dataset-2022-11-10-interview-lines-by-youtube) exposes OPS-labelled transcript segments and type-related fields, so it is a relevant corpus lead. However, its visible dataset card does not state a license. It is therefore **not confirmed as open-source/open-data for reuse**. The application links to it but does not bundle or redistribute its records; obtain permission or confirm applicable terms before importing or reusing it. The OPAI model repository at https://github.com/stanbar/objectivepersonality.ai documents transcript classifiers and benchmarks, but its code uses the PolyForm Perimeter License, which includes a noncompete clause; this project does not copy its implementation.
+
+A held-out score measures agreement with supplied labels only. Crowd-sourced, inherited, disputed or self-selected OPS labels are not an independent gold standard. Until a licensed corpus with independently assigned labels and a documented inter-rater process is available, treat evaluation as a pipeline smoke test rather than validation of OPS or reliable personality inference. This tool remains a research prototype, not a validated psychological assessment.
+
 ## Evidence and validation policy
 
 1. Every concept should have a source or be marked as a hypothesis.
