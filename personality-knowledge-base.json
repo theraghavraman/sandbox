@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "1.0.0",
+  "title": "Personality Studios Research & Provenance",
+  "generatedAt": "2026-10-10",
+  "policy": {
+    "purpose": "Educational self-reflection; no diagnosis, hiring, or high-stakes decisions.",
+    "scoring": "Scores are within-questionnaire descriptive indices, not percentiles or calibrated probabilities.",
+    "validation": "No reliability, factor-structure, test-retest, criterion-validity, or held-out validation has yet been conducted on these custom question sets.",
+    "independence": "Commercial instrument items are not copied; Big Five items are original and are not the BFI-2 or IPIP scale."
+  },
+  "models": [
+    {
+      "id": "big-five",
+      "name": "Big Five / Five-Factor Model",
+      "concepts": [
+        "Openness / Open-Mindedness",
+        "Conscientiousness",
+        "Extraversion",
+        "Agreeableness",
+        "Negative Emotionality / Neuroticism"
+      ],
+      "methods": "Continuous trait dimensions are more faithful to the Big Five tradition than categorical types. This studio currently uses a brief original item set; its domain coverage is uneven and is not normed. Reverse-keyed items are reverse-scored, and raw scores are shown only as within-set indicators.",
+      "gaps": [
+        "Custom items have not been psychometrically validated.",
+        "No age, language, culture, or reference-population norms.",
+        "Do not interpret a 0–100 display as a percentile or objective probability."
+      ]
+    },
+    {
+      "id": "mbti",
+      "name": "Myers-Briggs Type Indicator framework",
+      "concepts": [
+        "Extraversion–Introversion",
+        "Sensing–Intuition",
+        "Thinking–Feeling",
+        "Judging–Perceiving"
+      ],
+      "methods": "The commercial MBTI instrument is distinct from this independent, original forced-choice explorer. The current result is a preference hypothesis, not an official MBTI administration. Forced-choice responses and a four-letter cutoff can hide continuous or contextual variation; close margins must be surfaced.",
+      "gaps": [
+        "No official MBTI items, scoring tables, or practitioner process are reproduced.",
+        "No validated preference scales, norms, or test-retest study.",
+        "Type labels must not imply ability, performance, or fixed identity."
+      ]
+    },
+    {
+      "id": "disc",
+      "name": "DISC behavioral-style framework",
+      "concepts": [
+        "Dominance",
+        "Influence",
+        "Steadiness",
+        "Conscientiousness"
+      ],
+      "methods": "The current exercise uses original situational forced-choice options. The result is the distribution of choices in this particular item set, not an Everything DiSC score or a validated style classification. Forced-choice options are ipsative: selecting one response necessarily excludes others.",
+      "gaps": [
+        "Not the commercial Everything DiSC assessment or its eight-scale model.",
+        "No reliability, validity, norming, or criterion study.",
+        "Style may vary by situation; ties and close scores should remain ambiguous."
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "ipip",
+      "modelIds": [
+        "big-five"
+      ],
+      "type": "Primary item-pool resource",
+      "title": "International Personality Item Pool (IPIP)",
+      "url": "https://ipip.ori.org/",
+      "license": "IPIP items are stated by the site to be public domain; individual instruments and implementations still require checking.",
+      "supports": "Public-domain personality item resources and scale documentation. The current custom items are not copied from IPIP.",
+      "limits": "Availability of public-domain items does not validate this studio's custom questionnaire."
+    },
+    {
+      "id": "bfi2-main",
+      "modelIds": [
+        "big-five"
+      ],
+      "type": "Peer-reviewed research",
+      "title": "Soto & John (2017), The next Big Five Inventory-2",
+      "url": "https://doi.org/10.1037/pspp0000096",
+      "license": "Research article; the BFI-2 itself is copyrighted and is not reproduced here.",
+      "supports": "The BFI-2 is a 60-item domain-and-facet measure with a published development/validation paper.",
+      "limits": "Evidence for BFI-2 does not transfer to these original questions."
+    },
+    {
+      "id": "bfi2-short",
+      "modelIds": [
+        "big-five"
+      ],
+      "type": "Peer-reviewed research",
+      "title": "Soto & John (2017), BFI-2-S and BFI-2-XS",
+      "url": "https://doi.org/10.1016/j.jrp.2017.02.004",
+      "license": "Article citation only; questionnaire items are not copied.",
+      "supports": "The published 30-item short form balances efficiency against reliability and validity.",
+      "limits": "Our questions are not the BFI-2-S and have no demonstrated equivalent properties."
+    },
+    {
+      "id": "mbti-official",
+      "modelIds": [
+        "mbti"
+      ],
+      "type": "Primary commercial instrument source",
+      "title": "Myers & Briggs Foundation — Reliability and Validity",
+      "url": "https://www.myersbriggs.org/research-and-library/validity-reliability/home.htm",
+      "license": "Official instrument and item content are protected; this project does not reproduce them.",
+      "supports": "Official source for the MBTI instrument's own validity/reliability claims and the distinction between preference categories and continuous trait scales.",
+      "limits": "Publisher-authored source; not independent validation of this studio."
+    },
+    {
+      "id": "mbti-ethics",
+      "modelIds": [
+        "mbti"
+      ],
+      "type": "Primary professional guidance",
+      "title": "Myers & Briggs Foundation — MBTI Code of Ethics",
+      "url": "https://www.myersbriggs.org/using-type-as-a-professional/mbti-code-of-ethics/home.htm",
+      "license": "Reference link; no protected items reproduced.",
+      "supports": "Use nonjudgmental language, avoid overgeneralization, and do not use MBTI to screen job applicants.",
+      "limits": "Ethical guidance is not a validation study for this tool."
+    },
+    {
+      "id": "disc-science",
+      "modelIds": [
+        "disc"
+      ],
+      "type": "Primary vendor research summary",
+      "title": "Everything DiSC — The Science Behind DiSC",
+      "url": "https://www.everythingdisc.com/the-science-behind-disc",
+      "license": "Commercial instrument materials are not reproduced.",
+      "supports": "Vendor-published account of reliability/validity methods and eight-scale Everything DiSC model.",
+      "limits": "Vendor-authored claims should be read as such; these results cannot be transferred to this custom questionnaire."
+    }
+  ]
+}
