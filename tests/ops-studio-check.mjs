@@ -7,13 +7,13 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
 const html = fs.readFileSync(path.join(root, "ops-studio.html"), "utf8");
 const kb = JSON.parse(fs.readFileSync(path.join(root, "ops-knowledge-base.json"), "utf8"));
-const scriptMatch = html.match(/<script>([\\s\\S]*?)<\\/script>/i);
+const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/i);
 assert.ok(scriptMatch, "OPS studio must contain its application script");
 new Function(scriptMatch[1]); // Parse only; do not execute browser code in Node.
 
-const ids = [...html.matchAll(/\\bid="([^"]+)"/g)].map(m => m[1]);
+const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
 assert.equal(new Set(ids).size, ids.length, "HTML IDs must be unique");
-const scriptIds = [...scriptMatch[1].matchAll(/\\$\\("([^"]+)"\\)/g)].map(m => m[1]);
+const scriptIds = [...scriptMatch[1].matchAll(/\$\("([^"]+)"\)/g)].map(m => m[1]);
 for (const id of scriptIds) assert.ok(ids.includes(id), "Missing HTML element referenced by script: " + id);
 
 assert.equal(kb.schemaVersion, "1.0.0");
@@ -35,7 +35,7 @@ for (const group of ["dimensions", "coins", "functions", "animals", "rules", "gl
 assert.equal(kb.functions.length, 8);
 assert.equal(kb.animals.length, 4);
 assert.ok(html.includes('href="ops-studio.html"') || html.includes("OPS Research Lab"));
-const codePattern = /^([MF]{2})\\s*[–-]\\s*([A-Z][a-z])\\s*\\/\\s*([A-Z][a-z])\\s*[–-]\\s*([PSBC]{2})\\s*\\/\\s*([PSBC])\\s*\\(\\s*([PSBC])\\s*\\)$/;
+const codePattern = /^([MF]{2})\s*[–-]\s*([A-Z][a-z])\s*\/\s*([A-Z][a-z])\s*[–-]\s*([PSBC]{2})\s*\/\s*([PSBC])\s*\(\s*([PSBC])\s*\)$/;
 for (const code of ["FF – Fe/Se – PC/S(B)", "MF – Ni/Fi – SB/P(C)"]) {
   assert.ok(codePattern.test(code), "Expected common type-code example to parse: " + code);
 }
