@@ -1,0 +1,32 @@
+name: OPS Studio Integrity Check
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ops-studio.html"
+      - "ops-knowledge-base.json"
+      - "OPS-RESEARCH.md"
+      - "tests/ops-studio-check.mjs"
+      - ".github/workflows/ops-studio-check.yml"
+  pull_request:
+    paths:
+      - "ops-studio.html"
+      - "ops-knowledge-base.json"
+      - "OPS-RESEARCH.md"
+      - "tests/ops-studio-check.mjs"
+      - ".github/workflows/ops-studio-check.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate OPS studio and knowledge corpus
+        run: node tests/ops-studio-check.mjs
