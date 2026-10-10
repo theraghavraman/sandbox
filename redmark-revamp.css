@@ -663,8 +663,8 @@ main .footnote, main small, main .hint { color: #827c70; }
 @media (min-width: 761px) and (max-width: 1200px) {
   main .method-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
   main .tool-layout { grid-template-columns: minmax(0, 1.1fr) minmax(265px, .9fr) !important; }
-  .sidebar { width: 238px !important; }
-  main { margin-left: 238px !important; }
+  body.sandbox-home .sidebar { width: 238px !important; }
+  body.sandbox-home main { margin-left: 238px !important; }
 }
 @media (max-width: 760px) {
   .topbar {
@@ -672,13 +672,13 @@ main .footnote, main small, main .hint { color: #827c70; }
     height: 60px !important;
     gap: 9px !important;
   }
-  .mobile-nav-toggle { display: grid !important; }
+  body.sandbox-home .mobile-nav-toggle { display: grid !important; }
   .brand { gap: 8px !important; }
   .brand-mark { width: 34px !important; height: 34px !important; border-radius: 11px !important; }
   .brand strong { font-size: 12px !important; white-space: nowrap; }
   .brand small { font-size: 10px !important; }
   .top-actions .pill { display: none !important; }
-  .sidebar {
+  body.sandbox-home .sidebar {
     position: fixed !important;
     top: 60px !important;
     bottom: 0 !important;
@@ -693,8 +693,8 @@ main .footnote, main small, main .hint { color: #827c70; }
     border-right: 1px solid #e9e1d5 !important;
     box-shadow: none !important;
   }
-  .sidebar.mobile-open { transform: translateX(0) !important; box-shadow: 18px 0 46px rgba(38,31,22,.18) !important; }
-  .nav-scrim {
+  body.sandbox-home .sidebar.mobile-open { transform: translateX(0) !important; box-shadow: 18px 0 46px rgba(38,31,22,.18) !important; }
+  body.sandbox-home .nav-scrim {
     display: block !important;
     position: fixed !important;
     z-index: 31 !important;
@@ -704,7 +704,7 @@ main .footnote, main small, main .hint { color: #827c70; }
     visibility: hidden !important;
     transition: opacity .2s ease, visibility .2s ease !important;
   }
-  .nav-scrim.is-visible { opacity: 1 !important; visibility: visible !important; }
+  body.sandbox-home .nav-scrim.is-visible { opacity: 1 !important; visibility: visible !important; }
   main { margin-left: 0 !important; padding: 20px 13px 42px !important; }
   main .page-head { border-radius: 20px !important; padding: 22px !important; }
   main .page-head::after { font-size: 100px !important; right: 10px !important; bottom: -12px !important; }
