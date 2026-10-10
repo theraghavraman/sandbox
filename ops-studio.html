@@ -24,7 +24,7 @@ main{min-width:0;padding:27px clamp(14px,3vw,42px) 54px;max-width:1550px;width:1
 <aside class="side">
  <div class="side-top"><div class="brand">REDMARK FORGE<small>OPS RESEARCH LAB</small></div><a class="back" href="./index.html">← Sandbox</a></div>
  <nav class="side-nav" aria-label="OPS Lab sections">
-  <a class="active" href="#overview" data-tab="overview">Overview</a><a href="#analyze" data-tab="analyze">Analyze Material</a><a href="#knowledge" data-tab="knowledge">Knowledge Base</a><a href="#builder" data-tab="builder">Type Workbench</a><a href="#map" data-tab="map">Concept Map</a><a href="#cases" data-tab="cases">Evidence Lab</a><a href="#sources" data-tab="sources">Sources & Gaps</a><a href="#coverage" data-tab="coverage">Coverage</a>
+  <a class="active" href="#overview" data-tab="overview">Overview</a><a href="#analyze" data-tab="analyze">Analyze Material</a><a href="#corpus" data-tab="corpus">Corpus & Evaluation</a><a href="#knowledge" data-tab="knowledge">Knowledge Base</a><a href="#builder" data-tab="builder">Type Workbench</a><a href="#map" data-tab="map">Concept Map</a><a href="#cases" data-tab="cases">Evidence Lab</a><a href="#sources" data-tab="sources">Sources & Gaps</a><a href="#coverage" data-tab="coverage">Coverage</a>
  </nav>
  <div class="side-note">Local-first research workspace.<br>Cases stay in this browser unless exported.<br><br><span class="mono">OPS CORPUS v1.0.0</span></div>
 </aside>
@@ -121,6 +121,34 @@ main{min-width:0;padding:27px clamp(14px,3vw,42px) 54px;max-width:1550px;width:1
    </div><div class="notice" style="margin-top:13px;margin-bottom:0">Avoid uploading private conversations or sensitive material about someone without permission. Do not use this report for hiring, medical, legal or other high-stakes decisions.</div></div>
   </div>
   <div id="analysisReport" class="analysis-report" aria-live="polite"><div class="panel"><h2>Your report will appear here</h2><p class="sub">Load or paste source material, then select “Generate insights report.”</p></div></div>
+ </section>
+
+
+ <section class="pane" id="pane-corpus">
+  <div class="notice"><strong>Research mode:</strong> this module supports provenance-tracked corpus import, TF-IDF semantic-style retrieval, dimension-wise candidate scoring and group-held-out evaluation. It does not contain a trained OPS model. Scores are retrieval vote shares, not calibrated probabilities.</div>
+  <div class="grid2">
+   <div class="panel">
+    <div class="panel-head"><div><h2>Corpus & provenance</h2><p class="sub">Import CSV/JSON rows that have text, an OPS label, source metadata and a person/source grouping key.</p></div><span class="pill ok">Browser-only</span></div>
+    <p class="sub">Recommended source to investigate: <a href="https://huggingface.co/datasets/ThingsThatDoStuff/aop-dataset-2022-11-10-interview-lines-by-youtube" target="_blank" rel="noopener noreferrer">AOP interview-lines dataset on Hugging Face</a>. Review its dataset card, licensing, annotation method and reuse terms before use. The studio does not copy or redistribute its data.</p>
+    <div class="dropzone"><strong>Import a labelled corpus</strong><p class="sub">CSV or JSON; up to 20,000 rows per import. CSV accepts common OPAI/AOP field names.</p><label class="btn" for="opsCorpusFile">Choose corpus file</label><input id="opsCorpusFile" type="file" accept=".csv,.json,text/csv,application/json" hidden></div>
+    <div class="top-actions" style="margin-top:12px"><button class="btn" id="loadOpsDemo">Load synthetic demo</button><button class="btn" id="exportOpsCorpus">Export normalized corpus</button><button class="btn" id="clearOpsCorpus">Clear corpus</button></div>
+    <div id="opsCorpusStatus" class="resultbox" style="margin-top:12px">No corpus loaded. Import a licensed dataset or load the clearly labelled synthetic demo.</div>
+    <div class="field" style="margin-top:12px"><label>Expected fields</label><p class="sub">Text: <code>text</code> or <code>transcript</code>; type: <code>ops_type</code>, <code>type</code> or <code>type-128</code>; group: <code>person_id</code>, <code>speaker_id</code>, <code>name</code> or <code>source_id</code>; provenance: source URL/title, license and annotation method. Missing provenance is flagged.</p></div>
+   </div>
+   <div class="panel">
+    <div class="panel-head"><div><h2>Evidence retrieval</h2><p class="sub">Retrieve similar corpus excerpts and aggregate their labels by OPS dimension.</p></div></div>
+    <div class="field"><label for="opsQueryText">Text to investigate</label><textarea id="opsQueryText" style="min-height:180px" placeholder="Paste a transcript or a behavioural excerpt. Use material you have permission to analyze."></textarea></div>
+    <div class="formgrid"><div class="field"><label for="opsTopK">Retrieved examples (k)</label><select id="opsTopK"><option>3</option><option selected>5</option><option>10</option><option>15</option></select></div><div class="field"><label for="opsMinSimilarity">Minimum similarity</label><select id="opsMinSimilarity"><option value="0.02">0.02 · exploratory</option><option value="0.05" selected>0.05 · default</option><option value="0.10">0.10 · stricter</option><option value="0.20">0.20 · high overlap</option></select></div></div>
+    <button class="btn primary" id="runOpsRetrieval">Retrieve & score dimensions</button>
+    <p class="sub" style="margin-top:10px">Retrieval uses local TF-IDF vectors over unigrams and bigrams. It is a lexical similarity baseline, not a neural embedding model. Text stays in this browser tab.</p>
+   </div>
+  </div>
+  <div id="opsRetrievalReport" class="analysis-report"><div class="panel"><h2>Dimension-wise results</h2><p class="sub">Load a corpus and enter text to see retrieved evidence, candidate distributions, margins and uncertainty warnings.</p></div></div>
+  <div class="panel" style="margin-top:14px">
+   <div class="panel-head"><div><h2>Held-out evaluation</h2><p class="sub">Deterministic group split: all rows from a person/group stay on one side. Near-duplicate rows from the same source should share a group ID.</p></div><button class="btn primary" id="runOpsEvaluation">Evaluate held-out groups</button></div>
+   <div class="notice">This is valid only as a provisional benchmark when labels are trustworthy and groups prevent leakage. Rows from public-figure transcripts may contain noisy or crowd-sourced type labels; test-set scores measure agreement with those labels, not objective psychological truth.</div>
+   <div id="opsEvaluationReport" class="resultbox">Evaluation has not been run.</div>
+  </div>
  </section>
 
  <section class="pane" id="pane-coverage">
@@ -309,6 +337,150 @@ const signalGroups=[
 {id:"De",name:"De · external priorities",terms:["team decision","group needs","social expectations","coordinate people","manage the group","shared responsibility","what others need","collective goals"]},
 {id:"Di",name:"Di · internal priorities",terms:["my own judgment","personal standards","independent decision","inner conviction","my own logic","personal autonomy","self-defined","individual values"]}
 ];
+
+let opsCorpus=[];
+let opsCorpusMeta={sourceName:"",sourceUrl:"",license:"",annotationMethod:"",importedAt:"",synthetic:false};
+function csvRows(raw){
+ const rows=[];let row=[],cell="",quoted=false;
+ for(let i=0;i<raw.length;i++){const c=raw[i];if(quoted){if(c==='"'&&raw[i+1]==='"'){cell+='"';i++}else if(c==='"')quoted=false;else cell+=c}else if(c==='"')quoted=true;else if(c===","){row.push(cell);cell=""}else if(c==="\n"){row.push(cell);rows.push(row);row=[];cell=""}else if(c!=="\r")cell+=c}
+ if(cell.length||row.length){row.push(cell);rows.push(row)}
+ if(!rows.length)return [];
+ const heads=rows.shift().map(x=>x.trim().replace(/^\uFEFF/,""));
+ return rows.filter(r=>r.some(x=>x.trim())).map(r=>Object.fromEntries(heads.map((h,i)=>[h,r[i]||""])));
+}
+function firstField(row,names){for(const n of names){if(row[n]!==undefined&&String(row[n]).trim())return String(row[n]).trim()}const keys=Object.keys(row);for(const wanted of names){const key=keys.find(k=>k.toLowerCase()===wanted.toLowerCase());if(key&&String(row[key]).trim())return String(row[key]).trim()}return ""}
+function normalizeOpsRow(row,index){
+ const text=firstField(row,["text","transcript","utterance","content","sample"]);
+ const type=firstField(row,["ops_type","type-128","type","opsType","full_type","label"]);
+ const sourceId=firstField(row,["source_id","video_id","id","line_id","sourceId"]);
+ const group=firstField(row,["group_id","person_id","speaker_id","name","person","speaker","source_id","video_id","id"]);
+ const person=firstField(row,["person_id","name","person","speaker","speaker_id"]);
+ const sourceUrl=firstField(row,["source_url","url","video_url","source"]);
+ const sourceTitle=firstField(row,["source_title","title","video_title","dataset"]);
+ const license=firstField(row,["license","data_license"]);
+ const annotation=firstField(row,["annotation_method","typing_method","label_method","annotator"]);
+ if(!text||!type)return null;
+ return {id:firstField(row,["row_id","line_id","sample_id"])||("row-"+index),text:text.slice(0,6000),opsType:type,sourceId:sourceId||"unknown-source",groupId:group||sourceId||("ungrouped-"+index),person:person||"",sourceUrl:sourceUrl||"",sourceTitle:sourceTitle||"",license:license||"",annotationMethod:annotation||"",synthetic:false,rawLabel:type};
+}
+function parseOpsCorpus(raw,filename){
+ let rows;
+ if(filename.toLowerCase().endsWith(".json")){const data=JSON.parse(raw);rows=Array.isArray(data)?data:(Array.isArray(data.data)?data.data:(Array.isArray(data.rows)?data.rows:null));if(!rows)throw new Error("JSON must contain an array of rows, or a data/rows array.")}
+ else rows=csvRows(raw);
+ if(!rows.length)throw new Error("No rows were found in this file.");
+ const parsed=rows.slice(0,20000).map(normalizeOpsRow).filter(Boolean);
+ if(!parsed.length)throw new Error("No usable rows found. Each row needs a text/transcript field and an OPS type label.");
+ opsCorpus=parsed;
+ opsCorpusMeta={sourceName:filename,sourceUrl:"",license:"Not declared in imported file",annotationMethod:"Not declared in imported file",importedAt:new Date().toISOString(),synthetic:false};
+ renderOpsCorpusStatus();
+}
+function renderOpsCorpusStatus(){
+ const n=opsCorpus.length,groups=new Set(opsCorpus.map(r=>r.groupId).filter(x=>x&&x.indexOf("ungrouped-")!==0)).size;
+ const missingProvenance=opsCorpus.filter(r=>!r.sourceUrl||!r.license||!r.annotationMethod).length;
+ const synthetic=opsCorpus.filter(r=>r.synthetic).length;
+ $("opsCorpusStatus").innerHTML='<strong>'+n.toLocaleString()+' labelled excerpts loaded</strong><p class="sub">'+groups+' identifiable grouping keys · '+missingProvenance+' rows with incomplete source/license/annotation provenance · '+synthetic+' synthetic demo rows.</p><p class="sub">Import: '+esc(opsCorpusMeta.sourceName||"unspecified")+' · '+esc(opsCorpusMeta.importedAt||"not recorded")+'</p><p class="sub">The imported corpus is held in page memory and is not automatically uploaded or persisted. Export it if you need a copy; check source permissions first.</p>';
+}
+function loadOpsSyntheticDemo(){
+ const demo=[
+ ["demo-01","I compare options against measurable outcomes and prefer a clear plan with deadlines.","MF-Te/Ni-BP/S(C)","demo-person-01","Synthetic example authored for UI testing"],
+ ["demo-02","I often brainstorm several possibilities, then check whether each idea is logically consistent.","FF-Ne/Ti-CP/S(B)","demo-person-02","Synthetic example authored for UI testing"],
+ ["demo-03","I notice small changes in the room and like trying the solution immediately rather than theorizing for long.","MM-Se/Fi-PC/S(B)","demo-person-03","Synthetic example authored for UI testing"],
+ ["demo-04","I need quiet time to reflect on my values and what feels personally right before I decide.","FF-Fi/Ni-SC/B(P)","demo-person-04","Synthetic example authored for UI testing"],
+ ["demo-05","I keep the team coordinated, make the responsibilities explicit, and explain the steps in order.","MF-Te/Si-BS/C(P)","demo-person-05","Synthetic example authored for UI testing"],
+ ["demo-06","I like exploring unfamiliar ideas and gathering different perspectives before narrowing down a direction.","FM-Ne/Fi-CP/B(S)","demo-person-06","Synthetic example authored for UI testing"],
+ ["demo-07","I test a concept through practical action, adjust quickly, and learn from what happens in the moment.","MM-Se/Ti-PC/S(B)","demo-person-07","Synthetic example authored for UI testing"],
+ ["demo-08","I focus on how decisions affect people, shared expectations, and the emotional tone of the group.","FF-Fe/Ni-SB/P(C)","demo-person-08","Synthetic example authored for UI testing"]
+ ];
+ opsCorpus=demo.map((r,i)=>({id:r[0],text:r[1],opsType:r[2],sourceId:"synthetic-demo",groupId:r[3],person:"Synthetic fictional example "+(i+1),sourceUrl:"",sourceTitle:r[4],license:"CC0-style original demo text (not a dataset license claim)",annotationMethod:"Illustrative labels invented for interface testing; not expert typed",synthetic:true,rawLabel:r[2]}));
+ opsCorpusMeta={sourceName:"Built-in synthetic demo",sourceUrl:"",license:"Synthetic demo only",annotationMethod:"Illustrative, not expert typed",importedAt:new Date().toISOString(),synthetic:true};
+ renderOpsCorpusStatus();
+ $("opsEvaluationReport").textContent="Evaluation disabled for the synthetic demo: these invented examples are for testing UI flow only and are not valid ground truth.";
+}
+function tokenizeOps(text){return (String(text||"").toLowerCase().match(/[a-z0-9]+(?:'[a-z]+)?/g)||[]).filter(t=>t.length>1&&!/^(the|and|for|that|with|this|from|have|has|had|are|was|were|you|your|they|them|then|than|into|about|just|like|what|when|where|which|will|would|could|should|there|their|here|been|being|not|but|can|all|our|out|one|who|how|why)$/.test(t))}
+function opsTerms(text){const tokens=tokenizeOps(text),terms=tokens.slice();for(let i=0;i<tokens.length-1;i++)terms.push(tokens[i]+"_"+tokens[i+1]);return terms}
+function buildOpsIdf(rows){
+ const df=Object.create(null),docs=rows.map(r=>new Set(opsTerms(r.text)));
+ docs.forEach(d=>d.forEach(t=>df[t]=(df[t]||0)+1));
+ const idf=Object.create(null);Object.keys(df).forEach(t=>idf[t]=Math.log(1+(rows.length+1)/(df[t]+1))+1);
+ return {idf,docs};
+}
+function opsVector(text,idf){const counts=Object.create(null);opsTerms(text).forEach(t=>counts[t]=(counts[t]||0)+1);const v=Object.create(null);let norm=0;Object.keys(counts).forEach(t=>{if(idf[t]){v[t]=(1+Math.log(counts[t]))*idf[t];norm+=v[t]*v[t]}});norm=Math.sqrt(norm)||1;Object.keys(v).forEach(t=>v[t]/=norm);return v}
+function opsCosine(a,b){let score=0;Object.keys(a).forEach(t=>{if(b[t])score+=a[t]*b[t]});return score}
+function parseOpsLabel(label){
+ const s=String(label||"").replace(/\s/g,"");
+ const m=s.match(/^([MF]{2})[-–_]?([A-Z][a-z])\/([A-Z][a-z])[-–_]?([PSBC]{2})\/?([PSBC])?\(?([PSBC])?\)?$/);
+ if(!m)return null;
+ const functions=[m[2],m[3]],stack=(m[4]+(m[5]||"")+(m[6]||"")).split("");
+ if(stack.length!==4||new Set(stack).size!==4||!["P","S","B","C"].every(x=>stack.includes(x)))return null;
+ return {modality:m[1],functions,animals:stack};
+}
+function opsDimensions(row){
+ const label=parseOpsLabel(row.opsType);if(!label)return {};
+ const dims={modality:label.modality,leadFunction:label.functions[0],secondFunction:label.functions[1],animal1:label.animals[0],animal2:label.animals[1],animal3:label.animals[2],animal4:label.animals[3]};
+ const f1=(KB.functions||[]).find(f=>f.id===label.functions[0]),f2=(KB.functions||[]).find(f=>f.id===label.functions[1]);
+ if(f1){dims.observerDecider=f1.axis;f1.components.forEach(c=>{if(["Di","De","Oi","Oe"].includes(c))dims[c==="Di"||c==="De"?"diDe":"oiOe"]=c})}
+ if(f2){f2.components.forEach(c=>{if(["Di","De","Oi","Oe"].includes(c))dims[c==="Di"||c==="De"?"diDe":"oiOe"]=c})}
+ return dims;
+}
+function scoreOpsQuery(query,rows,k,minSim){
+ const usable=rows.map(r=>({...r,dimensions:opsDimensions(r)})).filter(r=>Object.keys(r.dimensions).length&&r.text.length>20);
+ if(!usable.length)throw new Error("No rows have parseable OPS labels. Expected examples like MF-Te/Ni-BP/S(C) or MF-Te/Ni-BPSC.");
+ const model=buildOpsIdf(usable),q=opsVector(query,model.idf);
+ const hits=usable.map(r=>({...r,similarity:opsCosine(q,opsVector(r.text,model.idf))})).filter(r=>r.similarity>=minSim).sort((a,b)=>b.similarity-a.similarity).slice(0,k);
+ const dimensionNames={modality:"Modality",leadFunction:"Lead function",secondFunction:"Second function",observerDecider:"Observer / Decider",diDe:"Di / De orientation",oiOe:"Oi / Oe orientation",animal1:"Animal 1",animal2:"Animal 2",animal3:"Animal 3",animal4:"Animal 4"};
+ const dimensions={};
+ Object.keys(dimensionNames).forEach(key=>{
+  const votes={};let total=0;
+  hits.forEach(h=>{const val=h.dimensions[key];if(val){votes[val]=(votes[val]||0)+h.similarity;total+=h.similarity}});
+  const ranked=Object.entries(votes).map(([label,weight])=>({label,weight,share:total?weight/total:0})).sort((a,b)=>b.weight-a.weight);
+  const margin=ranked.length>1?ranked[0].share-ranked[1].share:(ranked.length?ranked[0].share:0);
+  const best=ranked[0];
+  dimensions[key]={name:dimensionNames[key],ranked,best:best?best.label:"No evidence",voteShare:best?best.share:0,margin,uncertain:!best||hits.length<3||best.share<0.55||margin<0.18};
+ });
+ return {hits,dimensions,usableRows:usable.length,queryTokens:tokenizeOps(query).length,meanSimilarity:hits.length?hits.reduce((n,h)=>n+h.similarity,0)/hits.length:0};
+}
+function runOpsRetrieval(){
+ const query=$("opsQueryText").value.trim(),out=$("opsRetrievalReport");
+ if(query.length<80){out.innerHTML='<div class="panel"><h2>More context needed</h2><p class="sub">Enter at least 80 characters so retrieval has more than a short phrase to compare.</p></div>';return}
+ if(!opsCorpus.length){out.innerHTML='<div class="notice">Load a corpus first.</div>';return}
+ try{
+  const result=scoreOpsQuery(query,opsCorpus,Number($("opsTopK").value),Number($("opsMinSimilarity").value));
+  const dimHtml=Object.values(result.dimensions).map(d=>'<article class="entry"><div class="meta"><span class="pill">'+esc(d.name)+'</span><span class="pill '+(d.uncertain?"warn":"ok")+'">'+(d.uncertain?"Low confidence / review":"Stronger retrieval agreement")+'</span></div><h3>'+esc(d.best)+'</h3><p>Top vote share: '+Math.round(d.voteShare*100)+'% · top-two margin: '+Math.round(d.margin*100)+' percentage points</p><div class="list">'+d.ranked.slice(0,4).map(x=>'<div class="score-row"><span>'+esc(x.label)+'</span><div class="meter"><span style="width:'+Math.round(x.share*100)+'%"></span></div><strong>'+Math.round(x.share*100)+'%</strong></div>').join("")+'</div></article>').join("");
+  const hitsHtml=result.hits.map((h,i)=>'<article class="evidence-quote"><div class="meta"><span class="pill">#'+(i+1)+'</span><span class="pill">similarity '+h.similarity.toFixed(3)+'</span><span class="pill">'+esc(h.opsType)+'</span></div><p>'+esc(h.text.slice(0,800))+'</p><p class="src">Group: '+esc(h.groupId)+' · source: '+esc(h.sourceId)+' · '+esc(h.sourceTitle||"source title missing")+' · license: '+esc(h.license||"not supplied")+' · annotation: '+esc(h.annotationMethod||"not supplied")+'</p></article>').join("");
+  out.innerHTML='<div class="panel"><div class="panel-head"><div><div class="eyebrow">Nearest-neighbour baseline</div><h2>Dimension-wise candidate scores</h2><p class="sub">'+result.hits.length+' examples retrieved from '+result.usableRows+' labelled rows · mean cosine similarity '+result.meanSimilarity.toFixed(3)+'</p></div></div><div class="notice">Vote shares are similarity-weighted label frequencies among retrieved examples, not calibrated probabilities. '+(result.hits.length<3?"Very few examples matched; treat every dimension as low confidence.":"Review the evidence excerpts and competing labels before interpreting any dimension.")+'</div><div class="grid2">'+dimHtml+'</div><h3 style="margin-top:18px">Retrieved evidence with provenance</h3>'+(hitsHtml||'<p class="sub">No examples passed the similarity threshold. Lower the threshold or import a larger corpus.</p>')+'</div>';
+ }catch(e){out.innerHTML='<div class="notice"><strong>Retrieval could not run:</strong> '+esc(e.message)+'</div>'}
+}
+function groupHash(value){let h=2166136261;for(let i=0;i<value.length;i++){h^=value.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function runOpsEvaluation(){
+ const out=$("opsEvaluationReport");
+ if(!opsCorpus.length){out.innerHTML="Load a labelled corpus first.";return}
+ if(opsCorpus.some(r=>r.synthetic)){out.innerHTML="Evaluation disabled: synthetic examples are illustrative and cannot be used as ground truth. Import independently labelled, provenance-tracked examples.";return}
+ const parsed=opsCorpus.map(r=>({...r,dimensions:opsDimensions(r)})).filter(r=>Object.keys(r.dimensions).length&&r.text.length>20);
+ const groups=[...new Set(parsed.map(r=>r.groupId).filter(Boolean))];
+ if(groups.length<5){out.innerHTML="At least five distinct person/source groups are required for a minimally useful group-held-out split. Current groups: "+groups.length+".";return}
+ const testGroups=new Set(groups.filter(g=>groupHash(g)%5===0));
+ if(!testGroups.size||testGroups.size===groups.length){out.innerHTML="The deterministic group split did not produce both train and test groups. Add more groups and retry.";return}
+ const train=parsed.filter(r=>!testGroups.has(r.groupId)),test=parsed.filter(r=>testGroups.has(r.groupId));
+ if(train.length<3||test.length<2){out.innerHTML="Too few training or test rows after grouping. Import a larger corpus.";return}
+ const dimensions=["modality","leadFunction","secondFunction","observerDecider","diDe","oiOe","animal1","animal2","animal3","animal4"];
+ const totals={},correct={};dimensions.forEach(d=>{totals[d]=0;correct[d]=0});
+ let evaluated=0,unknown=0;
+ test.forEach(row=>{
+  const candidates=train.map(r=>({row:r,sim:opsCosine(opsVector(row.text,buildOpsIdf(train).idf),opsVector(r.text,buildOpsIdf(train).idf))})).sort((a,b)=>b.sim-a.sim).slice(0,5);
+  if(!candidates.length||candidates[0].sim<0.02){unknown++;return}evaluated++;
+  const votes={};dimensions.forEach(d=>votes[d]={});
+  candidates.forEach(c=>{const weight=Math.max(0.001,c.sim);dimensions.forEach(d=>{const label=c.row.dimensions[d];if(label)votes[d][label]=(votes[d][label]||0)+weight})});
+  dimensions.forEach(d=>{const actual=row.dimensions[d];if(!actual)return;totals[d]++;const predicted=Object.entries(votes[d]).sort((a,b)=>b[1]-a[1])[0];if(predicted&&predicted[0]===actual)correct[d]++});
+ });
+ const metrics=dimensions.filter(d=>totals[d]>0).map(d=>({name:d,accuracy:correct[d]/totals[d],n:totals[d]}));
+ out.innerHTML='<div class="meta"><span class="pill">'+train.length+' train rows</span><span class="pill">'+test.length+' held-out rows</span><span class="pill">'+train.length+' train / '+test.length+' test rows</span><span class="pill warn">'+testGroups.size+' held-out groups</span></div><p>Usable test cases: '+evaluated+' · no-match/low-similarity: '+unknown+' · grouping key: person/source group ID.</p><div class="notice">This deterministic split is grouped, but it is not a substitute for a preregistered benchmark. Inspect source/person grouping and duplicates before trusting scores. A type label can be noisy or disputed.</div><div class="list">'+metrics.map(m=>'<article class="entry"><div class="meta"><span class="pill">'+esc(m.name)+'</span><span class="pill">'+m.n+' labelled test rows</span></div><h3>'+Math.round(m.accuracy*100)+'% accuracy</h3><div class="meter"><span style="width:'+Math.round(m.accuracy*100)+'%"></span></div></article>').join("")+'</div><p class="src">Baseline: top-5 TF-IDF cosine neighbours, similarity-weighted vote, exact-label accuracy by dimension. No hyperparameter tuning on the held-out split. Results measure agreement with corpus labels only.</p>';
+}
+$("opsCorpusFile").addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(file){try{parseOpsCorpus(await file.text(),file.name)}catch(err){$("opsCorpusStatus").textContent="Import failed: "+err.message}e.target.value=""}});
+$("loadOpsDemo").addEventListener("click",loadOpsSyntheticDemo);
+$("clearOpsCorpus").addEventListener("click",()=>{opsCorpus=[];opsCorpusMeta={};renderOpsCorpusStatus();$("opsRetrievalReport").innerHTML='<div class="panel"><h2>Corpus cleared</h2></div>';$("opsEvaluationReport").textContent="Evaluation has not been run."});
+$("exportOpsCorpus").addEventListener("click",()=>{if(!opsCorpus.length){alert("No corpus to export.");return}download("ops-provenance-corpus-"+new Date().toISOString().slice(0,10)+".json",JSON.stringify({schemaVersion:"1.0",metadata:opsCorpusMeta,records:opsCorpus},null,2),"application/json")});
+$("runOpsRetrieval").addEventListener("click",runOpsRetrieval);
+$("runOpsEvaluation").addEventListener("click",runOpsEvaluation);
+
 function extractPlainText(html){const doc=new DOMParser().parseFromString(html,"text/html");doc.querySelectorAll("script,style,noscript,svg,nav,footer,header").forEach(n=>n.remove());return (doc.body?.innerText||doc.body?.textContent||"").replace(/\s+/g," ").trim()}
 function setAnalysisSource(text,meta){$("analysisText").value=text;$("analysisSourceMeta").textContent=meta+" · "+text.length.toLocaleString()+" characters";$("analysisReport").innerHTML='<div class="panel"><h2>Source loaded</h2><p class="sub">Review the extracted text, then generate the report. Text stays in this page unless you export it.</p></div>'}
 async function readAnalysisFile(file){
