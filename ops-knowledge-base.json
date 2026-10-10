@@ -874,11 +874,11 @@
       "id": "coin-consume-blast",
       "name": "Consume vs Blast",
       "symbol": "C / B",
-      "group": "Animals",
+      "group": "Animal contrast",
       "model": "classic-512",
       "dimensionId": "consume-blast",
-      "independent": true,
-      "summary": "One of the animal distinctions used to construct the classic animal-stack variations.",
+      "independent": false,
+      "summary": "Blast versus Consume is an animal contrast used to describe stacks, but it is not counted as a separate globally independent binary coin in this nine-coin accounting.",
       "sourceIds": [
         "animals-source",
         "starter-kit",
@@ -889,11 +889,11 @@
       "id": "coin-play-sleep",
       "name": "Play vs Sleep",
       "symbol": "P / S",
-      "group": "Animals",
+      "group": "Animal contrast",
       "model": "classic-512",
       "dimensionId": "play-sleep",
-      "independent": true,
-      "summary": "One of the animal distinctions used to construct the classic animal-stack variations.",
+      "independent": false,
+      "summary": "Play versus Sleep is an animal contrast used to describe stacks, but it is not counted as a separate globally independent binary coin in this nine-coin accounting.",
       "sourceIds": [
         "animals-source",
         "starter-kit",
@@ -938,7 +938,7 @@
       "model": "classic-512",
       "dimensionId": "info-energy",
       "independent": false,
-      "summary": "Represented as a derived distinction associated with the animal stack; do not count it as a tenth independent classic coin.",
+      "summary": "Derived from which category of animal appears last in the stack. It is a useful framework label but not counted as a separate independent coin in the nine-coin / 512 arithmetic used here.",
       "sourceIds": [
         "info-energy-source",
         "animals-source",
@@ -970,12 +970,40 @@
       "sourceIds": [
         "mahakram-research"
       ]
+    },
+    {
+      "id": "coin-animal-second-savior",
+      "name": "Second savior animal selection",
+      "symbol": "Second animal",
+      "group": "Animal-stack encoding",
+      "model": "classic-512",
+      "dimensionId": "play-sleep",
+      "independent": true,
+      "summary": "The first animal is derived from the Oe/Oi and De/Di savior orientations. The second savior animal is selected from the opposite category, with two available options; this is one binary choice in the four-stack variants per savior-function type.",
+      "sourceIds": [
+        "info-energy-source",
+        "type-code"
+      ]
+    },
+    {
+      "id": "coin-animal-last-category",
+      "name": "Last animal category selection",
+      "symbol": "Last animal",
+      "group": "Animal-stack encoding",
+      "model": "classic-512",
+      "dimensionId": "info-energy",
+      "independent": true,
+      "summary": "Once the savior animals are fixed, the remaining two animals can be ordered in two ways. The last animal's category determines the derived Info/Energy-dominance label; this is the second binary choice in the four-stack variants per savior-function type.",
+      "sourceIds": [
+        "info-energy-source",
+        "type-code"
+      ]
     }
   ],
   "coinArchitecture": {
     "classicModel": "classic-512",
     "independentCoinCount": 9,
-    "countCalculation": "3 human-needs + 2 letter + 2 animal + 2 modality coins = 9 independent binary coins; 2^9 = 512",
+    "countCalculation": "3 human-need coins + 2 letter coins + 2 animal-stack selection bits + 2 modality coins = 9 independent binary choices; 2^9 = 512.",
     "groups": [
       {
         "name": "Human needs",
@@ -993,10 +1021,10 @@
         ]
       },
       {
-        "name": "Animals",
+        "name": "Animal-stack selection bits",
         "coinIds": [
-          "coin-consume-blast",
-          "coin-play-sleep"
+          "coin-animal-second-savior",
+          "coin-animal-last-category"
         ]
       },
       {
@@ -1007,6 +1035,10 @@
         ]
       }
     ],
+    "animalContrasts": [
+      "coin-consume-blast",
+      "coin-play-sleep"
+    ],
     "derived": [
       "derived-info-energy"
     ],
@@ -1014,7 +1046,7 @@
       "coin-social-authority-utility",
       "coin-social-reciprocal-transactional"
     ],
-    "caveat": "This is a synthesis of the classic model as described by the cited public sources. The exact current official checklist and historical revision boundaries remain an open research question."
+    "caveat": "The four stack variants per ordered savior-function type are encoded as two binary stack-selection choices. P/S and B/C are animal contrasts, and Info/Energy dominance is a derived label from the last animal; these are not each counted as extra independent global coins in this nine-coin arithmetic. Exact official checklist terminology and revision history remain an open research question."
   },
   "validAnimalStacks": [
     "SCBP",
