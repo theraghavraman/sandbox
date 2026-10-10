@@ -6,6 +6,14 @@
 <section class="panel"><div class="ph"><h2>03 · Hex viewer & exact byte search</h2><p>Offset-addressed hex/ASCII view; search hex signatures and export a selected region.</p></div><div class="pb"><div class="row"><div class="field" style="flex:1"><label for="offset">Start offset (decimal or 0x)</label><input id="offset" value="0"></div><div class="field" style="width:115px"><label for="count">Bytes</label><select id="count"><option>128</option><option selected>256</option><option>512</option><option>1024</option><option>2048</option></select></div></div><div class="row"><button class="btn" id="prev">◀ Prev</button><button class="btn" id="next">Next ▶</button><button class="btn primary" id="showHex">Render</button><button class="btn" id="region">Export region</button></div><div id="hex" class="mono" style="margin-top:9px">Analyze a file to inspect bytes.</div><div class="row" style="margin-top:10px"><div class="field" style="flex:1"><label for="pattern">Search hex pattern (e.g. 50 4B 03 04)</label><input id="pattern" placeholder="DE AD BE EF"></div><button class="btn" id="search">Find bytes</button></div><div id="searchStatus" class="status">Exact byte search; first 1000 hits maximum.</div></div></section>
 <section class="panel"><div class="ph"><h2>04 · Printable strings & structure</h2><p>Extract ASCII runs and inspect common EOF/end markers for trailing bytes.</p></div><div class="pb"><div class="row"><div class="field" style="flex:1"><label for="min">Minimum string length</label><select id="min"><option>4</option><option selected>6</option><option>8</option><option>12</option></select></div><button class="btn primary" id="strings">Extract strings</button><button class="btn" id="stringsDown">Download TXT</button></div><div id="stringOut" class="output">Printable strings appear with byte offsets.</div><h3 style="font-size:13px">Structure / trailing-data indicators</h3><div id="structure" class="output">Analyze a file to scan markers.</div></div></section>
 <section class="panel"><div class="ph"><h2>05 · Evidence comparison</h2><p>Byte equality, digest comparison, aligned differing positions and length delta.</p></div><div class="pb"><div class="field"><label for="a">Sample A</label><input id="a" type="file"></div><div class="field"><label for="b">Sample B</label><input id="b" type="file"></div><button class="btn orange" id="compare">Compare samples</button><div id="comparison" class="status">Select two samples.</div></div></section>
+<!--EXT-PANELS-->
+<section class="panel full"><div class="ph"><h2>06 · Embedded-file carving</h2><p>Scans the whole evidence file for 40+ file signatures at any offset, validates headers, estimates extent (exact for PNG, JPEG, GIF, BMP, RIFF, SQLite, MP4; heuristic otherwise) and exports carved regions or all of them as a ZIP.</p></div><div class="pb"><div class="row"><button class="btn orange" id="x-carve">Scan for embedded files</button><button class="btn" id="x-carveZip">Download all carved (.zip)</button><button class="btn" id="x-carveCsv">Carve table CSV</button><label class="hint" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="x-carveText" checked> include text-based signatures (XML, HTML, PEM, RTF)</label></div><div id="x-carveStatus" class="status">Choose a file in panel 01, then scan.</div><div style="overflow:auto;max-height:340px;margin-top:10px"><table id="x-carveTable" style="width:100%;border-collapse:collapse;font-size:12px"></table></div></div></section>
+<section class="panel full"><div class="ph"><h2>07 · Entropy map &amp; byte histogram</h2><p>Block-by-block Shannon entropy across the file reveals compressed/encrypted regions, padding and appended data. Hover the chart for offsets.</p></div><div class="pb"><div class="row"><div class="field" style="width:170px"><label for="x-block">Block size</label><select id="x-block"><option value="0">Auto (~512 blocks)</option><option>256</option><option>1024</option><option>4096</option><option>16384</option><option>65536</option><option>1048576</option></select></div><button class="btn orange" id="x-map">Draw entropy map</button><button class="btn" id="x-mapPng">Save chart PNG</button></div><canvas id="x-entCanvas" height="190" style="width:100%;height:190px;border:1px solid var(--line);border-radius:8px;margin-top:8px;background:#fbfcfc"></canvas><div id="x-entTip" class="hint">Hover for offset and entropy.</div><canvas id="x-histCanvas" height="130" style="width:100%;height:130px;border:1px solid var(--line);border-radius:8px;margin-top:8px;background:#fbfcfc"></canvas><div id="x-mapStatus" class="status">Choose a file in panel 01, then draw.</div><div id="x-regions" class="output" style="margin-top:8px">High-entropy and low-entropy regions are listed here.</div></div></section>
+<section class="panel"><div class="ph"><h2>08 · Indicators of interest (IOC) extractor</h2><p>Pulls URLs, e-mails, IPv4 addresses, domains, Windows paths, registry keys, hashes, JWTs and Base64 blobs from ASCII and UTF-16LE strings.</p></div><div class="pb"><div class="row"><div class="field" style="width:130px"><label for="x-iocMin">Min length</label><select id="x-iocMin"><option>5</option><option selected>6</option><option>8</option><option>10</option></select></div><label class="hint" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="x-iocU16" checked> include UTF-16LE</label><button class="btn orange" id="x-ioc">Extract indicators</button><button class="btn" id="x-iocCsv">CSV</button></div><div id="x-iocStatus" class="status">Ready.</div><div id="x-iocOut" class="output" style="margin-top:8px">Indicators appear grouped by type with offsets.</div></div></section>
+<section class="panel"><div class="ph"><h2>09 · XOR &amp; Base64 probe</h2><p>Single-byte XOR brute force (scored by printable ratio, English letter frequency and known magic) plus repeating-key keysize estimation by Hamming distance.</p></div><div class="pb"><div class="row"><div class="field" style="width:150px"><label for="x-xorMax">Max key length</label><select id="x-xorMax"><option>16</option><option selected>32</option><option>64</option></select></div><button class="btn orange" id="x-xor">Analyze XOR</button><button class="btn" id="x-b64">Decode Base64 blobs</button></div><div id="x-xorStatus" class="status">Ready.</div><div id="x-xorOut" class="output" style="margin-top:8px">Uses the first 256 KiB of the selected file.</div></div></section>
+<section class="panel full"><div class="ph"><h2>10 · Multi-hash lab &amp; verifier</h2><p>MD5, SHA-1, SHA-256, SHA-384, SHA-512 and CRC-32 for every selected file, duplicate detection across the batch, and a known-hash verifier that auto-detects the algorithm.</p></div><div class="pb"><div class="row"><button class="btn orange" id="x-hashAll">Hash all selected files</button><button class="btn" id="x-hashCsv">Hashes CSV</button><div class="field" style="flex:1;min-width:260px;margin:0"><input id="x-known" placeholder="Paste a known hash (MD5 / SHA-1 / SHA-256 / SHA-512) to verify against every file"></div><button class="btn" id="x-verify">Verify</button></div><div id="x-hashStatus" class="status" style="margin-top:8px">Ready.</div><div id="x-hashOut" class="output" style="margin-top:8px">Hash results and duplicate groups appear here.</div></div></section>
+<section class="panel full"><div class="ph"><h2>11 · Case report</h2><p>Bundles everything computed on this page (identity, carving, entropy regions, indicators, hashes) into one Markdown or JSON report.</p></div><div class="pb"><div class="row"><button class="btn primary" id="x-reportMd">Download Markdown report</button><button class="btn" id="x-reportJson">Download JSON bundle</button></div><div id="x-reportStatus" class="status">Run any analysis above first; sections that have not been run are omitted.</div></div></section>
+<!--/EXT-PANELS-->
 </div></main><script>
 (()=>{'use strict';const $=id=>document.getElementById(id);let files=[],data=null,current=null,report=null,stringRows=[],offset=0;
 const fmt=n=>{if(!Number.isFinite(n))return'—';let u=['B','KB','MB','GB'],i=0;while(n>=1024&&i<3){n/=1024;i++}return(n<10&&i?n.toFixed(1):Math.round(n))+' '+u[i]},esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),say=(s,k='')=>{$('status').textContent=s;$('status').className='status '+k},save=(b,n)=>{let u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(u),1200)},hx=a=>Array.from(a,b=>b.toString(16).padStart(2,'0')).join(' ');
@@ -21,4 +29,202 @@ $('copyReport').onclick=async()=>{if(!report)return say('Analyze a file first.',
 $('inventory').onclick=async()=>{if(!files.length)return say('Choose files first.','err');let rows=[['name','size_bytes','mime','signature','entropy_bits','sha256']];for(let f of files){if(f.size>128*1024*1024){rows.push([f.name,f.size,f.type,'SKIPPED_LIMIT','','']);continue}let a=new Uint8Array(await f.arrayBuffer());rows.push([f.name,f.size,f.type,type(a.slice(0,64)),entropy(a).toFixed(5),await digest(a)])}save(new Blob([rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n')],{type:'text/csv'}),'evidence-inventory.csv');say('CSV exported for '+files.length+' files.','ok')};
 $('compare').onclick=async()=>{try{let a=$('a').files[0],b=$('b').files[0];if(!a||!b)throw Error('Select both samples.');if(a.size>128*1024*1024||b.size>128*1024*1024)throw Error('Each file must be 128 MiB or smaller.');let [aa,bb]=await Promise.all([a.arrayBuffer(),b.arrayBuffer()]),x=new Uint8Array(aa),y=new Uint8Array(bb),[ha,hb]=await Promise.all([digest(x),digest(y)]);let dif=0,first=-1;for(let i=0;i<Math.min(x.length,y.length);i++)if(x[i]!==y[i]){dif++;if(first<0)first=i}$('comparison').className='status '+(ha===hb?'ok':'warn');$('comparison').textContent='Byte-identical: '+(ha===hb?'YES':'NO')+'\nA SHA-256: '+ha+'\nB SHA-256: '+hb+'\nLength delta (A-B): '+(x.length-y.length)+' bytes\nDiffering aligned positions: '+dif+'\nFirst difference: '+(first<0?'none within common length':'0x'+first.toString(16))+'\nAligned count is not edit distance; insertions shift offsets.'}catch(e){$('comparison').textContent=e.message;$('comparison').className='status err'}};
 })();
-</script></body></html>
+</script><!--EXT-SCRIPT--><script>
+/* Forensics Studio extension: carving, entropy map, IOC, XOR probe, multi-hash, case report. Self-contained. */
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const LIMIT=128*1024*1024;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const h8=n=>'0x'+n.toString(16).padStart(8,'0');
+const fmt=n=>{let u=['B','KB','MB','GB'],i=0;while(n>=1024&&i<3){n/=1024;i++}return(n<10&&i?n.toFixed(1):Math.round(n))+' '+u[i]};
+const save=(b,n)=>{const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)};
+const say=(id,s,k='')=>{const e=$(id);e.textContent=s;if(e.classList.contains('status'))e.className='status '+k};
+const state={carve:null,regions:null,ioc:null,xor:null,hashes:null};
+let cache={file:null,data:null};
+async function load(){const f=$('files').files[0];if(!f)throw Error('Choose evidence in panel 01 first.');if(f.size>LIMIT)throw Error('File exceeds the 128 MiB analysis limit.');if(cache.file!==f||!cache.data)cache={file:f,data:new Uint8Array(await f.arrayBuffer())};return cache}
+const ascii=s=>Array.from(s,c=>c.charCodeAt(0));
+const u32le=(a,i)=>(a[i]|a[i+1]<<8|a[i+2]<<16|a[i+3]<<24)>>>0;
+const u32be=(a,i)=>(a[i]<<24|a[i+1]<<16|a[i+2]<<8|a[i+3])>>>0;
+const u16be=(a,i)=>a[i]<<8|a[i+1];
+function idx(a,pat,from=0,to=a.length){const p0=pat[0];outer:for(let i=from;i<=to-pat.length;i++){if(a[i]!==p0)continue;for(let j=1;j<pat.length;j++)if(a[i+j]!==pat[j])continue outer;return i}return-1}
+
+/* ---------- signature table: [name, bytes, ext, offsetOfMagicInFile, textBased] ---------- */
+const S=(n,b,e,o=0,t=false)=>({n,b:typeof b==='string'?ascii(b):b,e,o,t});
+const SIGS=[
+S('PNG',[137,80,78,71,13,10,26,10],'png'),S('JPEG',[255,216,255],'jpg'),S('GIF87a','GIF87a','gif'),S('GIF89a','GIF89a','gif'),
+S('PDF','%PDF-','pdf'),S('ZIP / OOXML / JAR / APK',[80,75,3,4],'zip'),S('RAR 4.x',[82,97,114,33,26,7,0],'rar'),S('RAR 5.x',[82,97,114,33,26,7,1,0],'rar'),
+S('7-Zip',[55,122,188,175,39,28],'7z'),S('GZIP',[31,139,8],'gz'),S('BZIP2','BZh','bz2'),S('XZ',[253,55,122,88,90,0],'xz'),S('Zstandard',[40,181,47,253],'zst'),
+S('ELF',[127,69,76,70],'elf'),S('Mach-O 64-bit',[207,250,237,254],'macho'),S('Mach-O 32-bit',[206,250,237,254],'macho'),S('Mach-O fat',[202,254,186,190],'macho'),
+S('PE / DOS executable','MZ','exe'),S('SQLite 3','SQLite format 3\0','sqlite'),S('OLE2 (DOC/XLS/PPT/MSI)',[208,207,17,224,161,177,26,225],'ole'),
+S('TIFF (LE)',[73,73,42,0],'tif'),S('TIFF (BE)',[77,77,0,42],'tif'),S('RIFF (WAV/WebP/AVI)','RIFF','riff'),S('BMP','BM','bmp'),
+S('MP3 (ID3v2)','ID3','mp3'),S('Ogg','OggS','ogg'),S('FLAC','fLaC','flac'),S('MIDI','MThd','mid'),S('Matroska / WebM',[26,69,223,163],'mkv'),
+S('MP4 / MOV (ftyp)','ftyp','mp4',4),S('WebAssembly',[0,97,115,109,1,0,0,0],'wasm'),S('PCAP (LE)',[212,195,178,161],'pcap'),S('PCAP (BE)',[161,178,195,212],'pcap'),
+S('PCAPNG',[10,13,13,10],'pcapng'),S('TAR (ustar)','ustar','tar',257),S('Photoshop PSD','8BPS','psd'),S('Windows ICO',[0,0,1,0],'ico'),S('DEX (Android)','dex\n03','dex'),
+S('LUKS','LUKS\xba\xbe','luks'),S('Java class (CAFEBABE)',[202,254,186,190],'class'),S('ISO 9660 (CD001)','CD001','iso',32769),
+S('RTF','{\\rtf1','rtf',0,true),S('XML','<?xml','xml',0,true),S('HTML','<!DOCTYPE html','html',0,true),S('HTML (lower)','<!doctype html','html',0,true),S('PEM block','-----BEGIN ','pem',0,true),S('PostScript','%!PS','ps',0,true),
+S('OpenSSH public key','ssh-rsa ','pub',0,true)
+];
+const BUCKET=(()=>{const m=Array.from({length:256},()=>[]);for(const s of SIGS)m[s.b[0]].push(s);return m})();
+function valid(a,s,i){ // i = position of magic; returns refined name or null
+ switch(s.n){
+  case'PE / DOS executable':{if(i+64>a.length)return null;const e=u32le(a,i+60);if(e<64||e>0x100000||i+e+4>a.length)return null;return a[i+e]===80&&a[i+e+1]===69&&a[i+e+2]===0&&a[i+e+3]===0?'PE executable (EXE/DLL/SYS)':null}
+  case'BZIP2':return a[i+3]>=49&&a[i+3]<=57&&a[i+4]===0x31&&a[i+5]===0x41&&a[i+6]===0x59&&a[i+7]===0x26&&a[i+8]===0x53&&a[i+9]===0x59?s.n:null;
+  case'BMP':{if(i+30>a.length)return null;const d=u32le(a,i+14);return a[i+6]===0&&a[i+7]===0&&a[i+8]===0&&a[i+9]===0&&[12,40,52,56,64,108,124].includes(d)?s.n:null}
+  case'RIFF (WAV/WebP/AVI)':{const t=String.fromCharCode(a[i+8],a[i+9],a[i+10],a[i+11]);return t==='WAVE'?'WAV audio':t==='WEBP'?'WebP image':t==='AVI '?'AVI video':null}
+  case'Windows ICO':{if(i+22>a.length)return null;const n=a[i+4]|a[i+5]<<8;return n>=1&&n<=64&&a[i+9]===0&&(a[i+10]<=1)&&u32le(a,i+14)>0&&u32le(a,i+18)<=a.length-i+4?s.n:null}
+  case'Java class (CAFEBABE)':case'Mach-O fat':{const v=u16be(a,i+6),c=u16be(a,i+4);return(v>=45&&v<=80&&c<=5)?'Java class':(c>=1&&c<=8&&v===0&&u16be(a,i+6)===0)?'Mach-O universal':null}
+  case'MP3 (ID3v2)':return a[i+3]<=4&&a[i+4]<=1?s.n:null;
+  case'GZIP':return a[i+3]<32&&(a[i+8]===0||a[i+8]===2||a[i+8]===4)?s.n:null;
+  case'TIFF (LE)':{const v=u32le(a,i+4);return v>=8&&v<0x8000000?s.n:null}case'TIFF (BE)':{const v=u32be(a,i+4);return v>=8&&v<0x8000000?s.n:null}
+  case'JPEG':return a[i+3]>=0xC0?s.n:null;
+  case'DEX (Android)':return a[i+7]===0?s.n:null;
+  case'ZIP / OOXML / JAR / APK':{const v=a[i+4]|a[i+5]<<8;return v>=10&&v<=100?s.n:null}
+  case'MP4 / MOV (ftyp)':{const sz=u32be(a,i-4);return sz>=12&&sz<=256?s.n:null}
+  default:return s.n}}
+/* ---------- extent estimation ---------- */
+function extent(a,st,name,nextStart){
+ const E=(end,exact)=>({end:Math.min(Math.max(end,st+1),a.length),exact});
+ try{
+  if(name==='PNG'){const k=idx(a,[73,69,78,68],st+8);return k>=0?E(k+8,true):null}
+  if(name==='JPEG'){let p=st+2;while(p+4<a.length){if(a[p]!==255){p++;continue}const m=a[p+1];if(m===0xD9)return E(p+2,true);if(m===0xD8||(m>=0xD0&&m<=0xD7)||m===1||m===255){p+=m===255?1:2;continue}const L=a[p+2]<<8|a[p+3];p+=2+L;if(m===0xDA){while(p+1<a.length){if(a[p]===255&&a[p+1]!==0&&!(a[p+1]>=0xD0&&a[p+1]<=0xD7)&&a[p+1]!==255)break;p++}}}return null}
+  if(name.startsWith('GIF')){let p=st+10;const fl=a[p];p+=3;if(fl&128)p+=3*(1<<((fl&7)+1));while(p<a.length){const b=a[p];if(b===0x3B)return E(p+1,true);if(b===0x21){p+=2;while(a[p]){p+=a[p]+1}p++}else if(b===0x2C){const lf=a[p+9];p+=10;if(lf&128)p+=3*(1<<((lf&7)+1));p++;while(a[p]){p+=a[p]+1}p++}else return null}return null}
+  if(name==='BMP'){const n=u32le(a,st+2);return n>14?E(st+n,true):null}
+  if(name==='WAV audio'||name==='WebP image'||name==='AVI video'){return E(st+8+u32le(a,st+4)+(u32le(a,st+4)&1),true)}
+  if(name==='SQLite 3'){let ps=u16be(a,st+16);if(ps===1)ps=65536;const pc=u32be(a,st+28);return ps&&pc?E(st+ps*pc,true):null}
+  if(name==='MP4 / MOV (ftyp)'){let p=st-4,n=0;while(p+8<=a.length&&n<20000){let sz=u32be(a,p);const t=String.fromCharCode(a[p+4],a[p+5],a[p+6],a[p+7]);if(!/^[ -~]{4}$/.test(t))break;if(sz===1){sz=u32be(a,p+8)*4294967296+u32be(a,p+12)}if(sz===0){p=a.length;break}if(sz<8)break;p+=sz;n++}return p>st?{end:Math.min(p,a.length),exact:true,start:st-4}:null}
+  if(name.startsWith('ZIP')){const lim=nextStart||a.length;let p=st;for(;;){const k=idx(a,[80,75,5,6],p);if(k<0||k+22>a.length)break;const cl=a[k+20]|a[k+21]<<8;if(k+22+cl<=a.length)return E(k+22+cl,false);p=k+1}return null}
+  if(name==='PDF'){const lim=nextStart||a.length;let last=-1,p=st;for(;;){const k=idx(a,[37,37,69,79,70],p,lim);if(k<0)break;last=k;p=k+5}if(last<0)return null;let e=last+5;while(e<a.length&&(a[e]===10||a[e]===13)&&e<last+8)e++;return E(e,false)}
+  if(name==='ELF'||name.startsWith('PE')){return null}
+  if(name==='PEM block'){const k=idx(a,ascii('-----END '),st);if(k<0)return null;const e=idx(a,[45,45,45,45,45],k+9);return e>=0?E(e+5,true):null}
+  if(name==='XML'||name==='HTML'||name==='HTML (lower)'){const t=name==='XML'?null:ascii('</html>');const k=t?idx(a,t,st):-1;return k>=0?E(k+7,false):null}
+  if(name==='RTF'){let d=0;for(let p=st;p<a.length&&p<st+64*1024*1024;p++){const c=a[p];if(c===92){p++;continue}if(c===123)d++;else if(c===125){d--;if(d===0)return E(p+1,true)}}return null}
+ }catch{}
+ return null}
+function nameFor(n){return n}
+/* ---------- carving ---------- */
+async function carve(){
+ const{file,data:a}=await load();const hits=[];const t0=performance.now();const withText=$('x-carveText').checked;
+ for(let i=0;i<a.length&&hits.length<2000;i++){const L=BUCKET[a[i]];if(!L.length)continue;
+  for(const s of L){if(s.t&&!withText)continue;const st=i-s.o;if(st<0)continue;
+   if(s.o===0&&i!==st)continue;let ok=true;for(let j=1;j<s.b.length;j++)if(a[i+j]!==s.b[j]){ok=false;break}if(!ok)continue;
+   const nm=valid(a,s,i);if(!nm)continue;hits.push({off:st,name:nm,ext:s.e,magicAt:i});break}
+  if(i%8000000===0&&i)await new Promise(r=>setTimeout(r,0))}
+ hits.sort((x,y)=>x.off-y.off);
+ // drop duplicates at same offset, and containment noise for tiny false-positive sigs (ICO inside others etc.)
+ const uniq=[];for(const h of hits){if(uniq.length&&uniq[uniq.length-1].off===h.off)continue;uniq.push(h)}
+ for(let k=0;k<uniq.length;k++){const h=uniq[k];let next=a.length;for(let m=k+1;m<uniq.length;m++){if(uniq[m].name===h.name&&uniq[m].off>h.off){next=uniq[m].off;break}}
+  const ex=extent(a,h.off===h.magicAt?h.off:h.magicAt,h.name,next);
+  if(ex){h.end=ex.end;h.exact=ex.exact;if(ex.start!==undefined)h.off=ex.start}else{let nx=a.length;for(let m=k+1;m<uniq.length;m++)if(uniq[m].off>h.off+16){nx=uniq[m].off;break}h.end=nx;h.exact=false;h.unknown=true}
+  h.size=h.end-h.off;h.self=h.off===0}
+ state.carve={file:file.name,hits:uniq};render(uniq,a);
+ say('x-carveStatus','Scanned '+fmt(a.length)+' in '+Math.round(performance.now()-t0)+' ms · '+uniq.length+' signature hit(s)'+(uniq.length>=2000?' (capped at 2000)':'')+'. "Est." = extent is heuristic or runs to the next signature/EOF.','ok')}
+function render(h,a){const t=$('x-carveTable');if(!h.length){t.innerHTML='<tr><td class="hint">No known signatures found.</td></tr>';return}
+ t.innerHTML='<thead><tr style="text-align:left;color:var(--muted);font-size:11px"><th>#</th><th>Offset</th><th>Type</th><th>Size</th><th>Extent</th><th>Note</th><th></th></tr></thead><tbody>'+h.map((x,i)=>'<tr style="border-top:1px solid #edf0f2"><td>'+(i+1)+'</td><td style="font-family:var(--mono)">'+h8(x.off)+'</td><td><b>'+esc(x.name)+'</b></td><td>'+fmt(x.size)+'</td><td>'+(x.exact?'exact':'est.')+'</td><td class="hint">'+(x.self?'start of file':x.unknown?'extent unknown':'')+'</td><td><button class="btn" data-i="'+i+'" style="padding:4px 8px">Export</button></td></tr>').join('')+'</tbody>';
+ t.querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>{const x=h[+b.dataset.i];save(new Blob([a.subarray(x.off,x.end)]),'carved_'+h8(x.off).slice(2)+'.'+x.ext)})}
+/* ---------- zip writer (store) + crc32 ---------- */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(a,c=0){c=~c>>>0;for(let i=0;i<a.length;i++)c=CRC[(c^a[i])&255]^(c>>>8);return(~c)>>>0}
+function zipStore(files){const parts=[],cd=[];let off=0;const enc=new TextEncoder();
+ for(const f of files){const nm=enc.encode(f.name),crc=crc32(f.data),L=new DataView(new ArrayBuffer(30));L.setUint32(0,0x04034b50,true);L.setUint16(4,20,true);L.setUint16(6,0x0800,true);L.setUint16(8,0,true);L.setUint32(14,crc,true);L.setUint32(18,f.data.length,true);L.setUint32(22,f.data.length,true);L.setUint16(26,nm.length,true);
+  parts.push(new Uint8Array(L.buffer),nm,f.data);const C=new DataView(new ArrayBuffer(46));C.setUint32(0,0x02014b50,true);C.setUint16(4,20,true);C.setUint16(6,20,true);C.setUint16(8,0x0800,true);C.setUint32(16,crc,true);C.setUint32(20,f.data.length,true);C.setUint32(24,f.data.length,true);C.setUint16(28,nm.length,true);C.setUint32(42,off,true);cd.push(new Uint8Array(C.buffer),nm);off+=30+nm.length+f.data.length}
+ const cs=cd.reduce((s,x)=>s+x.length,0),E=new DataView(new ArrayBuffer(22));E.setUint32(0,0x06054b50,true);E.setUint16(8,files.length,true);E.setUint16(10,files.length,true);E.setUint32(12,cs,true);E.setUint32(16,off,true);
+ return new Blob([...parts,...cd,new Uint8Array(E.buffer)],{type:'application/zip'})}
+/* ---------- entropy map ---------- */
+function blockEntropy(a,s,e){const h=new Uint32Array(256);for(let i=s;i<e;i++)h[a[i]]++;let r=0,n=e-s;for(const c of h)if(c){const p=c/n;r-=p*Math.log2(p)}return r}
+let mapData=null;
+async function entropyMap(){const{file,data:a}=await load();let bs=+$('x-block').value;if(!bs)bs=Math.max(256,Math.pow(2,Math.ceil(Math.log2(Math.max(1,a.length/512)))));const n=Math.max(1,Math.ceil(a.length/bs)),ent=new Float32Array(n);
+ for(let b=0;b<n;b++)ent[b]=blockEntropy(a,b*bs,Math.min(a.length,(b+1)*bs));
+ mapData={bs,ent,len:a.length};draw();
+ // regions
+ const runs=pred=>{const r=[];let cur=null;for(let b=0;b<n;b++){if(pred(ent[b])){if(!cur)cur={s:b,e:b,sum:0};cur.e=b;cur.sum+=ent[b]}else if(cur){r.push(cur);cur=null}}if(cur)r.push(cur);return r};
+ const hi=runs(e=>e>=7.2),lo=runs(e=>e<=0.5);
+ const fr=(r)=>h8(r.s*bs)+' – '+h8(Math.min(a.length,(r.e+1)*bs))+'  ('+fmt(Math.min(a.length,(r.e+1)*bs)-r.s*bs)+', mean '+(r.sum/(r.e-r.s+1)).toFixed(3)+' bits)';
+ const keepH=hi.filter(r=>r.e-r.s>=1||n<8),keepL=lo.filter(r=>r.e-r.s>=1||n<8);
+ state.regions={file:file.name,blockSize:bs,high:keepH.map(fr),low:keepL.map(fr),overall:blockEntropy(a,0,a.length)};
+ say('x-mapStatus','Entropy map drawn.','ok');$('x-regions').textContent='Block size '+bs+' B · '+n+' blocks · overall entropy '+state.regions.overall.toFixed(4)+' bits/byte\n\nHIGH entropy (≥7.2: compressed / encrypted / random):\n'+(keepH.length?keepH.slice(0,60).map(fr).join('\n'):'  none')+'\n\nLOW entropy (≤0.5: zero-fill / padding / repeats):\n'+(keepL.length?keepL.slice(0,60).map(fr).join('\n'):'  none');
+ hist(a)}
+function draw(){const c=$('x-entCanvas');c.height=190;const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=Math.max(300,Math.round(r.width*d));c.height=Math.round(190*d);const x=c.getContext('2d'),w=c.width,h=c.height;x.clearRect(0,0,w,h);if(!mapData)return;const{ent}=mapData,n=ent.length,pad=26*d;
+ x.fillStyle='#8a97a3';x.font=(10*d)+'px sans-serif';for(let v=0;v<=8;v+=2){const y=h-pad-(h-2*pad)*v/8;x.fillText(v,4*d,y+3*d);x.strokeStyle='#e8ecef';x.beginPath();x.moveTo(20*d,y);x.lineTo(w,y);x.stroke()}
+ const px=b=>20*d+(w-24*d)*b/Math.max(1,n-1),py=e=>h-pad-(h-2*pad)*e/8;
+ x.beginPath();x.moveTo(px(0),h-pad);for(let b=0;b<n;b++)x.lineTo(px(b),py(ent[b]));x.lineTo(px(n-1),h-pad);x.closePath();x.fillStyle='rgba(237,106,36,.18)';x.fill();
+ x.beginPath();for(let b=0;b<n;b++)b?x.lineTo(px(b),py(ent[b])):x.moveTo(px(b),py(ent[b]));x.strokeStyle='#ed6a24';x.lineWidth=1.4*d;x.stroke();
+ x.setLineDash([4*d,4*d]);x.strokeStyle='#b53b32';x.beginPath();x.moveTo(20*d,py(7.2));x.lineTo(w,py(7.2));x.stroke();x.setLineDash([]);x.fillStyle='#b53b32';x.fillText('7.2',w-24*d,py(7.2)-3*d)}
+$('x-entCanvas').addEventListener('mousemove',ev=>{if(!mapData)return;const r=ev.target.getBoundingClientRect(),n=mapData.ent.length,b=Math.max(0,Math.min(n-1,Math.round((ev.clientX-r.left-20)/(r.width-24)*(n-1))));$('x-entTip').textContent='Block '+b+' · offset '+h8(b*mapData.bs)+' · entropy '+mapData.ent[b].toFixed(3)+' bits/byte'});
+function hist(a){const c=$('x-histCanvas'),d=window.devicePixelRatio||1,r=c.getBoundingClientRect();c.width=Math.max(300,Math.round(r.width*d));c.height=Math.round(130*d);const x=c.getContext('2d'),w=c.width,h=c.height,H=new Uint32Array(256);const step=Math.max(1,Math.floor(a.length/8000000));for(let i=0;i<a.length;i+=step)H[a[i]]++;let mx=0;for(const v of H)if(v>mx)mx=v;x.clearRect(0,0,w,h);const bw=(w-8*d)/256;for(let b=0;b<256;b++){const v=H[b]/(mx||1);x.fillStyle=b>=32&&b<127?'#ed6a24':b===0?'#17202c':'#73808d';x.fillRect(4*d+b*bw,h-14*d-(h-22*d)*Math.sqrt(v),Math.max(1,bw-.5),(h-22*d)*Math.sqrt(v))}x.fillStyle='#8a97a3';x.font=(10*d)+'px sans-serif';x.fillText('byte value 0 → 255 (orange = printable ASCII, dark = 0x00) · sqrt scale',6*d,h-3*d)}
+$('x-mapPng').onclick=()=>{if(!mapData)return say('x-mapStatus','Draw the entropy map first.','err');$('x-entCanvas').toBlob(b=>save(b,'entropy-map.png'))};
+window.addEventListener('resize',()=>{if(mapData){draw()}});
+/* ---------- strings + IOC ---------- */
+function stringRuns(a,min,u16){const out=[];let st=-1,s='';const MAX=250000;for(let i=0;i<a.length&&out.length<MAX;i++){const b=a[i];if((b>=32&&b<=126)||b===9){if(st<0)st=i;s+=String.fromCharCode(b)}else{if(s.length>=min)out.push([st,s,'ascii']);st=-1;s=''}}if(s.length>=min)out.push([st,s,'ascii']);
+ if(u16){for(let pass=0;pass<2;pass++){st=-1;s='';for(let i=pass;i+1<a.length&&out.length<MAX*1.4;i+=2){const lo=a[i],hi=a[i+1];if(hi===0&&((lo>=32&&lo<=126)||lo===9)){if(st<0)st=i;s+=String.fromCharCode(lo)}else{if(s.length>=min)out.push([st,s,'utf16le']);st=-1;s=''}}if(s.length>=min)out.push([st,s,'utf16le'])}}
+ return out}
+const RX=[
+ ['URL',/\b(?:https?|ftp|ws|wss|sftp):\/\/[^\s"'<>\\^`{|}]{4,}/gi],
+ ['E-mail',/\b[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9-]{1,63}(?:\.[A-Za-z0-9-]{1,63})*\.[A-Za-z]{2,24}\b/g],
+ ['IPv4',/\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/g],
+ ['Domain',/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|net|org|io|co|info|biz|gov|edu|ru|cn|de|uk|fr|jp|br|in|xyz|top|club|online|site|app|dev|cloud|onion|me|us|eu|nl|it|es|ca|au)\b/gi],
+ ['Windows path',/\b[A-Za-z]:\\(?:[\w .$()-]{1,64}\\)*[\w.$()-]{1,64}/g],
+ ['UNC path',/\\\\[A-Za-z0-9_.$-]{2,64}\\[^\s"'<>|]{2,120}/g],
+ ['Registry key',/\bHK(?:EY_(?:LOCAL_MACHINE|CURRENT_USER|CLASSES_ROOT|USERS)|LM|CU|CR)\\[^\s"'<>|]{2,160}/g],
+ ['Unix path',/(?:^|[\s"'=])(\/(?:etc|usr|var|tmp|home|bin|opt|root|dev|proc)\/[A-Za-z0-9._\/-]{2,100})/g],
+ ['Hash (MD5/SHA)',/\b(?:[a-f0-9]{32}|[a-f0-9]{40}|[a-f0-9]{64})\b/gi],
+ ['JWT',/\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{4,}\b/g],
+ ['Private key header',/-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE KEY-----/g],
+ ['Base64 blob',/(?:[A-Za-z0-9+\/]{4}){10,}(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?/g]
+];
+async function iocs(){const{file,data:a}=await load();const min=+$('x-iocMin').value,u16=$('x-iocU16').checked,runs=stringRuns(a,min,u16);const found=new Map(),rows=[];
+ for(const[off,s,enc]of runs){for(const[type,rx]of RX){rx.lastIndex=0;let m;let guard=0;while((m=rx.exec(s))&&guard++<50){const v=(m[1]||m[0]).trim();if(type==='Base64 blob'&&(/^[A-Fa-f0-9]+$/.test(v)||!/[A-Z]/.test(v)||!/[a-z]/.test(v)))continue;if(type==='Domain'&&/^\d+(\.\d+)+$/.test(v))continue;const key=type+'\u0000'+v;if(!found.has(key)){found.set(key,{type,v,off,enc,n:1});}else found.get(key).n++}}}
+ const list=[...found.values()],by={};for(const r of list)(by[r.type]=by[r.type]||[]).push(r);rows.push(...list);
+ state.ioc={file:file.name,total:list.length,byType:Object.fromEntries(Object.entries(by).map(([k,v])=>[k,v.slice(0,200).map(r=>({value:r.v,offset:h8(r.off),encoding:r.enc,count:r.n}))]))};
+ $('x-iocOut').textContent=list.length?Object.entries(by).map(([k,v])=>'■ '+k+' ('+v.length+')\n'+v.slice(0,40).map(r=>'  '+h8(r.off)+' '+(r.enc==='utf16le'?'[u16] ':'')+(r.v.length>150?r.v.slice(0,150)+'…':r.v)+(r.n>1?'  ×'+r.n:'')).join('\n')+(v.length>40?'\n  … '+(v.length-40)+' more (see CSV)':'')).join('\n\n'):'No indicators found in '+runs.length+' string runs.';
+ iocRows=rows;say('x-iocStatus','Indicators extracted: '+list.length+' unique across '+runs.length+' string runs.','ok')}
+let iocRows=[];
+$('x-iocCsv').onclick=()=>{if(!iocRows.length)return say('x-iocStatus','Extract indicators first.','err');const q=v=>'"'+String(v).replace(/"/g,'""')+'"';save(new Blob([['type,value,offset,encoding,count',...iocRows.map(r=>[r.type,r.v,h8(r.off),r.enc,r.n].map(q).join(','))].join('\r\n')],{type:'text/csv'}),'indicators.csv')};
+/* ---------- XOR / base64 probe ---------- */
+const FREQ={' ':13,e:12.7,t:9.1,a:8.2,o:7.5,i:7,n:6.7,s:6.3,h:6.1,r:6,d:4.3,l:4,u:2.8};
+function scoreBytes(b){let s=0,pr=0;for(const c of b){if(c>=32&&c<127||c===10||c===13||c===9){pr++;s+=FREQ[String.fromCharCode(c|32)]||0}else if(c===0)s-=1;else s-=4}return{pr:pr/b.length,s:s/b.length}}
+const MAGICS=[['MZ',[77,90]],['PDF',[37,80,68,70]],['ZIP',[80,75,3,4]],['PNG',[137,80,78,71]],['ELF',[127,69,76,70]],['GZIP',[31,139,8]],['JPEG',[255,216,255]],['GIF8',[71,73,70,56]]];
+function hamming(a,b){let d=0;for(let i=0;i<a.length;i++){let x=a[i]^b[i];while(x){d+=x&1;x>>=1}}return d}
+async function xorProbe(){const{file,data:all}=await load();const a=all.subarray(0,262144);let out='File: '+file.name+' · analyzing '+fmt(a.length)+'\n\n';
+ const res=[];for(let k=0;k<256;k++){const t=new Uint8Array(Math.min(a.length,65536));for(let i=0;i<t.length;i++)t[i]=a[i]^k;const sc=scoreBytes(t);let mg='';for(const[nm,m]of MAGICS)if(m.every((v,i)=>t[i]===v))mg=nm;res.push({k,s:sc.s+(mg?50:0)+sc.pr*5,pr:sc.pr,mg})}
+ res.sort((x,y)=>y.s-x.s);out+='Single-byte XOR candidates (key 0x00 = no change):\n'+res.slice(0,6).map(r=>'  key 0x'+r.k.toString(16).padStart(2,'0')+'  printable '+(r.pr*100).toFixed(1)+'%  score '+r.s.toFixed(2)+(r.mg?'  ← magic '+r.mg:'')).join('\n');
+ const max=+$('x-xorMax').value;const ks=[];for(let L=2;L<=max;L++){let tot=0,n=0;const blocks=Math.min(24,Math.floor(a.length/L)-1);if(blocks<4)break;for(let i=0;i<blocks-1;i++){tot+=hamming(a.subarray(i*L,i*L+L),a.subarray((i+1)*L,(i+1)*L+L))/L;n++}ks.push({L,d:tot/n})}
+ ks.sort((x,y)=>x.d-y.d);out+='\n\nRepeating-key size estimates (normalised Hamming distance; lower is better; random data ≈ 4.0):\n'+ks.slice(0,5).map(r=>'  length '+r.L+'  distance '+r.d.toFixed(3)).join('\n');
+ const best=ks[0];if(best&&best.d<3.4){const L=best.L,key=[];for(let c=0;c<L;c++){const col=[];for(let i=c;i<Math.min(a.length,L*400);i+=L)col.push(a[i]);let bk=0,bs=-1e9;for(let k=0;k<256;k++){const t=col.map(v=>v^k),sc=scoreBytes(t);if(sc.s>bs){bs=sc.s;bk=k}}key.push(bk)}
+  const prev=Array.from(a.subarray(0,160),(v,i)=>{const c=v^key[i%L];return c>=32&&c<127?String.fromCharCode(c):'.'}).join('');out+='\n\nBest repeating-key guess (length '+L+'): '+key.map(v=>v.toString(16).padStart(2,'0')).join(' ')+'\nPreview: '+prev;state.xor={file:file.name,single:res.slice(0,3).map(r=>({key:r.k,printable:r.pr,magic:r.mg})),keysizes:ks.slice(0,3),repeatingKey:key.map(v=>v.toString(16).padStart(2,'0')).join('')}}
+ else{out+='\n\nNo convincing repeating-key structure found.';state.xor={file:file.name,single:res.slice(0,3).map(r=>({key:r.k,printable:r.pr,magic:r.mg}))}}
+ say('x-xorStatus','XOR analysis complete.','ok');$('x-xorOut').textContent=out}
+async function b64(){const{file,data:a}=await load();const runs=stringRuns(a,40,false);let out='',n=0;for(const[off,s]of runs){const m=s.match(/(?:[A-Za-z0-9+\/]{4}){10,}(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?/g);if(!m)continue;for(const b of m){if(!/[A-Z]/.test(b)||!/[a-z]/.test(b))continue;let bin;try{bin=Uint8Array.from(atob(b),c=>c.charCodeAt(0))}catch{continue}const sc=scoreBytes(bin.subarray(0,200));let kind='binary';for(const[nm,mm]of MAGICS)if(mm.every((v,i)=>bin[i]===v))kind=nm+' magic';if(sc.pr>.9)kind='text';out+=h8(off)+'  '+b.length+' chars → '+bin.length+' bytes · '+kind+'\n    '+Array.from(bin.subarray(0,90),c=>c>=32&&c<127?String.fromCharCode(c):'.').join('')+'\n';if(++n>=40)break}if(n>=40)break}
+ say('x-xorStatus',n+' Base64 blob(s) decoded.','ok');$('x-xorOut').textContent=out||'No decodable Base64 blobs (≥40 chars, mixed case) found.'}
+/* ---------- MD5 + multi-hash ---------- */
+function md5(a){const K=new Uint32Array(64),R=[7,12,17,22,5,9,14,20,4,11,16,23,6,10,15,21];for(let i=0;i<64;i++)K[i]=Math.floor(Math.abs(Math.sin(i+1))*4294967296);
+ const n=a.length,pl=((n+8)>>6)+1<<6,m=new Uint8Array(pl);m.set(a);m[n]=128;const dv=new DataView(m.buffer);dv.setUint32(pl-8,(n<<3)>>>0,true);dv.setUint32(pl-4,Math.floor(n/536870912),true);
+ let a0=0x67452301,b0=0xefcdab89,c0=0x98badcfe,d0=0x10325476;for(let o=0;o<pl;o+=64){const M=new Uint32Array(16);for(let i=0;i<16;i++)M[i]=dv.getUint32(o+i*4,true);let A=a0,B=b0,C=c0,D=d0;
+  for(let i=0;i<64;i++){let F,g;if(i<16){F=(B&C)|(~B&D);g=i}else if(i<32){F=(D&B)|(~D&C);g=(5*i+1)%16}else if(i<48){F=B^C^D;g=(3*i+5)%16}else{F=C^(B|~D);g=7*i%16}F=(F+A+K[i]+M[g])>>>0;A=D;D=C;C=B;const r=R[(i>>4)*4+(i&3)];B=(B+((F<<r)|(F>>>(32-r))))>>>0}
+  a0=(a0+A)>>>0;b0=(b0+B)>>>0;c0=(c0+C)>>>0;d0=(d0+D)>>>0}
+ const out=new DataView(new ArrayBuffer(16));out.setUint32(0,a0,true);out.setUint32(4,b0,true);out.setUint32(8,c0,true);out.setUint32(12,d0,true);return Array.from(new Uint8Array(out.buffer),b=>b.toString(16).padStart(2,'0')).join('')}
+const hexOf=b=>Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,'0')).join('');
+async function hashOne(f){const a=new Uint8Array(await f.arrayBuffer());const r={name:f.name,size:f.size};r.md5=md5(a);r.crc32=crc32(a).toString(16).padStart(8,'0');for(const[k,alg]of[['sha1','SHA-1'],['sha256','SHA-256'],['sha384','SHA-384'],['sha512','SHA-512']])r[k]=hexOf(await crypto.subtle.digest(alg,a));return r}
+let hashRows=[];
+async function hashAll(){const fs=Array.from($('files').files);if(!fs.length)throw Error('Choose evidence files in panel 01 first.');hashRows=[];const skipped=[];for(const f of fs){if(f.size>LIMIT){skipped.push(f.name);continue}$('x-hashOut').textContent='Hashing '+f.name+'…';hashRows.push(await hashOne(f))}
+ const groups=new Map();for(const r of hashRows){(groups.get(r.sha256)||groups.set(r.sha256,[]).get(r.sha256)).push(r.name)}const dups=[...groups.values()].filter(g=>g.length>1);
+ $('x-hashOut').textContent=hashRows.map(r=>r.name+' ('+fmt(r.size)+')\n  MD5     '+r.md5+'\n  SHA-1   '+r.sha1+'\n  SHA-256 '+r.sha256+'\n  SHA-384 '+r.sha384+'\n  SHA-512 '+r.sha512+'\n  CRC-32  '+r.crc32).join('\n\n')+'\n\nDuplicate groups (identical SHA-256): '+(dups.length?'\n'+dups.map(g=>'  • '+g.join('  =  ')).join('\n'):'none')+(skipped.length?'\nSkipped (>128 MiB): '+skipped.join(', '):'');
+ state.hashes={files:hashRows,duplicates:dups};say('x-hashStatus','Hashed '+hashRows.length+' file(s).','ok')}
+function verify(){const k=$('x-known').value.trim().toLowerCase().replace(/[^0-9a-f]/g,'');if(!k)return say('x-hashStatus','Paste a hash to verify.','err');if(!hashRows.length)return say('x-hashStatus','Run "Hash all selected files" first.','err');const alg={8:'crc32',32:'md5',40:'sha1',64:'sha256',96:'sha384',128:'sha512'}[k.length];if(!alg)return say('x-hashStatus','Hash length '+k.length+' is not MD5/SHA-1/SHA-256/SHA-384/SHA-512/CRC-32.','err');const m=hashRows.filter(r=>r[alg]===k);$('x-hashOut').textContent=(m.length?'✔ MATCH ('+alg.toUpperCase()+'): '+m.map(r=>r.name).join(', '):'✘ No file matches that '+alg.toUpperCase()+' hash.')+'\n\n'+$('x-hashOut').textContent;say('x-hashStatus',m.length?'Hash verified.':'No match.',m.length?'ok':'warn')}
+$('x-hashCsv').onclick=()=>{if(!hashRows.length)return say('x-hashStatus','Hash files first.','err');const q=v=>'"'+String(v).replace(/"/g,'""')+'"',cols=['name','size','md5','sha1','sha256','sha384','sha512','crc32'];save(new Blob([[cols.join(','),...hashRows.map(r=>cols.map(c=>q(r[c])).join(','))].join('\r\n')],{type:'text/csv'}),'file-hashes.csv')};
+/* ---------- wiring ---------- */
+const guard=(fn,id='x-carveStatus')=>async()=>{try{say(id,'Working…');await fn();}catch(e){say(id,e.message||String(e),'err')}};
+$('x-carve').onclick=guard(carve);$('x-map').onclick=guard(entropyMap,'x-mapStatus');$('x-ioc').onclick=guard(iocs,'x-iocStatus');$('x-xor').onclick=guard(xorProbe,'x-xorStatus');$('x-b64').onclick=guard(b64,'x-xorStatus');$('x-hashAll').onclick=guard(hashAll,'x-hashStatus');$('x-verify').onclick=verify;
+$('x-carveZip').onclick=async()=>{if(!state.carve||!state.carve.hits.length)return say('x-carveStatus','Scan for embedded files first.','err');const{data:a}=await load();const files=state.carve.hits.filter(h=>!h.self||h.size<a.length).map(h=>({name:'carved_'+h8(h.off).slice(2)+'.'+h.ext,data:a.subarray(h.off,h.end)}));save(zipStore(files),'carved-files.zip');say('x-carveStatus','ZIP with '+files.length+' carved item(s) created.','ok')};
+$('x-carveCsv').onclick=()=>{if(!state.carve)return say('x-carveStatus','Scan first.','err');const q=v=>'"'+String(v).replace(/"/g,'""')+'"';save(new Blob([['offset,type,size,extent,end',...state.carve.hits.map(h=>[h8(h.off),h.name,h.size,h.exact?'exact':'estimated',h8(h.end)].map(q).join(','))].join('\r\n')],{type:'text/csv'}),'carve-table.csv')};
+function bundle(){return{tool:'Redmark Digital Forensics Studio',generatedAt:new Date().toISOString(),file:cache.file?{name:cache.file.name,size:cache.file.size}:null,carving:state.carve&&{hits:state.carve.hits.map(h=>({offset:h8(h.off),type:h.name,size:h.size,exact:!!h.exact}))},entropy:state.regions,indicators:state.ioc,xor:state.xor,hashes:state.hashes,caveat:'Heuristic triage only; not a forensic verdict.'}}
+$('x-reportJson').onclick=()=>{const b=bundle();if(!b.carving&&!b.entropy&&!b.indicators&&!b.xor&&!b.hashes)return say('x-reportStatus','Nothing to report yet. Run an analysis first.','err');save(new Blob([JSON.stringify(b,null,2)],{type:'application/json'}),'case-bundle.json');say('x-reportStatus','JSON bundle downloaded.','ok')};
+$('x-reportMd').onclick=()=>{const b=bundle();if(!b.carving&&!b.entropy&&!b.indicators&&!b.xor&&!b.hashes)return say('x-reportStatus','Nothing to report yet. Run an analysis first.','err');let m='# Forensic triage report\n\nGenerated: '+b.generatedAt+'\n\n'+(b.file?'**File:** '+b.file.name+' ('+fmt(b.file.size)+')\n\n':'');
+ if(b.hashes)m+='## Hashes\n\n| File | MD5 | SHA-256 |\n|---|---|---|\n'+b.hashes.files.map(r=>'| '+r.name+' | `'+r.md5+'` | `'+r.sha256+'` |').join('\n')+'\n\n'+(b.hashes.duplicates.length?'Duplicate groups: '+b.hashes.duplicates.map(g=>g.join(' = ')).join('; ')+'\n\n':'');
+ if(b.carving)m+='## Embedded file signatures\n\n| Offset | Type | Size | Extent |\n|---|---|---|---|\n'+b.carving.hits.slice(0,200).map(h=>'| '+h.offset+' | '+h.type+' | '+h.size+' | '+(h.exact?'exact':'est.')+' |').join('\n')+'\n\n';
+ if(b.entropy)m+='## Entropy\n\nOverall '+b.entropy.overall.toFixed(4)+' bits/byte at block size '+b.entropy.blockSize+'.\n\nHigh-entropy regions:\n'+(b.entropy.high.length?b.entropy.high.slice(0,40).map(x=>'- '+x).join('\n'):'- none')+'\n\nLow-entropy regions:\n'+(b.entropy.low.length?b.entropy.low.slice(0,40).map(x=>'- '+x).join('\n'):'- none')+'\n\n';
+ if(b.indicators)m+='## Indicators of interest\n\n'+Object.entries(b.indicators.byType).map(([k,v])=>'**'+k+'** ('+v.length+')\n'+v.slice(0,25).map(r=>'- `'+r.value.replace(/`/g,"'")+'` @ '+r.offset).join('\n')).join('\n\n')+'\n\n';
+ if(b.xor)m+='## XOR probe\n\nTop single-byte keys: '+b.xor.single.map(r=>'0x'+r.key.toString(16)+' ('+(r.printable*100).toFixed(0)+'% printable'+(r.magic?', '+r.magic:'')+')').join('; ')+'\n\n'+(b.xor.repeatingKey?'Repeating-key guess: `'+b.xor.repeatingKey+'`\n\n':'');
+ m+='---\n*Heuristic triage only; indicators are not proof of malicious or illicit activity.*\n';save(new Blob([m],{type:'text/markdown'}),'case-report.md');say('x-reportStatus','Markdown report downloaded.','ok')};
+})();
+</script><!--/EXT-SCRIPT-->
+</body></html>
