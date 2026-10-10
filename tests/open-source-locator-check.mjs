@@ -31,7 +31,7 @@ assert.ok(index.includes('href="open-source-locator.html"'), 'Studio missing fro
 assert.ok(index.includes('22 DESTINATIONS'), 'Main navigation destination count not updated');
 assert.ok(readme.includes('22 independent destinations'), 'README destination count not updated');
 assert.ok(readme.includes('Open Source Locator Studio'), 'README does not document the studio');
-assert.ok(page.includes('function esc('), 'Dynamic HTML escaping helper missing');
+assert.ok(page.includes('const esc='), 'Dynamic HTML escaping helper missing');
 assert.ok(page.includes("['https:','http:'].includes(u.protocol)"), 'External link protocol allowlist missing');
 
 console.log('Open Source Locator integrity checks passed.');
