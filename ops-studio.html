@@ -132,6 +132,8 @@ main{min-width:0;padding:27px clamp(14px,3vw,42px) 54px;max-width:1550px;width:1
     <p class="sub">Recommended source to investigate: <a href="https://huggingface.co/datasets/ThingsThatDoStuff/aop-dataset-2022-11-10-interview-lines-by-youtube" target="_blank" rel="noopener noreferrer">AOP interview-lines dataset on Hugging Face</a>. Review its dataset card, licensing, annotation method and reuse terms before use. The studio does not copy or redistribute its data.</p>
     <div class="dropzone"><strong>Import a labelled corpus</strong><p class="sub">CSV or JSON; up to 5,000 rows per import for browser memory safety. CSV accepts common OPAI/AOP field names.</p><label class="btn" for="opsCorpusFile">Choose corpus file</label><input id="opsCorpusFile" type="file" accept=".csv,.json,text/csv,application/json" hidden></div>
     <div class="top-actions" style="margin-top:12px"><button class="btn" id="loadOpsDemo">Load synthetic demo</button><button class="btn" id="exportOpsCorpus">Export normalized corpus</button><button class="btn" id="clearOpsCorpus">Clear corpus</button></div>
+    <div class="formgrid" style="margin-top:13px"><div class="field"><label for="opsCorpusSourceUrl">Dataset/source URL</label><input id="opsCorpusSourceUrl" type="url" placeholder="https://..."></div><div class="field"><label for="opsCorpusLicense">Dataset license / reuse terms</label><input id="opsCorpusLicense" placeholder="e.g. CC BY 4.0, or not verified"></div></div>
+    <div class="field"><label for="opsCorpusAnnotation">Label provenance / annotation method</label><input id="opsCorpusAnnotation" placeholder="Who typed the examples? Independent raters? Consensus?"></div>
     <div id="opsCorpusStatus" class="resultbox" style="margin-top:12px">No corpus loaded. Import a licensed dataset or load the clearly labelled synthetic demo.</div>
     <div class="field" style="margin-top:12px"><label>Expected fields</label><p class="sub">Text: <code>text</code> or <code>transcript</code>; type: <code>ops_type</code>, <code>type</code> or <code>type-128</code>; group: <code>person_id</code>, <code>speaker_id</code>, <code>name</code> or <code>source_id</code>; provenance: source URL/title, license and annotation method. Missing provenance is flagged.</p></div>
    </div>
@@ -147,6 +149,7 @@ main{min-width:0;padding:27px clamp(14px,3vw,42px) 54px;max-width:1550px;width:1
   <div class="panel" style="margin-top:14px">
    <div class="panel-head"><div><h2>Held-out evaluation</h2><p class="sub">Deterministic group split: all rows from a person/group stay on one side. Near-duplicate rows from the same source should share a group ID.</p></div><button class="btn primary" id="runOpsEvaluation">Evaluate held-out groups</button></div>
    <div class="notice">This is valid only as a provisional benchmark when labels are trustworthy and groups prevent leakage. Rows from public-figure transcripts may contain noisy or crowd-sourced type labels; test-set scores measure agreement with those labels, not objective psychological truth.</div>
+   <label class="check" style="display:flex;gap:8px;align-items:flex-start;margin:10px 0"><input type="checkbox" id="opsIndependentLabels"><span>I have verified that these held-out labels come from independent human typing/annotation, and that the grouping key prevents the same person/source appearing in both splits.</span></label>
    <div id="opsEvaluationReport" class="resultbox">Evaluation has not been run.</div>
   </div>
  </section>
@@ -370,7 +373,7 @@ function parseOpsCorpus(raw,filename){
  const parsed=rows.slice(0,5000).map(normalizeOpsRow).filter(Boolean);
  if(!parsed.length)throw new Error("No usable rows found. Each row needs a text/transcript field and an OPS type label.");
  opsCorpus=parsed;
- opsCorpusMeta={sourceName:filename,sourceUrl:"",license:"Not declared in imported file",annotationMethod:"Not declared in imported file",importedAt:new Date().toISOString(),synthetic:false};
+ opsCorpusMeta={sourceName:filename,sourceUrl:$("opsCorpusSourceUrl").value.trim(),license:$("opsCorpusLicense").value.trim()||"Not verified",annotationMethod:$("opsCorpusAnnotation").value.trim()||"Not verified",importedAt:new Date().toISOString(),synthetic:false};opsCorpus.forEach(r=>{if(!r.sourceUrl)r.sourceUrl=opsCorpusMeta.sourceUrl;if(!r.license)r.license=opsCorpusMeta.license;if(!r.annotationMethod)r.annotationMethod=opsCorpusMeta.annotationMethod});
  renderOpsCorpusStatus();
 }
 function renderOpsCorpusStatus(){
@@ -453,7 +456,7 @@ function groupHash(value){let h=2166136261;for(let i=0;i<value.length;i++){h^=va
 function runOpsEvaluation(){
  const out=$("opsEvaluationReport");
  if(!opsCorpus.length){out.innerHTML="Load a labelled corpus first.";return}
- if(opsCorpus.some(r=>r.synthetic)){out.innerHTML="Evaluation disabled: synthetic examples are illustrative and cannot be used as ground truth. Import independently labelled, provenance-tracked examples.";return}
+ if(opsCorpus.some(r=>r.synthetic)){out.innerHTML="Evaluation disabled: synthetic examples are illustrative and cannot be used as ground truth. Import independently labelled, provenance-tracked examples.";return}if(!$("opsIndependentLabels").checked){out.innerHTML="Confirm the independent-label and no-leakage statement before evaluating. This is a research safeguard, not an automatic verification of your data.";return}if(!opsCorpusMeta.annotationMethod||opsCorpusMeta.annotationMethod==="Not verified"||!opsCorpusMeta.sourceUrl||!opsCorpusMeta.license||opsCorpusMeta.license==="Not verified"){out.innerHTML="Add a dataset/source URL, license/reuse terms, and label provenance/annotation method above, then re-import the corpus. These metadata are required before evaluation.";return}
  const parsed=opsCorpus.map(r=>({...r,dimensions:opsDimensions(r)})).filter(r=>Object.keys(r.dimensions).length&&r.text.length>20);
  const groups=[...new Set(parsed.map(r=>r.groupId).filter(Boolean))];
  if(groups.length<5){out.innerHTML="At least five distinct person/source groups are required for a minimally useful group-held-out split. Current groups: "+groups.length+".";return}
