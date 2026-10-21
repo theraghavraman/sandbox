@@ -18,21 +18,21 @@ main{max-width:1180px;margin:auto;padding:32px 18px 60px}.hero{display:flex;alig
 .relay{margin-top:16px}.relay summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;padding:16px 20px;font:700 16px var(--display)}.relay summary::-webkit-details-marker{display:none}.relay summary small{font:500 11px var(--mono);color:var(--muted)}.relay[open] summary{border-bottom:1px solid var(--line)}.relay .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}input[type=password]{width:100%;border:1px solid #d8e0e5;border-radius:10px;padding:11px;background:#fff;color:var(--ink)}
 @media(max-width:760px){.relay .pair{grid-template-columns:1fr}.relay summary{padding:15px}}
 @media(max-width:760px){main{padding:24px 12px 40px}.hero{display:block}.badge{display:inline-block;margin-top:14px}.grid{grid-template-columns:1fr}.body{padding:15px}.head{padding:15px}.stats{grid-template-columns:1fr 1fr}.top{padding:0 12px}}
-</style>
+.file-list{margin-top:10px;display:grid;gap:6px;max-height:280px;overflow:auto}.file-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:13px}.file-row span{overflow-wrap:anywhere;min-width:0}.file-row .btn{flex:none;padding:6px 12px}</style>
 <link rel="stylesheet" href="./redmark-revamp.css?v=4">
 </head>
 <body>
 <header class="top"><div class="brand"><div class="mark">RS</div><div><strong>REDMARK<span style="color:var(--accent)">SHARE</span></strong><small>Peer-to-peer file transfer · Redmark Forge</small></div></div><a href="./index.html">← Sandbox home</a></header>
 <main>
-<section class="hero"><div><div class="eyebrow">Redmark Forge / P2P transfer</div><h1>Send big. Share directly.</h1><p>Torrent-style chunked transfers, peer discovery, QR handoff and automatic reconstruction. Choose one file; RedmarkShare handles the pieces.</p></div><div class="badge">BROWSER-BASED · NO ACCOUNT</div></section>
+<section class="hero"><div><div class="eyebrow">Redmark Forge / P2P transfer</div><h1>Send big. Share directly.</h1><p>Torrent-style chunked transfers, peer discovery, QR handoff and automatic reconstruction. Choose one or more files; RedmarkShare handles the pieces.</p></div><div class="badge">BROWSER-BASED · NO ACCOUNT</div></section>
 <div class="grid">
 <section class="card">
-<div class="head"><h2>↗ Send a file</h2><p>Select one file and create a torrent-style share that another RedmarkShare peer can join.</p></div>
+<div class="head"><h2>↗ Send files</h2><p>Select one or more files and create a torrent-style share that another RedmarkShare peer can join.</p></div>
 <div class="body">
-<div class="field"><label for="sendFile">File to share</label><input id="sendFile" type="file"><div class="hint">Large files are processed as torrent pieces, not converted into one giant JavaScript buffer. Keep this tab open and the original file available while sharing.</div></div>
+<div class="field"><label for="sendFile">File(s) to share</label><input id="sendFile" type="file" multiple><div class="hint">Large files are processed as torrent pieces, not converted into one giant JavaScript buffer. Keep this tab open and the original file available while sharing.</div></div>
 <div class="btns"><button class="btn orange" id="startSeed">Create share & QR</button><button class="btn" id="stopSeed" disabled>Stop sharing</button></div>
 <div id="sendStatus" class="status">Choose a file to begin.</div>
-<div class="stats"><div class="stat"><small>File size</small><strong id="sendSize">—</strong></div><div class="stat"><small>Connected peers</small><strong id="seedPeers">0</strong></div><div class="stat"><small>Uploaded</small><strong id="uploaded">0 B</strong></div></div>
+<div class="stats"><div class="stat"><small>Size</small><strong id="sendSize">—</strong></div><div class="stat"><small>Connected peers</small><strong id="seedPeers">0</strong></div><div class="stat"><small>Uploaded</small><strong id="uploaded">0 B</strong></div></div>
 <div class="section-label">Scan to join</div><div class="qrbox" id="sendQr"><span class="hint">Your share QR appears here.</span></div>
 <div class="field"><label for="magnetOut">Magnet link (fallback)</label><textarea id="magnetOut" readonly placeholder="Created after the torrent metadata is ready"></textarea></div>
 <div class="btns"><button class="btn" id="copyMagnet" disabled>Copy magnet link</button></div>
@@ -50,6 +50,7 @@ main{max-width:1180px;margin:auto;padding:32px 18px 60px}.hero{display:flex;alig
 <div class="stats"><div class="stat"><small>Progress</small><strong id="progressText">0%</strong></div><div class="stat"><small>Peers</small><strong id="downloadPeers">0</strong></div><div class="stat"><small>Speed</small><strong id="downloadSpeed">0 B/s</strong></div></div>
 <div class="stat" style="margin-top:8px"><small>File</small><strong id="receiveFile">—</strong></div>
 <div class="btns"><button class="btn orange" id="saveFile" disabled>Save completed file</button></div>
+<div id="receiveList" class="file-list" hidden></div>
 <div class="hint" style="margin-top:8px">For files over 10 GB, use a Chromium-based browser with file-saving support and sufficient free disk space. RedmarkShare streams the received file to disk where the File System Access API is available; it avoids building a single giant Blob in memory.</div>
 </div></section>
 </div>
@@ -123,7 +124,7 @@ const trackers = [
 const STUN = { urls: ['stun:stun.l.google.com:19302', 'stun:global.stun.twilio.com:3478'] };
 const RELAY_KEY = 'redmarkshare.turn';
 const SAVE_BLOB_LIMIT = 1024 ** 3; // in-memory save fallback (no File System Access API) up to 1 GB
-let client = null, clientNeedsRebuild = false, seedTorrent = null, downloadTorrent = null, peerTimer = null, cameraStream = null, scanFrame = null, scanActive = false, completedFile = null;
+let client = null, clientNeedsRebuild = false, seedTorrent = null, downloadTorrent = null, peerTimer = null, cameraStream = null, scanFrame = null, scanActive = false, completedFile = null, completedFiles = [];
 const fmt = n => { if (!Number.isFinite(n)) return '—'; const u=['B','KB','MB','GB','TB']; let i=0; while(n>=1024&&i<u.length-1){n/=1024;i++} return (n<10&&i?n.toFixed(1):Math.round(n))+' '+u[i]; };
 const plural = (n,w) => n+' '+w+(n===1?'':'s');
 function status(id,msg,kind=''){ const el=$(id); el.textContent=msg; el.className='status'+(kind?' '+kind:''); }
@@ -156,13 +157,15 @@ function renderQR(value,box){ box.replaceChildren(); if(!window.QRCode){box.text
 function receiverPageUrl(magnet){const u=new URL('./redmarkshare.html',window.location.href);u.search='';u.hash='';u.searchParams.set('magnet',magnet);return u.href;}
 
 // ---------- Send ----------
-$('sendFile').addEventListener('change',()=>{const f=$('sendFile').files[0];$('sendSize').textContent=f?fmt(f.size):'—';});
+$('sendFile').addEventListener('change',()=>{const fs=[...$('sendFile').files],total=fs.reduce((n,f)=>n+f.size,0);$('sendSize').textContent=!fs.length?'—':fs.length===1?fmt(total):plural(fs.length,'file')+' · '+fmt(total);});
 $('startSeed').addEventListener('click',()=>{
-  const file=$('sendFile').files[0]; if(!file){status('sendStatus','Choose a file first.','warn');return;}
+  const files=[...$('sendFile').files],file=files[0]; if(!file){status('sendStatus','Choose a file first.','warn');return;}
+  // One file is seeded exactly as before; several become one multi-file torrent behind the same magnet/QR.
+  const multi=files.length>1,input=multi?files:file,shareName=multi?'RedmarkShare '+files.length+' files':file.name,label=multi?plural(files.length,'file'):file.name,total=files.reduce((n,f)=>n+f.size,0);
   try{
     getClient(); if(seedTorrent){cleanupTorrent(seedTorrent);seedTorrent=null;} $('startSeed').disabled=true; $('stopSeed').disabled=false;
     $('sendQr').textContent='Preparing torrent pieces and metadata…'; $('magnetOut').value=''; $('copyMagnet').disabled=true;
-    status('sendStatus','Preparing '+file.name+' ('+fmt(file.size)+'). Keep this page open while metadata is created.');
+    status('sendStatus','Preparing '+label+' ('+fmt(total)+'). Keep this page open while metadata is created.');
     let torrent;
     const publishShare = () => {
       if (!torrent || !seedTorrent || seedTorrent !== torrent || !torrent.magnetURI) return;
@@ -170,7 +173,7 @@ $('startSeed').addEventListener('click',()=>{
       renderQR(receiverPageUrl(torrent.magnetURI),$('sendQr'));
       if(!torrent.numPeers) status('sendStatus','Share link and QR are ready. Recipient can scan now. Keep this tab open and in the foreground until the transfer finishes.','ok');
     };
-    torrent = client.seed(file,{name:file.name,announce:trackers},seededTorrent=>{
+    torrent = client.seed(input,{name:shareName,announce:trackers},seededTorrent=>{
       torrent=seededTorrent; seedTorrent=seededTorrent; publishShare(); updateSeedStats();
     });
     seedTorrent=torrent;
@@ -197,7 +200,7 @@ function readMagnet(value){let v=value.trim();try{if(v.startsWith('http://')||v.
 function setReceiveIdle(){ $('startDownload').disabled=false; $('stopDownload').disabled=true; }
 function cancelDownload(){
   if(peerTimer){clearTimeout(peerTimer);peerTimer=null;}
-  const t=downloadTorrent; downloadTorrent=null; completedFile=null; $('saveFile').disabled=true;
+  const t=downloadTorrent; downloadTorrent=null; completedFile=null; completedFiles=[]; $('saveFile').disabled=true; $('saveFile').textContent='Save completed file'; $('receiveList').hidden=true; $('receiveList').replaceChildren();
   cleanupTorrent(t);
 }
 function startReceive(){
@@ -213,23 +216,25 @@ function startReceive(){
   downloadTorrent=torrent;
   let failedAttempts=0;
   const active=()=>downloadTorrent===torrent;
-  const refresh=()=>{if(!active())return;const p=Math.round((torrent.progress||0)*100);$('progressBar').style.width=p+'%';$('progressText').textContent=p+'%';$('downloadPeers').textContent=torrent.numPeers;$('downloadSpeed').textContent=fmt(client.downloadSpeed)+'/s';if(torrent.files[0])$('receiveFile').textContent=torrent.files[0].name+' · '+fmt(torrent.files[0].length);};
+  const refresh=()=>{if(!active())return;const p=Math.round((torrent.progress||0)*100);$('progressBar').style.width=p+'%';$('progressText').textContent=p+'%';$('downloadPeers').textContent=torrent.numPeers;$('downloadSpeed').textContent=fmt(client.downloadSpeed)+'/s';if(torrent.files.length>1)$('receiveFile').textContent=plural(torrent.files.length,'file')+' · '+fmt(torrent.length);else if(torrent.files[0])$('receiveFile').textContent=torrent.files[0].name+' · '+fmt(torrent.files[0].length);};
   torrent.on('wire',()=>{ if(!active())return; if(peerTimer){clearTimeout(peerTimer);peerTimer=null;} refresh(); if(!torrent.files.length) status('receiveStatus','Connected to the sender. Loading file details…','ok'); });
-  torrent.on('metadata',()=>{ if(!active())return; refresh(); status('receiveStatus','Receiving '+(torrent.files[0]?torrent.files[0].name:'file')+'. Pieces are verified as they arrive.','ok'); });
+  torrent.on('metadata',()=>{ if(!active())return; refresh(); status('receiveStatus','Receiving '+(torrent.files.length>1?plural(torrent.files.length,'file'):torrent.files[0]?torrent.files[0].name:'file')+'. Pieces are verified as they arrive.','ok'); });
   torrent.on('download',refresh);
   torrent.on('warning',err=>{
     if(!active())return; const m=String(err&&err.message||err);
     if(/connection (failed|error)/i.test(m)){ failedAttempts++; if(!torrent.numPeers){ if(peerTimer){clearTimeout(peerTimer);peerTimer=null;} status('receiveStatus','The sender was found, but the direct connection failed ('+plural(failedAttempts,'attempt')+'). '+relayAdvice(),'warn'); } }
     else console.warn('RedmarkShare (receive):',m);
   });
-  torrent.on('done',()=>{ if(!active())return; refresh(); completedFile=torrent.files[0]||null; $('saveFile').disabled=!completedFile; status('receiveStatus','All pieces are downloaded and verified. Tap Save completed file.','ok'); setReceiveIdle(); });
+  torrent.on('done',()=>{ if(!active())return; refresh(); completedFile=torrent.files[0]||null; completedFiles=[...torrent.files]; $('saveFile').disabled=!completedFile;
+    if(completedFiles.length>1){ $('saveFile').textContent='Save all '+completedFiles.length+' files'; renderReceiveList(); status('receiveStatus','All '+completedFiles.length+' files are downloaded and verified. Tap Save all, or save them one by one below.','ok'); }
+    else status('receiveStatus','All pieces are downloaded and verified. Tap Save completed file.','ok');
+    setReceiveIdle(); });
   torrent.on('error',err=>{ if(!active())return; status('receiveStatus','Transfer error: '+(err.message||err),'err'); downloadTorrent=null; setReceiveIdle(); });
   peerTimer=setTimeout(()=>{ peerTimer=null; if(active() && !torrent.numPeers && !failedAttempts) status('receiveStatus','Still looking for the sender after 25 seconds. Check the sender\'s page is open, in the foreground, and still sharing. '+relayAdvice(),'warn'); },25000);
 }
 $('startDownload').addEventListener('click',startReceive);
 $('stopDownload').addEventListener('click',()=>{cancelDownload();setReceiveIdle();status('receiveStatus','Transfer cancelled.','warn');});
-$('saveFile').addEventListener('click',async()=>{
-  if(!completedFile){status('receiveStatus','No completed file is ready to save.','warn');return;}
+async function saveOne(completedFile){
   try{
     if(window.showSaveFilePicker){
       const handle=await window.showSaveFilePicker({suggestedName:completedFile.name});
@@ -247,6 +252,28 @@ $('saveFile').addEventListener('click',async()=>{
       status('receiveStatus','Download started: '+completedFile.name+' ('+fmt(completedFile.length)+'). Check your Downloads.','ok');
     }
   }catch(e){if(e.name==='AbortError'){status('receiveStatus','Save cancelled. Your completed file remains available; tap Save completed file to try again.','warn');}else status('receiveStatus',e.message||'Could not save file. Check disk space and browser permissions.','err');}
+}
+// Path of a received file inside the share, without the share's own folder name.
+function relPath(f){const parts=String(f.path||f.name).split(/[\\/]/).filter(Boolean);if(parts.length>1&&downloadTorrentName&&parts[0]===downloadTorrentName)parts.shift();return parts.filter(x=>x!=='.'&&x!=='..');}
+let downloadTorrentName='';
+function renderReceiveList(){const box=$('receiveList');box.replaceChildren();downloadTorrentName=completedFiles[0]&&completedFiles[0].path&&completedFiles[0].path.includes('/')?completedFiles[0].path.split('/')[0]:'';
+  for(const f of completedFiles){const row=document.createElement('div');row.className='file-row';const name=document.createElement('span');name.textContent=relPath(f).join('/')+' · '+fmt(f.length);const b=document.createElement('button');b.className='btn';b.type='button';b.textContent='Save';b.addEventListener('click',()=>saveOne(f));row.append(name,b);box.append(row);}
+  box.hidden=false;}
+async function saveAll(){
+  if(window.showDirectoryPicker){
+    let dir;try{dir=await window.showDirectoryPicker({mode:'readwrite'});}catch(e){if(e.name==='AbortError'){status('receiveStatus','Save cancelled. Your files remain available; save them all again or one by one below.','warn');return;}throw e;}
+    let n=0;for(const f of completedFiles){const parts=relPath(f);let d=dir;for(const sub of parts.slice(0,-1))d=await d.getDirectoryHandle(sub,{create:true});
+      n++;status('receiveStatus','Writing '+n+' of '+completedFiles.length+': '+parts.join('/')+'… keep this tab open.','warn');
+      const w=await (await d.getFileHandle(parts[parts.length-1]||('file-'+n),{create:true})).createWritable();await f.stream().pipeTo(w);}
+    status('receiveStatus','Saved all '+completedFiles.length+' files into the folder you chose.','ok');return;}
+  // No folder access (phones, Firefox, Safari): download each file; the browser may ask to allow multiple downloads.
+  const total=completedFiles.reduce((s,f)=>s+f.length,0);if(total>SAVE_BLOB_LIMIT)throw new Error('These files total '+fmt(total)+', too much to save from memory in this browser. Save them one by one below, or use desktop Chrome or Edge to save all at once.');
+  for(const f of completedFiles){const url=URL.createObjectURL(await f.blob());const a=document.createElement('a');a.href=url;a.download=relPath(f).join('_')||f.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);await new Promise(r=>setTimeout(r,400));}
+  status('receiveStatus','Started '+completedFiles.length+' downloads. If your browser blocked some, allow multiple downloads or save them one by one below.','ok');}
+$('saveFile').addEventListener('click',async()=>{
+  if(!completedFile){status('receiveStatus','No completed file is ready to save.','warn');return;}
+  if(completedFiles.length>1){try{await saveAll();}catch(e){status('receiveStatus',e.message||'Could not save the files. Check disk space and browser permissions.','err');}return;}
+  await saveOne(completedFile);
 });
 async function stopCamera(){scanActive=false;if(scanFrame)cancelAnimationFrame(scanFrame);scanFrame=null;if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;} $('camera').srcObject=null;$('camera').style.display='none';$('scanBtn').disabled=false;$('stopScan').disabled=true;}
 $('stopScan').addEventListener('click',stopCamera);

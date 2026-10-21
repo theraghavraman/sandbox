@@ -109,7 +109,8 @@ These tools are experimental. Signature, steganalysis and image-forensics indica
 
 `redmarkshare.html` adds a browser-based peer-to-peer transfer page linked from the main sidebar. It uses WebTorrent/WebRTC-compatible peers, creates a magnet link and QR code when sending, and lets a receiver scan a QR code or paste the magnet link to join the swarm. Torrent pieces are verified by the torrent protocol, and downloaded files can be streamed to disk in browsers supporting the File System Access API.
 
-- One selected file is shared as one torrent; chunking and reconstruction are handled by the torrent engine.
+- One or more selected files are shared as one torrent (several files become a multi-file torrent behind the same magnet link and QR); chunking and reconstruction are handled by the torrent engine.
+- The receiver can save all files of a multi-file share into one folder in browsers with folder access (desktop Chrome/Edge), or save each file individually anywhere.
 - QR is a handoff for the magnet link, not a storage mechanism.
 - The sender's browser must remain open and keep the original file available while seeding.
 - Browser WebTorrent peers communicate with WebRTC-compatible peers, not all ordinary TCP/UDP BitTorrent peers.
