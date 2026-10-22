@@ -302,11 +302,22 @@ $('saveFile').addEventListener('click',async()=>{
 let jsQRLoad=null;
 function loadJsQR(){if(window.jsQR)return Promise.resolve(window.jsQR);return jsQRLoad||(jsQRLoad=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';s.onload=()=>window.jsQR?res(window.jsQR):rej(new Error('The QR decoder did not load.'));s.onerror=()=>{jsQRLoad=null;rej(new Error('The QR decoder could not be downloaded. Check the connection, or paste the link instead.'));};document.head.append(s);}));}
 async function makeQrReader(){
-  try{if('BarcodeDetector' in window&&(await BarcodeDetector.getSupportedFormats()).includes('qr_code')){const d=new BarcodeDetector({formats:['qr_code']});return async v=>{const c=await d.detect(v);return c.length&&c[0].rawValue||'';};}}catch{}
-  const decode=await loadJsQR(),cv=document.createElement('canvas'),g=cv.getContext('2d',{willReadFrequently:true});
-  return async v=>{const w=v.videoWidth,h=v.videoHeight;if(!w||!h)return'';const k=Math.min(1,1280/Math.max(w,h));cv.width=Math.round(w*k);cv.height=Math.round(h*k);g.drawImage(v,0,0,cv.width,cv.height);const r=decode(g.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height,{inversionAttempts:'dontInvert'});return r&&r.data||'';};
+  let native=null,nativeOk=false;
+  try{if('BarcodeDetector' in window&&(await BarcodeDetector.getSupportedFormats()).includes('qr_code')){native=new BarcodeDetector({formats:['qr_code']});nativeOk=true;}}catch{}
+  const cv=document.createElement('canvas'),g=cv.getContext('2d',{willReadFrequently:true});let decode=null,m=0;
+  // jsQR alternates the whole frame with a full-resolution centre crop: a QR on another screen is often small in a phone's wide view.
+  const viaJsQR=async v=>{decode=decode||await loadJsQR();const w=v.videoWidth,h=v.videoHeight;if(!w||!h)return'';const crop=(m++&1)===1,side=Math.min(w,h)*0.6,sw=crop?side:w,sh=crop?side:h,k=Math.min(1,1280/Math.max(sw,sh));
+    cv.width=Math.round(sw*k);cv.height=Math.round(sh*k);g.drawImage(v,crop?(w-side)/2:0,crop?(h-side)/2:0,sw,sh,0,0,cv.width,cv.height);const r=decode(g.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height,{inversionAttempts:'dontInvert'});return r&&r.data||'';};
+  if(!nativeOk){decode=await loadJsQR();return viaJsQR;}
+  // Built-in detector first. Some phones expose it but it errors or never finds anything, so after 3 s without a result
+  // jsQR also gets every other frame, and it takes over completely if the built-in detector keeps failing.
+  const t0=Date.now();let n=0,fails=0;
+  return async v=>{const useNative=nativeOk&&(Date.now()-t0<3000||(n++&1)===0);
+    if(useNative){try{const c=await native.detect(v);if(c.length&&c[0].rawValue)return c[0].rawValue;}catch{if(++fails>=5)nativeOk=false;}return'';}
+    try{return await viaJsQR(v);}catch{return'';}};
 }
-const CAMERA={video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false};
+const CAMERA={video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false};
+const SCAN_TIP='Still looking. Hold the QR steady about 15–30 cm from the camera so it fills about half of the view, and turn up the other screen’s brightness to avoid glare.';
 const isFileLink=v=>{try{return v.startsWith('magnet:?')||((v.startsWith('https://')||v.startsWith('http://'))&&new URL(v).searchParams.has('magnet'));}catch{return false;}};
 const isNoteLink=v=>/[?#&]note=/.test(v);
 async function stopCamera(){scanActive=false;if(scanFrame)cancelAnimationFrame(scanFrame);scanFrame=null;if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;} $('camera').srcObject=null;$('camera').style.display='none';$('scanBtn').disabled=false;$('stopScan').disabled=true;}
@@ -315,7 +326,8 @@ $('scanBtn').addEventListener('click',async()=>{
   try{
     const readQr=await makeQrReader();cameraStream=await navigator.mediaDevices.getUserMedia(CAMERA);
     const video=$('camera');video.srcObject=cameraStream;video.style.display='block';await video.play();scanActive=true;$('scanBtn').disabled=true;$('stopScan').disabled=false;status('receiveStatus','Point the camera at the sender QR code.','warn');
-    const tick=async()=>{if(!scanActive)return;try{const v=await readQr(video);if(v){if(isFileLink(v)){ $('magnetIn').value=v;await stopCamera();status('receiveStatus','QR scanned. Connecting…','ok');startReceive();return;}if(isNoteLink(v)){await stopCamera();status('receiveStatus','That QR is a Quick note; it is shown in the Quick note panel below.','ok');openNoteLink(v);return;}}}catch{}scanFrame=requestAnimationFrame(tick);};tick();
+    const scanStart=Date.now();let tipShown=false;
+    const tick=async()=>{if(!scanActive)return;if(!tipShown&&Date.now()-scanStart>10000){tipShown=true;status('receiveStatus',SCAN_TIP,'warn');}try{const v=await readQr(video);if(v){if(isFileLink(v)){ $('magnetIn').value=v;await stopCamera();status('receiveStatus','QR scanned. Connecting…','ok');startReceive();return;}if(isNoteLink(v)){await stopCamera();status('receiveStatus','That QR is a Quick note; it is shown in the Quick note panel below.','ok');openNoteLink(v);return;}}}catch{}scanFrame=requestAnimationFrame(tick);};tick();
   }catch(e){await stopCamera();status('receiveStatus',/QR decoder/.test(e.message)?e.message:'Could not access camera. Check browser permission or paste the magnet link. '+e.message,'err');}
 });
 
@@ -416,7 +428,8 @@ $('noteScanStop').addEventListener('click',stopNoteScan);
 $('noteScan').addEventListener('click',async()=>{
   try{const readQr=await makeQrReader();noteStream=await navigator.mediaDevices.getUserMedia(CAMERA);
     const v=$('noteCamera');v.srcObject=noteStream;v.style.display='block';await v.play();noteScanActive=true;$('noteScan').disabled=true;$('noteScanStop').disabled=false;status('noteRecvStatus','Point the camera at the note QR.','warn');
-    const tick=async()=>{if(!noteScanActive)return;try{const val=await readQr(v);if(val&&isNoteLink(val)){await stopNoteScan();openNoteLink(val);return;}if(val&&isFileLink(val)){await stopNoteScan();status('noteRecvStatus','That QR is a file share; it is receiving under Receive a file above.','ok');$('magnetIn').value=val;startReceive();$('magnetIn').scrollIntoView({behavior:'smooth',block:'center'});return;}}catch{}noteScanFrame=requestAnimationFrame(tick);};tick();
+    const scanStart=Date.now();let tipShown=false;
+    const tick=async()=>{if(!noteScanActive)return;if(!tipShown&&Date.now()-scanStart>10000){tipShown=true;status('noteRecvStatus',SCAN_TIP,'warn');}try{const val=await readQr(v);if(val&&isNoteLink(val)){await stopNoteScan();openNoteLink(val);return;}if(val&&isFileLink(val)){await stopNoteScan();status('noteRecvStatus','That QR is a file share; it is receiving under Receive a file above.','ok');$('magnetIn').value=val;startReceive();$('magnetIn').scrollIntoView({behavior:'smooth',block:'center'});return;}}catch{}noteScanFrame=requestAnimationFrame(tick);};tick();
   }catch(e){await stopNoteScan();status('noteRecvStatus',/QR decoder/.test(e.message||'')?e.message:'Could not access the camera. Check the browser permission, or paste the note link. '+(e.message||''),'err');}
 });
 window.addEventListener('pagehide',stopNoteScan);
