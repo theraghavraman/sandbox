@@ -42,7 +42,7 @@ main{max-width:1180px;margin:auto;padding:32px 18px 60px}.hero{display:flex;alig
 <div class="body">
 <div class="btns"><button class="btn orange" id="scanBtn">Scan QR with camera</button><button class="btn" id="stopScan" disabled>Stop camera</button></div>
 <video id="camera" class="camera" playsinline muted></video>
-<div class="hint" id="scanHint">Camera scanning uses BarcodeDetector where available. If your browser doesn't support it, paste the magnet link below.</div>
+<div class="hint" id="scanHint">Works with a phone camera or a computer webcam: hold the sender's QR in front of it. You can also paste the magnet link below.</div>
 <div class="field" style="margin-top:15px"><label for="magnetIn">Magnet link</label><textarea id="magnetIn" placeholder="magnet:?xt=urn:btih:…"></textarea></div>
 <div class="btns"><button class="btn primary" id="startDownload">Connect & receive</button><button class="btn" id="stopDownload" disabled>Cancel transfer</button></div>
 <div id="receiveStatus" class="status">Waiting for a share link.</div>
@@ -67,7 +67,7 @@ main{max-width:1180px;margin:auto;padding:32px 18px 60px}.hero{display:flex;alig
 <div>
 <div class="btns" style="margin-top:0"><button class="btn orange" id="noteScan" type="button">Scan note QR</button><button class="btn" id="noteScanStop" type="button" disabled>Stop camera</button></div>
 <video id="noteCamera" class="camera" playsinline muted></video>
-<div class="hint">On a phone, the normal camera app can open the note QR too. On a computer, paste the note link below.</div>
+<div class="hint">Works with a phone camera or a computer webcam: hold the other screen's QR in front of it. A phone's normal camera app can open the note QR too, or paste the note link below.</div>
 <div class="field" style="margin-top:15px"><label for="noteLinkIn">Note link</label><textarea id="noteLinkIn" placeholder="https://…redmarkshare.html#note=…"></textarea></div>
 <div class="btns"><button class="btn primary" id="noteOpen" type="button">Open note</button></div>
 <div id="noteRecvStatus" class="status">Waiting for a note.</div>
@@ -297,15 +297,26 @@ $('saveFile').addEventListener('click',async()=>{
   if(completedFiles.length>1){try{await saveAll();}catch(e){status('receiveStatus',e.message||'Could not save the files. Check disk space and browser permissions.','err');}return;}
   await saveOne(completedFile);
 });
+// QR reading for the in-page scanners. Uses the browser's own BarcodeDetector where it supports QR (Android,
+// ChromeOS, Chrome on macOS); elsewhere (most desktop browsers, Safari, Firefox) camera frames are decoded with jsQR.
+let jsQRLoad=null;
+function loadJsQR(){if(window.jsQR)return Promise.resolve(window.jsQR);return jsQRLoad||(jsQRLoad=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';s.onload=()=>window.jsQR?res(window.jsQR):rej(new Error('The QR decoder did not load.'));s.onerror=()=>{jsQRLoad=null;rej(new Error('The QR decoder could not be downloaded. Check the connection, or paste the link instead.'));};document.head.append(s);}));}
+async function makeQrReader(){
+  try{if('BarcodeDetector' in window&&(await BarcodeDetector.getSupportedFormats()).includes('qr_code')){const d=new BarcodeDetector({formats:['qr_code']});return async v=>{const c=await d.detect(v);return c.length&&c[0].rawValue||'';};}}catch{}
+  const decode=await loadJsQR(),cv=document.createElement('canvas'),g=cv.getContext('2d',{willReadFrequently:true});
+  return async v=>{const w=v.videoWidth,h=v.videoHeight;if(!w||!h)return'';const k=Math.min(1,1280/Math.max(w,h));cv.width=Math.round(w*k);cv.height=Math.round(h*k);g.drawImage(v,0,0,cv.width,cv.height);const r=decode(g.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height,{inversionAttempts:'dontInvert'});return r&&r.data||'';};
+}
+const CAMERA={video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false};
+const isFileLink=v=>{try{return v.startsWith('magnet:?')||((v.startsWith('https://')||v.startsWith('http://'))&&new URL(v).searchParams.has('magnet'));}catch{return false;}};
+const isNoteLink=v=>/[?#&]note=/.test(v);
 async function stopCamera(){scanActive=false;if(scanFrame)cancelAnimationFrame(scanFrame);scanFrame=null;if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;} $('camera').srcObject=null;$('camera').style.display='none';$('scanBtn').disabled=false;$('stopScan').disabled=true;}
 $('stopScan').addEventListener('click',stopCamera);
 $('scanBtn').addEventListener('click',async()=>{
-  if(!('BarcodeDetector' in window)){status('receiveStatus','QR camera scanning is not supported by this browser. Paste the sender magnet link instead.','warn');$('scanHint').textContent='This browser has no BarcodeDetector QR scanner. Paste the magnet link from the sender.';return;}
   try{
-    const detector=new BarcodeDetector({formats:['qr_code']});cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+    const readQr=await makeQrReader();cameraStream=await navigator.mediaDevices.getUserMedia(CAMERA);
     const video=$('camera');video.srcObject=cameraStream;video.style.display='block';await video.play();scanActive=true;$('scanBtn').disabled=true;$('stopScan').disabled=false;status('receiveStatus','Point the camera at the sender QR code.','warn');
-    const tick=async()=>{if(!scanActive)return;try{const codes=await detector.detect(video);if(codes.length&&codes[0].rawValue){const v=codes[0].rawValue;let accepted=false;try{accepted=v.startsWith('magnet:?')||((v.startsWith('https://')||v.startsWith('http://'))&&new URL(v).searchParams.has('magnet'));}catch{}if(accepted){ $('magnetIn').value=v;await stopCamera();status('receiveStatus','QR scanned. Connecting…','ok');startReceive();return;}}}catch{}scanFrame=requestAnimationFrame(tick);};tick();
-  }catch(e){await stopCamera();status('receiveStatus','Could not access camera. Check browser permission or paste the magnet link. '+e.message,'err');}
+    const tick=async()=>{if(!scanActive)return;try{const v=await readQr(video);if(v){if(isFileLink(v)){ $('magnetIn').value=v;await stopCamera();status('receiveStatus','QR scanned. Connecting…','ok');startReceive();return;}if(isNoteLink(v)){await stopCamera();status('receiveStatus','That QR is a Quick note; it is shown in the Quick note panel below.','ok');openNoteLink(v);return;}}}catch{}scanFrame=requestAnimationFrame(tick);};tick();
+  }catch(e){await stopCamera();status('receiveStatus',/QR decoder/.test(e.message)?e.message:'Could not access camera. Check browser permission or paste the magnet link. '+e.message,'err');}
 });
 
 // ---------- Relay settings UI ----------
@@ -357,7 +368,8 @@ async function noteFromFragment(v){const dot=v.indexOf('.'),kind=v.slice(0,dot),
   if(kind==='1'){if(!window.DecompressionStream)throw new Error('This browser cannot unpack compressed notes. Update it, or ask the sender for a longer note link.');return new TextDecoder().decode(await throughStream(bytes,new DecompressionStream('deflate-raw')));}
   if(kind==='0')return new TextDecoder().decode(bytes);throw new Error('Unrecognised note link.');}
 function noteUrl(hashNote,magnet){const u=new URL('./redmarkshare.html',window.location.href);u.search='';u.hash='';if(magnet)u.searchParams.set('note',magnet);if(hashNote)u.hash='note='+hashNote;return u.href;}
-function showNoteQr(url){$('noteLink').value=url;$('noteCopyLink').disabled=false;const box=$('noteQr');box.replaceChildren();if(!window.QRCode){box.textContent='QR generator failed to load. Copy the note link instead.';return;}const c=document.createElement('canvas');box.append(c);QRCode.toCanvas(c,url,{width:340,margin:3,errorCorrectionLevel:'L'},err=>{if(err)box.textContent='Could not draw this QR. Copy the note link instead.';});}
+function showNoteQr(url){$('noteLink').value=url;$('noteCopyLink').disabled=false;const box=$('noteQr');box.replaceChildren();if(!window.QRCode){box.textContent='QR generator failed to load. Copy the note link instead.';return;}const c=document.createElement('canvas');box.append(c);// Whole pixels per module (at least 4): fractional module sizes blur dense codes and webcams then fail to read them.
+let scale=4;try{scale=Math.max(4,Math.ceil(340/(QRCode.create(url,{errorCorrectionLevel:'L'}).modules.size+6)));}catch{}QRCode.toCanvas(c,url,{scale,margin:3,errorCorrectionLevel:'L'},err=>{if(err)box.textContent='Could not draw this QR. Copy the note link instead.';});}
 function stopNoteSeed(){if(noteSeedTorrent){cleanupTorrent(noteSeedTorrent);noteSeedTorrent=null;}$('noteStop').disabled=true;}
 async function copyText(text,okId,okMsg,field){try{await navigator.clipboard.writeText(text);status(okId,okMsg,'ok');}catch{const f=$(field);f.focus();f.select();status(okId,'Clipboard unavailable here; the text is selected so you can copy it manually.','warn');}}
 $('notePaste').addEventListener('click',async()=>{try{const t=await navigator.clipboard.readText();if(!t){status('noteSendStatus','The clipboard has no text.','warn');return;}$('noteText').value=t;status('noteSendStatus','Pasted '+fmt(new TextEncoder().encode(t).length)+' from the clipboard. Tap Create note QR.','ok');}catch{status('noteSendStatus','This browser did not allow reading the clipboard. Paste into the box with Ctrl/Cmd+V instead.','warn');}});
@@ -402,11 +414,10 @@ $('noteCopy').addEventListener('click',()=>copyText($('noteOut').value,'noteRecv
 async function stopNoteScan(){noteScanActive=false;if(noteScanFrame)cancelAnimationFrame(noteScanFrame);noteScanFrame=null;if(noteStream){noteStream.getTracks().forEach(t=>t.stop());noteStream=null;}$('noteCamera').srcObject=null;$('noteCamera').style.display='none';$('noteScan').disabled=false;$('noteScanStop').disabled=true;}
 $('noteScanStop').addEventListener('click',stopNoteScan);
 $('noteScan').addEventListener('click',async()=>{
-  if(!('BarcodeDetector' in window)){status('noteRecvStatus','This browser cannot scan QR codes. Use the phone camera app instead, or paste the note link.','warn');return;}
-  try{const det=new BarcodeDetector({formats:['qr_code']});noteStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+  try{const readQr=await makeQrReader();noteStream=await navigator.mediaDevices.getUserMedia(CAMERA);
     const v=$('noteCamera');v.srcObject=noteStream;v.style.display='block';await v.play();noteScanActive=true;$('noteScan').disabled=true;$('noteScanStop').disabled=false;status('noteRecvStatus','Point the camera at the note QR.','warn');
-    const tick=async()=>{if(!noteScanActive)return;try{const c=await det.detect(v),val=c.length&&c[0].rawValue;if(val&&/[?#&]note=/.test(val)){await stopNoteScan();openNoteLink(val);return;}}catch{}noteScanFrame=requestAnimationFrame(tick);};tick();
-  }catch(e){await stopNoteScan();status('noteRecvStatus','Could not access the camera. Check the browser permission, or paste the note link. '+(e.message||''),'err');}
+    const tick=async()=>{if(!noteScanActive)return;try{const val=await readQr(v);if(val&&isNoteLink(val)){await stopNoteScan();openNoteLink(val);return;}if(val&&isFileLink(val)){await stopNoteScan();status('noteRecvStatus','That QR is a file share; it is receiving under Receive a file above.','ok');$('magnetIn').value=val;startReceive();$('magnetIn').scrollIntoView({behavior:'smooth',block:'center'});return;}}catch{}noteScanFrame=requestAnimationFrame(tick);};tick();
+  }catch(e){await stopNoteScan();status('noteRecvStatus',/QR decoder/.test(e.message||'')?e.message:'Could not access the camera. Check the browser permission, or paste the note link. '+(e.message||''),'err');}
 });
 window.addEventListener('pagehide',stopNoteScan);
 // Opened from a note QR/link: show it, then drop the note from the address bar and history.
