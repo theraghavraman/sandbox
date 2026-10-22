@@ -175,6 +175,17 @@ function getClient(){
 // torrent.destroy() removes the torrent from the client synchronously, so the same
 // magnet can be added again right away (client.remove() is async and can reject).
 function cleanupTorrent(t){ if(t && !t.destroyed){ try{t.destroy();}catch{} } }
+// Safari on iPhone in Private Browsing (and other browsers without the origin-private file system) cannot open the
+// storage WebTorrent keeps pieces in, so transfers failed there with "UnknownError". Detect that once and keep the
+// pieces in memory instead; everywhere else WebTorrent's default storage is used as before.
+class MemoryChunkStore{constructor(chunkLength){this.chunkLength=Number(chunkLength);this.chunks=[];this.closed=false;}
+  put(i,buf,cb=()=>{}){if(this.closed)return queueMicrotask(()=>cb(new Error('Storage is closed')));this.chunks[i]=buf;queueMicrotask(()=>cb(null));}
+  get(i,opts,cb=()=>{}){if(typeof opts==='function')return this.get(i,null,opts);if(this.closed)return queueMicrotask(()=>cb(new Error('Storage is closed')));let buf=this.chunks[i];if(!buf){const e=new Error('Chunk not found');e.notFound=true;return queueMicrotask(()=>cb(e));}const off=(opts&&opts.offset)||0,len=(opts&&opts.length)||(buf.length-off);if(off!==0||len!==buf.length)buf=buf.slice(off,off+len);queueMicrotask(()=>cb(null,buf));}
+  close(cb=()=>{}){this.closed=true;queueMicrotask(()=>cb(null));}
+  destroy(cb=()=>{}){this.closed=true;this.chunks=[];queueMicrotask(()=>cb(null));}}
+let memoryPieces=false;
+const storeCheck=(async()=>{try{if(navigator.storage&&navigator.storage.getDirectory){await navigator.storage.getDirectory();return;}}catch{}memoryPieces=true;})();
+const pieceStoreOpt=()=>memoryPieces?{store:MemoryChunkStore}:{};
 function renderQR(value,box){ box.replaceChildren(); if(!window.QRCode){box.textContent='QR generator failed to load. Use the magnet link instead.';return;} const canvas=document.createElement('canvas'); box.append(canvas); QRCode.toCanvas(canvas,value,{width:300,margin:3,errorCorrectionLevel:'M'},err=>{if(err)box.textContent='Could not create QR. Copy the magnet link instead.';}); }
 function receiverPageUrl(magnet){const u=new URL('./redmarkshare.html',window.location.href);u.search='';u.hash='';u.searchParams.set('magnet',magnet);return u.href;}
 
@@ -195,7 +206,7 @@ $('startSeed').addEventListener('click',()=>{
       renderQR(receiverPageUrl(torrent.magnetURI),$('sendQr'));
       if(!torrent.numPeers) status('sendStatus','Share link and QR are ready. Recipient can scan now. Keep this tab open and in the foreground until the transfer finishes.','ok');
     };
-    torrent = client.seed(input,{name:shareName,announce:trackers},seededTorrent=>{
+    torrent = client.seed(input,{name:shareName,announce:trackers,...pieceStoreOpt()},seededTorrent=>{
       torrent=seededTorrent; seedTorrent=seededTorrent; publishShare(); updateSeedStats();
     });
     seedTorrent=torrent;
@@ -232,9 +243,9 @@ function startReceive(){
   cancelDownload();
   $('startDownload').disabled=true;$('stopDownload').disabled=false;
   $('progressBar').style.width='0%';$('progressText').textContent='0%';$('downloadPeers').textContent='0';$('downloadSpeed').textContent='0 B/s';$('receiveFile').textContent='Finding peers…';
-  status('receiveStatus','Looking for the sender through the trackers…');
+  status('receiveStatus','Looking for the sender through the trackers…'+(memoryPieces?' Private browsing: the received file is kept in memory, so very large files may not fit.':''));
   let torrent;
-  try{ torrent=client.add(magnet,{announce:trackers}); }catch(e){ status('receiveStatus',e.message||'Could not start transfer.','err'); setReceiveIdle(); return; }
+  try{ torrent=client.add(magnet,{announce:trackers,...pieceStoreOpt()}); }catch(e){ status('receiveStatus',e.message||'Could not start transfer.','err'); setReceiveIdle(); return; }
   downloadTorrent=torrent;
   let failedAttempts=0;
   const active=()=>downloadTorrent===torrent;
@@ -366,7 +377,7 @@ showRelayState();
 // When the phone's native camera opens the QR URL, prefill the magnet and start receiving.
 // This lets the recipient use the same published Sandbox page without installing an app.
 const incoming = new URLSearchParams(window.location.search).get('magnet');
-if(incoming){$('magnetIn').value=incoming;status('receiveStatus','Share link opened from QR. Connecting automatically…','ok');setTimeout(startReceive,350);}
+if(incoming){$('magnetIn').value=incoming;status('receiveStatus','Share link opened from QR. Connecting automatically…','ok');storeCheck.then(()=>setTimeout(startReceive,350));}
 // ---------- Quick note: clipboard text by QR ----------
 // Short notes are carried inside the QR/link itself (#note=…, never sent to the server); longer ones are seeded
 // as a tiny torrent and the link carries ?note=<magnet>. This block does not touch the file send/receive flow.
@@ -394,7 +405,7 @@ $('noteCreate').addEventListener('click',async()=>{
   try{getClient();}catch(e){status('noteSendStatus',e.message,'err');return;}
   $('noteQr').textContent='Too long to fit in a QR; preparing a peer-to-peer share…';
   status('noteSendStatus','This note is too long to fit inside a QR, so it is shared peer-to-peer. Keep this tab open until it is received.');
-  let t;try{t=client.seed(new File([text],'redmark-note.txt',{type:'text/plain'}),{name:'redmark-note.txt',announce:trackers},()=>publish());}catch(e){status('noteSendStatus','Could not share the note: '+(e.message||e),'err');return;}
+  let t;try{t=client.seed(new File([text],'redmark-note.txt',{type:'text/plain'}),{name:'redmark-note.txt',announce:trackers,...pieceStoreOpt()},()=>publish());}catch(e){status('noteSendStatus','Could not share the note: '+(e.message||e),'err');return;}
   noteSeedTorrent=t;$('noteStop').disabled=false;
   function publish(){if(noteSeedTorrent!==t||!t.magnetURI)return;showNoteQr(noteUrl('',t.magnetURI));status('noteSendStatus','Ready. Scan the QR on the other device. This note is sent peer-to-peer, so keep this tab open until it arrives.','ok');}
   t.on('infoHash',publish);t.on('metadata',publish);t.on('ready',publish);
@@ -408,7 +419,7 @@ function receiveNoteP2P(magnet){
   try{getClient();}catch(e){status('noteRecvStatus',e.message,'err');return;}
   if(noteDownload){cleanupTorrent(noteDownload);noteDownload=null;}
   status('noteRecvStatus','Connecting to the sender to fetch the note…');
-  let t;try{t=client.add(magnet,{announce:trackers});}catch(e){status('noteRecvStatus','Could not start: '+(e.message||e),'err');return;}
+  let t;try{t=client.add(magnet,{announce:trackers,...pieceStoreOpt()});}catch(e){status('noteRecvStatus','Could not start: '+(e.message||e),'err');return;}
   noteDownload=t;
   const timer=setTimeout(()=>{if(noteDownload===t&&!t.numPeers)status('noteRecvStatus','Still looking for the sender after 25 seconds. Check that the sender page is open and still sharing the note. '+relayAdvice(),'warn');},25000);
   t.on('done',async()=>{clearTimeout(timer);if(noteDownload!==t)return;try{const f=t.files[0];if(!f)throw new Error('The share contained no note.');if(f.length>NOTE_MAX_BYTES)throw new Error('This share is larger than a note; open it under Receive a file.');showNote(await (await f.blob()).text(),'peer-to-peer');}catch(e){status('noteRecvStatus',e.message,'err');}finally{noteDownload=null;cleanupTorrent(t);}});
@@ -435,7 +446,7 @@ $('noteScan').addEventListener('click',async()=>{
 window.addEventListener('pagehide',stopNoteScan);
 // Opened from a note QR/link: show it, then drop the note from the address bar and history.
 {const p=new URLSearchParams(window.location.search),h=new URLSearchParams(window.location.hash.slice(1));
- if(h.get('note')||p.get('note')){const raw=window.location.href;history.replaceState(null,'',window.location.pathname);openNoteLink(raw);}}
+ if(h.get('note')||p.get('note')){const raw=window.location.href;history.replaceState(null,'',window.location.pathname);storeCheck.then(()=>openNoteLink(raw));}}
 window.addEventListener('pagehide',()=>{stopCamera();if(client){try{client.destroy();}catch{}}});
 </script>
 <!--EXT-SCRIPT--><script>
