@@ -118,6 +118,7 @@ These tools are experimental. Signature, steganalysis and image-forensics indica
 - Large-file disk saving requires a browser that supports `showSaveFilePicker` and enough free disk space. This page intentionally avoids a giant in-memory Blob fallback for very large files.
 - This initial version does not guarantee resume after closing/reloading the page, and has not yet been validated with a real >10 GB end-to-end test. Treat it as an experimental implementation until tested across the target browsers and networks.
 - The page loads WebTorrent and QR generation from third-party CDNs. A future production release should pin and self-host audited dependencies and verify tracker availability.
+- **Quick note:** share clipboard text with the same QR handoff. Notes of roughly a thousand characters or less travel inside the QR/link itself (in the URL fragment, which is never sent to the web server), so the other device needs no connection to the sender; longer notes (up to 1 MB) are sent peer-to-peer like a file.
 - **Torrent toolkit (offline):** creates standard v1 .torrent files and magnet links, inspects any .torrent or magnet, and verifies downloaded files piece by piece against a .torrent. These parts do not need WebTorrent or a network.
 - **Pack & hash:** bundles several files into a stored ZIP, and computes streaming SHA-256 and CRC-32 to compare with the sender's hash.
 - **Connection check:** reports host/STUN/TURN candidate types and measures local WebRTC throughput.

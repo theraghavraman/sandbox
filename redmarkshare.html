@@ -18,7 +18,7 @@ main{max-width:1180px;margin:auto;padding:32px 18px 60px}.hero{display:flex;alig
 .relay{margin-top:16px}.relay summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;padding:16px 20px;font:700 16px var(--display)}.relay summary::-webkit-details-marker{display:none}.relay summary small{font:500 11px var(--mono);color:var(--muted)}.relay[open] summary{border-bottom:1px solid var(--line)}.relay .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}input[type=password]{width:100%;border:1px solid #d8e0e5;border-radius:10px;padding:11px;background:#fff;color:var(--ink)}
 @media(max-width:760px){.relay .pair{grid-template-columns:1fr}.relay summary{padding:15px}}
 @media(max-width:760px){main{padding:24px 12px 40px}.hero{display:block}.badge{display:inline-block;margin-top:14px}.grid{grid-template-columns:1fr}.body{padding:15px}.head{padding:15px}.stats{grid-template-columns:1fr 1fr}.top{padding:0 12px}}
-.file-list{margin-top:10px;display:grid;gap:6px;max-height:280px;overflow:auto}.file-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:13px}.file-row span{overflow-wrap:anywhere;min-width:0}.file-row .btn{flex:none;padding:6px 12px}</style>
+.file-list{margin-top:10px;display:grid;gap:6px;max-height:280px;overflow:auto}.file-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:13px}.file-row span{overflow-wrap:anywhere;min-width:0}.file-row .btn{flex:none;padding:6px 12px}.note-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;align-items:start}textarea.note-text{min-height:120px;font:14px/1.5 system-ui,sans-serif}</style>
 <link rel="stylesheet" href="./redmark-revamp.css?v=4">
 </head>
 <body>
@@ -52,6 +52,28 @@ main{max-width:1180px;margin:auto;padding:32px 18px 60px}.hero{display:flex;alig
 <div class="btns"><button class="btn orange" id="saveFile" disabled>Save completed file</button></div>
 <div id="receiveList" class="file-list" hidden></div>
 <div class="hint" style="margin-top:8px">For files over 10 GB, use a Chromium-based browser with file-saving support and sufficient free disk space. RedmarkShare streams the received file to disk where the File System Access API is available; it avoids building a single giant Blob in memory.</div>
+</div></section>
+<section class="card" id="noteCard" style="grid-column:1/-1">
+<div class="head"><h2>✎ Quick note</h2><p>Share clipboard text between devices with the same QR handoff. Short notes travel inside the QR itself, so the other device needs no connection to this one; longer notes are sent peer-to-peer like a file.</p></div>
+<div class="body note-grid">
+<div>
+<div class="field"><label for="noteText">Note to share</label><textarea id="noteText" class="note-text" placeholder="Type or paste text, a link, an address, a code…"></textarea></div>
+<div class="btns"><button class="btn" id="notePaste" type="button">Paste from clipboard</button><button class="btn orange" id="noteCreate" type="button">Create note QR</button><button class="btn" id="noteStop" type="button" disabled>Stop note share</button></div>
+<div id="noteSendStatus" class="status">Type or paste a note, then create its QR.</div>
+<div class="qrbox" id="noteQr"><span class="hint">The note QR appears here.</span></div>
+<div class="field"><label for="noteLink">Note link (fallback)</label><textarea id="noteLink" readonly placeholder="Created with the QR"></textarea></div>
+<div class="btns"><button class="btn" id="noteCopyLink" type="button" disabled>Copy note link</button></div>
+</div>
+<div>
+<div class="btns" style="margin-top:0"><button class="btn orange" id="noteScan" type="button">Scan note QR</button><button class="btn" id="noteScanStop" type="button" disabled>Stop camera</button></div>
+<video id="noteCamera" class="camera" playsinline muted></video>
+<div class="hint">On a phone, the normal camera app can open the note QR too. On a computer, paste the note link below.</div>
+<div class="field" style="margin-top:15px"><label for="noteLinkIn">Note link</label><textarea id="noteLinkIn" placeholder="https://…redmarkshare.html#note=…"></textarea></div>
+<div class="btns"><button class="btn primary" id="noteOpen" type="button">Open note</button></div>
+<div id="noteRecvStatus" class="status">Waiting for a note.</div>
+<div class="field" style="margin-top:12px"><label for="noteOut">Received note</label><textarea id="noteOut" class="note-text" readonly placeholder="A received note appears here."></textarea></div>
+<div class="btns"><button class="btn orange" id="noteCopy" type="button" disabled>Copy note</button></div>
+</div>
 </div></section>
 </div>
 <details class="card relay" id="relayBox">
@@ -322,6 +344,74 @@ showRelayState();
 // This lets the recipient use the same published Sandbox page without installing an app.
 const incoming = new URLSearchParams(window.location.search).get('magnet');
 if(incoming){$('magnetIn').value=incoming;status('receiveStatus','Share link opened from QR. Connecting automatically…','ok');setTimeout(startReceive,350);}
+// ---------- Quick note: clipboard text by QR ----------
+// Short notes are carried inside the QR/link itself (#note=…, never sent to the server); longer ones are seeded
+// as a tiny torrent and the link carries ?note=<magnet>. This block does not touch the file send/receive flow.
+const NOTE_QR_MAX=1000, NOTE_MAX_BYTES=1048576;
+let noteSeedTorrent=null, noteDownload=null, noteStream=null, noteScanActive=false, noteScanFrame=null;
+const b64uEnc=b=>{let s='';for(let i=0;i<b.length;i+=8192)s+=String.fromCharCode(...b.subarray(i,i+8192));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');};
+const b64uDec=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-s.length%4)%4)),c=>c.charCodeAt(0));
+const throughStream=async(bytes,ts)=>new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(ts)).arrayBuffer());
+async function noteToFragment(text){const raw=new TextEncoder().encode(text);let best='0.'+b64uEnc(raw);if(window.CompressionStream){try{const z='1.'+b64uEnc(await throughStream(raw,new CompressionStream('deflate-raw')));if(z.length<best.length)best=z;}catch{}}return best;}
+async function noteFromFragment(v){const dot=v.indexOf('.'),kind=v.slice(0,dot),bytes=b64uDec(v.slice(dot+1));
+  if(kind==='1'){if(!window.DecompressionStream)throw new Error('This browser cannot unpack compressed notes. Update it, or ask the sender for a longer note link.');return new TextDecoder().decode(await throughStream(bytes,new DecompressionStream('deflate-raw')));}
+  if(kind==='0')return new TextDecoder().decode(bytes);throw new Error('Unrecognised note link.');}
+function noteUrl(hashNote,magnet){const u=new URL('./redmarkshare.html',window.location.href);u.search='';u.hash='';if(magnet)u.searchParams.set('note',magnet);if(hashNote)u.hash='note='+hashNote;return u.href;}
+function showNoteQr(url){$('noteLink').value=url;$('noteCopyLink').disabled=false;const box=$('noteQr');box.replaceChildren();if(!window.QRCode){box.textContent='QR generator failed to load. Copy the note link instead.';return;}const c=document.createElement('canvas');box.append(c);QRCode.toCanvas(c,url,{width:340,margin:3,errorCorrectionLevel:'L'},err=>{if(err)box.textContent='Could not draw this QR. Copy the note link instead.';});}
+function stopNoteSeed(){if(noteSeedTorrent){cleanupTorrent(noteSeedTorrent);noteSeedTorrent=null;}$('noteStop').disabled=true;}
+async function copyText(text,okId,okMsg,field){try{await navigator.clipboard.writeText(text);status(okId,okMsg,'ok');}catch{const f=$(field);f.focus();f.select();status(okId,'Clipboard unavailable here; the text is selected so you can copy it manually.','warn');}}
+$('notePaste').addEventListener('click',async()=>{try{const t=await navigator.clipboard.readText();if(!t){status('noteSendStatus','The clipboard has no text.','warn');return;}$('noteText').value=t;status('noteSendStatus','Pasted '+fmt(new TextEncoder().encode(t).length)+' from the clipboard. Tap Create note QR.','ok');}catch{status('noteSendStatus','This browser did not allow reading the clipboard. Paste into the box with Ctrl/Cmd+V instead.','warn');}});
+$('noteCreate').addEventListener('click',async()=>{
+  const text=$('noteText').value;if(!text.trim()){status('noteSendStatus','Type or paste a note first.','warn');return;}
+  if(new TextEncoder().encode(text).length>NOTE_MAX_BYTES){status('noteSendStatus','Notes are limited to 1 MB. Share longer text as a file above.','err');return;}
+  stopNoteSeed();$('noteLink').value='';$('noteCopyLink').disabled=true;
+  const direct=noteUrl(await noteToFragment(text));
+  if(direct.length<=NOTE_QR_MAX){showNoteQr(direct);status('noteSendStatus','Ready. The note is inside the QR itself, so the other device needs no connection to this one. Scan it, or send the note link.','ok');return;}
+  try{getClient();}catch(e){status('noteSendStatus',e.message,'err');return;}
+  $('noteQr').textContent='Too long to fit in a QR; preparing a peer-to-peer share…';
+  status('noteSendStatus','This note is too long to fit inside a QR, so it is shared peer-to-peer. Keep this tab open until it is received.');
+  let t;try{t=client.seed(new File([text],'redmark-note.txt',{type:'text/plain'}),{name:'redmark-note.txt',announce:trackers},()=>publish());}catch(e){status('noteSendStatus','Could not share the note: '+(e.message||e),'err');return;}
+  noteSeedTorrent=t;$('noteStop').disabled=false;
+  function publish(){if(noteSeedTorrent!==t||!t.magnetURI)return;showNoteQr(noteUrl('',t.magnetURI));status('noteSendStatus','Ready. Scan the QR on the other device. This note is sent peer-to-peer, so keep this tab open until it arrives.','ok');}
+  t.on('infoHash',publish);t.on('metadata',publish);t.on('ready',publish);
+  t.on('wire',()=>{if(noteSeedTorrent===t)status('noteSendStatus','Receiver connected; sending the note. Keep this tab open.','ok');});
+  t.on('error',err=>{if(noteSeedTorrent===t){status('noteSendStatus','Could not share the note: '+(err.message||err),'err');stopNoteSeed();}});
+});
+$('noteStop').addEventListener('click',()=>{stopNoteSeed();$('noteQr').textContent='Note sharing stopped.';status('noteSendStatus','You stopped sharing this note.','warn');});
+$('noteCopyLink').addEventListener('click',()=>copyText($('noteLink').value,'noteSendStatus','Note link copied. Send it through any channel; whoever opens it can read the note.','noteLink'));
+function showNote(text,how){$('noteOut').value=text;$('noteCopy').disabled=false;status('noteRecvStatus','Note received '+how+' ('+fmt(new TextEncoder().encode(text).length)+'). Tap Copy note.','ok');$('noteCard').scrollIntoView({behavior:'smooth',block:'start'});}
+function receiveNoteP2P(magnet){
+  try{getClient();}catch(e){status('noteRecvStatus',e.message,'err');return;}
+  if(noteDownload){cleanupTorrent(noteDownload);noteDownload=null;}
+  status('noteRecvStatus','Connecting to the sender to fetch the note…');
+  let t;try{t=client.add(magnet,{announce:trackers});}catch(e){status('noteRecvStatus','Could not start: '+(e.message||e),'err');return;}
+  noteDownload=t;
+  const timer=setTimeout(()=>{if(noteDownload===t&&!t.numPeers)status('noteRecvStatus','Still looking for the sender after 25 seconds. Check that the sender page is open and still sharing the note. '+relayAdvice(),'warn');},25000);
+  t.on('done',async()=>{clearTimeout(timer);if(noteDownload!==t)return;try{const f=t.files[0];if(!f)throw new Error('The share contained no note.');if(f.length>NOTE_MAX_BYTES)throw new Error('This share is larger than a note; open it under Receive a file.');showNote(await (await f.blob()).text(),'peer-to-peer');}catch(e){status('noteRecvStatus',e.message,'err');}finally{noteDownload=null;cleanupTorrent(t);}});
+  t.on('error',err=>{clearTimeout(timer);if(noteDownload===t){noteDownload=null;status('noteRecvStatus','Could not fetch the note: '+(err.message||err),'err');}});
+}
+async function openNoteLink(raw){
+  let u;try{u=new URL(String(raw).trim(),window.location.href);}catch{status('noteRecvStatus','That is not a note link.','err');return;}
+  const inline=new URLSearchParams(u.hash.slice(1)).get('note'),magnet=u.searchParams.get('note');
+  if(inline){try{showNote(await noteFromFragment(inline),'from the QR');}catch(e){status('noteRecvStatus',e.message&&!/atob|decode/i.test(e.message)?e.message:'This note link is incomplete or damaged.','err');}return;}
+  if(magnet&&/^magnet:\?xt=urn:bt(ih|mh):/i.test(magnet)){$('noteLinkIn').value=u.href;receiveNoteP2P(magnet);return;}
+  status('noteRecvStatus','That is not a RedmarkShare note link. File share links go in “Receive a file” above.','err');
+}
+$('noteOpen').addEventListener('click',()=>{const v=$('noteLinkIn').value.trim();if(!v){status('noteRecvStatus','Paste a note link first.','warn');return;}openNoteLink(v);});
+$('noteCopy').addEventListener('click',()=>copyText($('noteOut').value,'noteRecvStatus','Note copied to the clipboard.','noteOut'));
+async function stopNoteScan(){noteScanActive=false;if(noteScanFrame)cancelAnimationFrame(noteScanFrame);noteScanFrame=null;if(noteStream){noteStream.getTracks().forEach(t=>t.stop());noteStream=null;}$('noteCamera').srcObject=null;$('noteCamera').style.display='none';$('noteScan').disabled=false;$('noteScanStop').disabled=true;}
+$('noteScanStop').addEventListener('click',stopNoteScan);
+$('noteScan').addEventListener('click',async()=>{
+  if(!('BarcodeDetector' in window)){status('noteRecvStatus','This browser cannot scan QR codes. Use the phone camera app instead, or paste the note link.','warn');return;}
+  try{const det=new BarcodeDetector({formats:['qr_code']});noteStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+    const v=$('noteCamera');v.srcObject=noteStream;v.style.display='block';await v.play();noteScanActive=true;$('noteScan').disabled=true;$('noteScanStop').disabled=false;status('noteRecvStatus','Point the camera at the note QR.','warn');
+    const tick=async()=>{if(!noteScanActive)return;try{const c=await det.detect(v),val=c.length&&c[0].rawValue;if(val&&/[?#&]note=/.test(val)){await stopNoteScan();openNoteLink(val);return;}}catch{}noteScanFrame=requestAnimationFrame(tick);};tick();
+  }catch(e){await stopNoteScan();status('noteRecvStatus','Could not access the camera. Check the browser permission, or paste the note link. '+(e.message||''),'err');}
+});
+window.addEventListener('pagehide',stopNoteScan);
+// Opened from a note QR/link: show it, then drop the note from the address bar and history.
+{const p=new URLSearchParams(window.location.search),h=new URLSearchParams(window.location.hash.slice(1));
+ if(h.get('note')||p.get('note')){const raw=window.location.href;history.replaceState(null,'',window.location.pathname);openNoteLink(raw);}}
 window.addEventListener('pagehide',()=>{stopCamera();if(client){try{client.destroy();}catch{}}});
 </script>
 <!--EXT-SCRIPT--><script>
