@@ -18,7 +18,7 @@ main{max-width:1180px;margin:auto;padding:32px 18px 60px}.hero{display:flex;alig
 .relay{margin-top:16px}.relay summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;padding:16px 20px;font:700 16px var(--display)}.relay summary::-webkit-details-marker{display:none}.relay summary small{font:500 11px var(--mono);color:var(--muted)}.relay[open] summary{border-bottom:1px solid var(--line)}.relay .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}input[type=password]{width:100%;border:1px solid #d8e0e5;border-radius:10px;padding:11px;background:#fff;color:var(--ink)}
 @media(max-width:760px){.relay .pair{grid-template-columns:1fr}.relay summary{padding:15px}}
 @media(max-width:760px){main{padding:24px 12px 40px}.hero{display:block}.badge{display:inline-block;margin-top:14px}.grid{grid-template-columns:1fr}.body{padding:15px}.head{padding:15px}.stats{grid-template-columns:1fr 1fr}.top{padding:0 12px}}
-.file-list{margin-top:10px;display:grid;gap:6px;max-height:280px;overflow:auto}.file-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:13px}.file-row span{overflow-wrap:anywhere;min-width:0}.file-row .btn{flex:none;padding:6px 12px}.note-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;align-items:start}textarea.note-text{min-height:120px;font:14px/1.5 system-ui,sans-serif}</style>
+.file-list{margin-top:10px;display:grid;gap:6px;max-height:280px;overflow:auto}.file-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:13px}.file-row span{overflow-wrap:anywhere;min-width:0}.file-row .btn{flex:none;padding:6px 12px}.note-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;align-items:start}textarea.note-text{min-height:120px;font:14px/1.5 system-ui,sans-serif}.qr-full{position:fixed;inset:0;z-index:1000;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:12px;cursor:pointer}.qr-full p{margin:0;color:#334;font:14px/1.4 system-ui,sans-serif;text-align:center}.qr-full canvas{image-rendering:pixelated;flex:none}</style>
 <link rel="stylesheet" href="./redmark-revamp.css?v=4">
 </head>
 <body>
@@ -62,7 +62,7 @@ main{max-width:1180px;margin:auto;padding:32px 18px 60px}.hero{display:flex;alig
 <div id="noteSendStatus" class="status">Type or paste a note, then create its QR.</div>
 <div class="qrbox" id="noteQr"><span class="hint">The note QR appears here.</span></div>
 <div class="field"><label for="noteLink">Note link (fallback)</label><textarea id="noteLink" readonly placeholder="Created with the QR"></textarea></div>
-<div class="btns"><button class="btn" id="noteCopyLink" type="button" disabled>Copy note link</button></div>
+<div class="btns"><button class="btn" id="noteFull" type="button" disabled>Show QR full screen</button><button class="btn" id="noteCopyLink" type="button" disabled>Copy note link</button></div>
 </div>
 <div>
 <div class="btns" style="margin-top:0"><button class="btn orange" id="noteScan" type="button">Scan note QR</button><button class="btn" id="noteScanStop" type="button" disabled>Stop camera</button></div>
@@ -308,24 +308,33 @@ $('saveFile').addEventListener('click',async()=>{
   if(completedFiles.length>1){try{await saveAll();}catch(e){status('receiveStatus',e.message||'Could not save the files. Check disk space and browser permissions.','err');}return;}
   await saveOne(completedFile);
 });
-// QR reading for the in-page scanners. Uses the browser's own BarcodeDetector where it supports QR (Android,
-// ChromeOS, Chrome on macOS); elsewhere (most desktop browsers, Safari, Firefox) camera frames are decoded with jsQR.
-let jsQRLoad=null;
-function loadJsQR(){if(window.jsQR)return Promise.resolve(window.jsQR);return jsQRLoad||(jsQRLoad=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';s.onload=()=>window.jsQR?res(window.jsQR):rej(new Error('The QR decoder did not load.'));s.onerror=()=>{jsQRLoad=null;rej(new Error('The QR decoder could not be downloaded. Check the connection, or paste the link instead.'));};document.head.append(s);}));}
+// QR reading for the in-page scanners. The browser's own BarcodeDetector is used where it supports QR (Android,
+// ChromeOS, Chrome on macOS). Elsewhere (most laptops, iPhone, Firefox) frames go to ZXing compiled to WebAssembly,
+// which reads small, tilted or slightly blurred codes on another phone's screen; jsQR is the last resort.
+const scriptLoads={};
+function loadScript(src,global){if(window[global])return Promise.resolve(window[global]);return scriptLoads[src]||(scriptLoads[src]=new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=()=>window[global]?res(window[global]):rej(new Error('The QR decoder did not load.'));s.onerror=()=>{delete scriptLoads[src];rej(new Error('The QR decoder could not be downloaded. Check the connection, or paste the link instead.'));};document.head.append(s);}));}
+const loadJsQR=()=>loadScript('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js','jsQR');
+async function loadZXing(){const z=await loadScript('https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.4/dist/iife/reader/index.js','ZXingWASM');await z.prepareZXingModule({fireImmediately:true});return z;}
 async function makeQrReader(){
   let native=null,nativeOk=false;
   try{if('BarcodeDetector' in window&&(await BarcodeDetector.getSupportedFormats()).includes('qr_code')){native=new BarcodeDetector({formats:['qr_code']});nativeOk=true;}}catch{}
-  const cv=document.createElement('canvas'),g=cv.getContext('2d',{willReadFrequently:true});let decode=null,m=0;
-  // jsQR alternates the whole frame with a full-resolution centre crop: a QR on another screen is often small in a phone's wide view.
-  const viaJsQR=async v=>{decode=decode||await loadJsQR();const w=v.videoWidth,h=v.videoHeight;if(!w||!h)return'';const crop=(m++&1)===1,side=Math.min(w,h)*0.6,sw=crop?side:w,sh=crop?side:h,k=Math.min(1,1280/Math.max(sw,sh));
-    cv.width=Math.round(sw*k);cv.height=Math.round(sh*k);g.drawImage(v,crop?(w-side)/2:0,crop?(h-side)/2:0,sw,sh,0,0,cv.width,cv.height);const r=decode(g.getImageData(0,0,cv.width,cv.height).data,cv.width,cv.height,{inversionAttempts:'dontInvert'});return r&&r.data||'';};
-  if(!nativeOk){decode=await loadJsQR();return viaJsQR;}
+  const cv=document.createElement('canvas'),g=cv.getContext('2d',{willReadFrequently:true});
+  const grab=(v,crop,zoom)=>{const w=v.videoWidth,h=v.videoHeight;if(!w||!h)return null;const side=Math.min(w,h)*0.6,sw=crop?side:w,sh=crop?side:h,k=crop?zoom:Math.min(1,1280/Math.max(w,h));
+    cv.width=Math.round(sw*k);cv.height=Math.round(sh*k);g.imageSmoothingQuality='high';g.drawImage(v,crop?(w-side)/2:0,crop?(h-side)/2:0,sw,sh,0,0,cv.width,cv.height);return g.getImageData(0,0,cv.width,cv.height);};
+  let fallback=null;
+  const getFallback=()=>fallback||(fallback=(async()=>{
+    try{const z=await loadZXing();return async v=>{const img=grab(v,false);if(!img)return'';const r=await z.readBarcodesFromImageData(img,{formats:['QRCode'],tryHarder:true,maxNumberOfSymbols:1});return r.length&&r[0].isValid&&r[0].text||'';};}
+    catch{const decode=await loadJsQR();let m=0;
+      // jsQR misses small codes in a full frame, so it alternates with a 2x enlarged centre crop.
+      return async v=>{const img=grab(v,(m++&1)===1,2);if(!img)return'';const r=decode(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});return r&&r.data||'';};}
+  })());
+  if(!nativeOk)return await getFallback();
   // Built-in detector first. Some phones expose it but it errors or never finds anything, so after 3 s without a result
-  // jsQR also gets every other frame, and it takes over completely if the built-in detector keeps failing.
+  // the fallback decoder also gets every other frame, and takes over completely if the built-in detector keeps failing.
   const t0=Date.now();let n=0,fails=0;
   return async v=>{const useNative=nativeOk&&(Date.now()-t0<3000||(n++&1)===0);
     if(useNative){try{const c=await native.detect(v);if(c.length&&c[0].rawValue)return c[0].rawValue;}catch{if(++fails>=5)nativeOk=false;}return'';}
-    try{return await viaJsQR(v);}catch{return'';}};
+    try{return await (await getFallback())(v);}catch{return'';}};
 }
 const CAMERA={video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false};
 const SCAN_TIP='Still looking. Hold the QR steady about 15–30 cm from the camera so it fills about half of the view, and turn up the other screen’s brightness to avoid glare.';
@@ -391,9 +400,13 @@ async function noteFromFragment(v){const dot=v.indexOf('.'),kind=v.slice(0,dot),
   if(kind==='1'){if(!window.DecompressionStream)throw new Error('This browser cannot unpack compressed notes. Update it, or ask the sender for a longer note link.');return new TextDecoder().decode(await throughStream(bytes,new DecompressionStream('deflate-raw')));}
   if(kind==='0')return new TextDecoder().decode(bytes);throw new Error('Unrecognised note link.');}
 function noteUrl(hashNote,magnet){const u=new URL('./redmarkshare.html',window.location.href);u.search='';u.hash='';if(magnet)u.searchParams.set('note',magnet);if(hashNote)u.hash='note='+hashNote;return u.href;}
-function showNoteQr(url){$('noteLink').value=url;$('noteCopyLink').disabled=false;const box=$('noteQr');box.replaceChildren();if(!window.QRCode){box.textContent='QR generator failed to load. Copy the note link instead.';return;}const c=document.createElement('canvas');box.append(c);// Whole pixels per module (at least 4): fractional module sizes blur dense codes and webcams then fail to read them.
-let scale=4;try{scale=Math.max(4,Math.ceil(340/(QRCode.create(url,{errorCorrectionLevel:'L'}).modules.size+6)));}catch{}QRCode.toCanvas(c,url,{scale,margin:3,errorCorrectionLevel:'L'},err=>{if(err)box.textContent='Could not draw this QR. Copy the note link instead.';});}
-function stopNoteSeed(){if(noteSeedTorrent){cleanupTorrent(noteSeedTorrent);noteSeedTorrent=null;}$('noteStop').disabled=true;}
+// Whole device pixels per module, sized to the box: a browser-scaled canvas blurs the module edges, especially on phones.
+function drawCrispQr(c,text,cssMax){const dpr=window.devicePixelRatio||1,n=QRCode.create(text,{errorCorrectionLevel:'L'}).modules.size+6,k=Math.max(2,Math.floor(cssMax*dpr/n));return new Promise((res,rej)=>QRCode.toCanvas(c,text,{scale:k,margin:3,errorCorrectionLevel:'L'},err=>{if(err)return rej(err);c.style.width=(c.width/dpr)+'px';c.style.height=(c.height/dpr)+'px';c.style.imageRendering='pixelated';res();}));}
+function showNoteQr(url){$('noteLink').value=url;$('noteCopyLink').disabled=false;$('noteFull').disabled=false;const box=$('noteQr');box.replaceChildren();if(!window.QRCode){box.textContent='QR generator failed to load. Copy the note link instead.';return;}const c=document.createElement('canvas');box.append(c);drawCrispQr(c,url,Math.min(460,Math.max(200,box.clientWidth-26))).catch(()=>{box.textContent='Could not draw this QR. Copy the note link instead.';});}
+function closeNoteFull(){const o=$('noteFullView');if(o)o.remove();}
+$('noteFull').addEventListener('click',()=>{const url=$('noteLink').value;if(!url||!window.QRCode)return;closeNoteFull();const o=document.createElement('div');o.id='noteFullView';o.className='qr-full';o.setAttribute('role','dialog');o.setAttribute('aria-label','Note QR, full screen');const c=document.createElement('canvas'),t=document.createElement('p');t.textContent='Hold this screen up to the other device’s camera. Tap anywhere to close.';o.append(c,t);document.body.append(o);drawCrispQr(c,url,Math.min(window.innerWidth,window.innerHeight-70)*0.92).catch(closeNoteFull);o.addEventListener('click',closeNoteFull);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeNoteFull();});
+function stopNoteSeed(){if(noteSeedTorrent){cleanupTorrent(noteSeedTorrent);noteSeedTorrent=null;}$('noteStop').disabled=true;$('noteFull').disabled=true;}
 async function copyText(text,okId,okMsg,field){try{await navigator.clipboard.writeText(text);status(okId,okMsg,'ok');}catch{const f=$(field);f.focus();f.select();status(okId,'Clipboard unavailable here; the text is selected so you can copy it manually.','warn');}}
 $('notePaste').addEventListener('click',async()=>{try{const t=await navigator.clipboard.readText();if(!t){status('noteSendStatus','The clipboard has no text.','warn');return;}$('noteText').value=t;status('noteSendStatus','Pasted '+fmt(new TextEncoder().encode(t).length)+' from the clipboard. Tap Create note QR.','ok');}catch{status('noteSendStatus','This browser did not allow reading the clipboard. Paste into the box with Ctrl/Cmd+V instead.','warn');}});
 $('noteCreate').addEventListener('click',async()=>{
