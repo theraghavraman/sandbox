@@ -8,7 +8,8 @@
 <link rel="icon" href="./favicon.svg?v=purple1" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js" integrity="sha384-0RsG1yo/crf/1Qc14sho26SXXOTngNCjgJw7fuvXBt9W/OChF/Ijx+aUuBDqQwEk" crossorigin="anonymous"></script>
+<script type="importmap">{"integrity":{"https://cdn.jsdelivr.net/npm/webtorrent@2.6.6/dist/webtorrent.min.js":"sha384-WR4EzE7bAQ9xJhc8s5kGEjv7GjTstOoekdTJYTZ2itxj/1U1Zy9KkOrPs6z18s5r"}}</script>
 <style>
 :root{--ink:#17202c;--ink2:#344354;--muted:#73808d;--canvas:#f3f5f6;--paper:#fff;--line:#e0e5e9;--accent:#ed6a24;--accent2:#ffb23f;--soft:#fff0e5;--green:#18764c;--red:#b53b32;--display:'Bricolage Grotesque',system-ui,sans-serif;--body:'Figtree',system-ui,sans-serif;--mono:'Fira Code',monospace}
 *{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--ink);font:14px/1.55 var(--body)}button,input,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #ed6a2466;outline-offset:2px}
@@ -185,7 +186,28 @@ class MemoryChunkStore{constructor(chunkLength){this.chunkLength=Number(chunkLen
   destroy(cb=()=>{}){this.closed=true;this.chunks=[];queueMicrotask(()=>cb(null));}}
 let memoryPieces=false;
 const storeCheck=(async()=>{try{if(navigator.storage&&navigator.storage.getDirectory){await navigator.storage.getDirectory();return;}}catch{}memoryPieces=true;})();
-const pieceStoreOpt=()=>memoryPieces?{store:MemoryChunkStore}:{};
+// Pieces of every file sent or received are kept in the browser's private storage (OPFS), which every GitHub Pages
+// site on this origin can read, in a folder named "<name> - <first 8 hex digits of the infohash>". Tabs that send or
+// receive the same file share that folder, so each holds a shared Web Lock on it for as long as its torrent lives, and
+// the folder is deleted only when the lock can be taken exclusively: when no open tab still uses it.
+// Without Web Locks, WebTorrent deletes the pieces itself when the torrent is destroyed.
+const pieceStoreOpt=()=>memoryPieces?{store:MemoryChunkStore,destroyStoreOnDestroy:true}:navigator.locks?{}:{destroyStoreOnDestroy:true};
+const piecesLock=h=>'rs-pieces:'+h;
+// Only folders in WebTorrent's own layout (numbered piece files and nothing else) are touched.
+function dropPieces(h){return navigator.locks.request(piecesLock(h),{ifAvailable:true},async lock=>{
+  if(!lock||(client&&client.torrents.some(t=>!t.infoHash||t.infoHash.startsWith(h))))return;
+  const root=await navigator.storage.getDirectory();
+  for await(const [name,dir] of root.entries()){if(dir.kind!=='directory'||!name.endsWith(' - '+h))continue;
+    let pieces=true;for await(const [n,e] of dir.entries())if(e.kind!=='file'||!/^\d+$/.test(n)){pieces=false;break;}
+    if(pieces)await root.removeEntry(name,{recursive:true});}}).catch(()=>{});}
+function holdPieces(t){if(!navigator.locks||memoryPieces)return;
+  const take=()=>{if(t.destroyed)return;const h=t.infoHash.slice(0,8);
+    navigator.locks.request(piecesLock(h),{mode:'shared'},()=>new Promise(done=>t.destroyed?done():t.once('close',done))).then(()=>dropPieces(h),()=>{});};
+  if(t.infoHash)take();else t.once('infoHash',take);}
+// Remove piece folders left behind by earlier visits (a tab was closed while still sending or receiving).
+storeCheck.then(async()=>{if(memoryPieces||!navigator.locks)return;try{const root=await navigator.storage.getDirectory(),hashes=new Set();
+  for await(const [name,dir] of root.entries()){const m=dir.kind==='directory'&&/ - ([0-9a-f]{8})$/.exec(name);if(m)hashes.add(m[1]);}
+  for(const h of hashes)await dropPieces(h);}catch{}});
 function renderQR(value,box){ box.replaceChildren(); if(!window.QRCode){box.textContent='QR generator failed to load. Use the magnet link instead.';return;} const canvas=document.createElement('canvas'); box.append(canvas); QRCode.toCanvas(canvas,value,{width:300,margin:3,errorCorrectionLevel:'M'},err=>{if(err)box.textContent='Could not create QR. Copy the magnet link instead.';}); }
 function receiverPageUrl(magnet){const u=new URL('./redmarkshare.html',window.location.href);u.search='';u.hash='';u.searchParams.set('magnet',magnet);return u.href;}
 
@@ -209,7 +231,7 @@ $('startSeed').addEventListener('click',()=>{
     torrent = client.seed(input,{name:shareName,announce:trackers,...pieceStoreOpt()},seededTorrent=>{
       torrent=seededTorrent; seedTorrent=seededTorrent; publishShare(); updateSeedStats();
     });
-    seedTorrent=torrent;
+    seedTorrent=torrent;holdPieces(torrent);
     torrent.on('infoHash',publishShare);
     torrent.on('metadata',publishShare);
     torrent.on('ready',publishShare);
@@ -246,7 +268,7 @@ function startReceive(){
   status('receiveStatus','Looking for the sender through the trackers…'+(memoryPieces?' Private browsing: the received file is kept in memory, so very large files may not fit.':''));
   let torrent;
   try{ torrent=client.add(magnet,{announce:trackers,...pieceStoreOpt()}); }catch(e){ status('receiveStatus',e.message||'Could not start transfer.','err'); setReceiveIdle(); return; }
-  downloadTorrent=torrent;
+  downloadTorrent=torrent;holdPieces(torrent);
   let failedAttempts=0;
   const active=()=>downloadTorrent===torrent;
   const refresh=()=>{if(!active())return;const p=Math.round((torrent.progress||0)*100);$('progressBar').style.width=p+'%';$('progressText').textContent=p+'%';$('downloadPeers').textContent=torrent.numPeers;$('downloadSpeed').textContent=fmt(client.downloadSpeed)+'/s';if(torrent.files.length>1)$('receiveFile').textContent=plural(torrent.files.length,'file')+' · '+fmt(torrent.length);else if(torrent.files[0])$('receiveFile').textContent=torrent.files[0].name+' · '+fmt(torrent.files[0].length);};
@@ -312,9 +334,10 @@ $('saveFile').addEventListener('click',async()=>{
 // ChromeOS, Chrome on macOS). Elsewhere (most laptops, iPhone, Firefox) frames go to ZXing compiled to WebAssembly,
 // which reads small, tilted or slightly blurred codes on another phone's screen; jsQR is the last resort.
 const scriptLoads={};
-function loadScript(src,global){if(window[global])return Promise.resolve(window[global]);return scriptLoads[src]||(scriptLoads[src]=new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=()=>window[global]?res(window[global]):rej(new Error('The QR decoder did not load.'));s.onerror=()=>{delete scriptLoads[src];rej(new Error('The QR decoder could not be downloaded. Check the connection, or paste the link instead.'));};document.head.append(s);}));}
-const loadJsQR=()=>loadScript('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js','jsQR');
-async function loadZXing(){const z=await loadScript('https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.4/dist/iife/reader/index.js','ZXingWASM');await z.prepareZXingModule({fireImmediately:true});return z;}
+function loadScript(src,global,integrity){if(window[global])return Promise.resolve(window[global]);return scriptLoads[src]||(scriptLoads[src]=new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.integrity=integrity;s.crossOrigin='anonymous';s.onload=()=>window[global]?res(window[global]):rej(new Error('The QR decoder did not load.'));s.onerror=()=>{delete scriptLoads[src];rej(new Error('The QR decoder could not be downloaded. Check the connection, or paste the link instead.'));};document.head.append(s);}));}
+const loadJsQR=()=>loadScript('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js','jsQR','sha384-b5Ya4Bq3qCyz39m2ISh+4DxjAIljdeFwK/BsXLuj9gugaNwAcj/ia15fxNZL9Nlx');
+// The decoder and its WebAssembly are pinned by hash; a CDN copy that differs is refused rather than run.
+async function loadZXing(){const z=await loadScript('https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.4/dist/iife/reader/index.js','ZXingWASM','sha384-PN2+TcV6o3ygq0xnuFCxKBra0Yt4uPsZhoQ/vGYAwE57BrG9nHTvynv6YPyluWaU');const wasm=await (await fetch('https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.4/dist/reader/zxing_reader.wasm',{integrity:'sha384-uU3W9ksDBq9UOyHhv5S9GtsH9dlOsIMpeSy3WpglpRsLh12aEnMYcjZeSJq5MEum'})).arrayBuffer();await z.prepareZXingModule({overrides:{wasmBinary:wasm},fireImmediately:true});return z;}
 async function makeQrReader(){
   let native=null,nativeOk=false;
   try{if('BarcodeDetector' in window&&(await BarcodeDetector.getSupportedFormats()).includes('qr_code')){native=new BarcodeDetector({formats:['qr_code']});nativeOk=true;}}catch{}
@@ -397,7 +420,11 @@ const b64uDec=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')+'='.
 const throughStream=async(bytes,ts)=>new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(ts)).arrayBuffer());
 async function noteToFragment(text){const raw=new TextEncoder().encode(text);let best='0.'+b64uEnc(raw);if(window.CompressionStream){try{const z='1.'+b64uEnc(await throughStream(raw,new CompressionStream('deflate-raw')));if(z.length<best.length)best=z;}catch{}}return best;}
 async function noteFromFragment(v){const dot=v.indexOf('.'),kind=v.slice(0,dot),bytes=b64uDec(v.slice(dot+1));
-  if(kind==='1'){if(!window.DecompressionStream)throw new Error('This browser cannot unpack compressed notes. Update it, or ask the sender for a longer note link.');return new TextDecoder().decode(await throughStream(bytes,new DecompressionStream('deflate-raw')));}
+  if(kind==='1'){if(!window.DecompressionStream)throw new Error('This browser cannot unpack compressed notes. Update it, or ask the sender for a longer note link.');
+    // Stop unpacking at the note size limit: a crafted link could otherwise expand into gigabytes and crash the tab.
+    const rd=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')).getReader(),parts=[];let n=0;
+    for(;;){const {done,value}=await rd.read();if(done)break;n+=value.length;if(n>NOTE_MAX_BYTES){await rd.cancel().catch(()=>{});throw new Error('This note link expands to more than 1 MB, so it was not opened.');}parts.push(value);}
+    return new TextDecoder().decode(await new Blob(parts).arrayBuffer());}
   if(kind==='0')return new TextDecoder().decode(bytes);throw new Error('Unrecognised note link.');}
 function noteUrl(hashNote,magnet){const u=new URL('./redmarkshare.html',window.location.href);u.search='';u.hash='';if(magnet)u.searchParams.set('note',magnet);if(hashNote)u.hash='note='+hashNote;return u.href;}
 // Whole device pixels per module, sized to the box: a browser-scaled canvas blurs the module edges, especially on phones.
@@ -419,7 +446,7 @@ $('noteCreate').addEventListener('click',async()=>{
   $('noteQr').textContent='Too long to fit in a QR; preparing a peer-to-peer share…';
   status('noteSendStatus','This note is too long to fit inside a QR, so it is shared peer-to-peer. Keep this tab open until it is received.');
   let t;try{t=client.seed(new File([text],'redmark-note.txt',{type:'text/plain'}),{name:'redmark-note.txt',announce:trackers,...pieceStoreOpt()},()=>publish());}catch(e){status('noteSendStatus','Could not share the note: '+(e.message||e),'err');return;}
-  noteSeedTorrent=t;$('noteStop').disabled=false;
+  noteSeedTorrent=t;holdPieces(t);$('noteStop').disabled=false;
   function publish(){if(noteSeedTorrent!==t||!t.magnetURI)return;showNoteQr(noteUrl('',t.magnetURI));status('noteSendStatus','Ready. Scan the QR on the other device. This note is sent peer-to-peer, so keep this tab open until it arrives.','ok');}
   t.on('infoHash',publish);t.on('metadata',publish);t.on('ready',publish);
   t.on('wire',()=>{if(noteSeedTorrent===t)status('noteSendStatus','Receiver connected; sending the note. Keep this tab open.','ok');});
@@ -433,7 +460,13 @@ function receiveNoteP2P(magnet){
   if(noteDownload){cleanupTorrent(noteDownload);noteDownload=null;}
   status('noteRecvStatus','Connecting to the sender to fetch the note…');
   let t;try{t=client.add(magnet,{announce:trackers,...pieceStoreOpt()});}catch(e){status('noteRecvStatus','Could not start: '+(e.message||e),'err');return;}
-  noteDownload=t;
+  noteDownload=t;holdPieces(t);
+  // A note link starts fetching as soon as it is opened, so refuse anything that is not one small file before downloading it.
+  // Checked on the declared size as soon as metadata arrives, and again (with the file count) when the torrent is ready,
+  // which is before WebTorrent requests any pieces.
+  const refuse=what=>{if(noteDownload!==t)return;noteDownload=null;cleanupTorrent(t);status('noteRecvStatus','This link points to '+what+', not a note, so nothing was downloaded. Use Receive a file only if you trust the sender.','err');};
+  t.once('metadata',()=>{if(t.length>NOTE_MAX_BYTES)refuse(fmt(t.length));});
+  t.once('ready',()=>{if(t.length>NOTE_MAX_BYTES)refuse(fmt(t.length));else if(t.files.length!==1)refuse(plural(t.files.length,'file'));});
   const timer=setTimeout(()=>{if(noteDownload===t&&!t.numPeers)status('noteRecvStatus','Still looking for the sender after 25 seconds. Check that the sender page is open and still sharing the note. '+relayAdvice(),'warn');},25000);
   t.on('done',async()=>{clearTimeout(timer);if(noteDownload!==t)return;try{const f=t.files[0];if(!f)throw new Error('The share contained no note.');if(f.length>NOTE_MAX_BYTES)throw new Error('This share is larger than a note; open it under Receive a file.');showNote(await (await f.blob()).text(),'peer-to-peer');}catch(e){status('noteRecvStatus',e.message,'err');}finally{noteDownload=null;cleanupTorrent(t);}});
   t.on('error',err=>{clearTimeout(timer);if(noteDownload===t){noteDownload=null;status('noteRecvStatus','Could not fetch the note: '+(err.message||err),'err');}});
