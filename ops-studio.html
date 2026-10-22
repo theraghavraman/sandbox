@@ -495,13 +495,15 @@ async function readAnalysisFile(file){
  if(["txt","md","csv","json"].includes(ext))text=await file.text();
  else if(["html","htm"].includes(ext))text=extractPlainText(await file.text());
  else if(ext==="pdf"){
-  if(!window.pdfjsLib)await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";script.onload=resolve;script.onerror=()=>reject(new Error("PDF text extraction library could not load. Try a TXT export or paste text."));document.head.appendChild(script)});
-  window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-  const pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;const pages=[];
+  // pdf.js and its worker are pinned by hash, so a changed CDN copy is refused; isEvalSupported:false is the fix for
+  // CVE-2024-4367, where a crafted font in pdf.js before 4.2.67 can run script.
+  if(!window.pdfjsLib)await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";script.integrity="sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==";script.crossOrigin="anonymous";script.onload=resolve;script.onerror=()=>reject(new Error("PDF text extraction library could not load. Try a TXT export or paste text."));document.head.appendChild(script)});
+  if(!window.pdfjsLib.GlobalWorkerOptions.workerSrc.startsWith("blob:")){const r=await fetch("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",{integrity:"sha512-BbrZ76UNZq5BhH7LL7pn9A4TKQpQeNCHOo65/akfelcIBbcVvYWOFQKPXIrykE3qZxYjmDX573oa4Ywsc7rpTw=="}).catch(()=>null);if(!r||!r.ok)throw new Error("PDF text extraction library could not load. Try a TXT export or paste text.");window.pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob([await r.blob()],{type:"text/javascript"}))}
+  const pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer(),isEvalSupported:false}).promise;const pages=[];
   for(let i=1;i<=Math.min(pdf.numPages,100);i++){const page=await pdf.getPage(i),content=await page.getTextContent();pages.push(content.items.map(x=>x.str).join(" "))}
   text=pages.join("\n\n");if(!text.trim())throw new Error("No selectable text found in this PDF. It may be scanned; run OCR elsewhere and paste the extracted text.")
  }else if(ext==="docx"){
-  if(!window.mammoth)await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js";script.onload=resolve;script.onerror=()=>reject(new Error("DOCX extraction library could not load. Save as TXT or paste the text instead."));document.head.appendChild(script)});
+  if(!window.mammoth)await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js";script.integrity="sha512-wuWo/cLB9W5BsZeyTYLuiTwr+FDlvjQC7C6atr+To7Jk92XHWI7WsImJZiruw7C9bnc8Zg7N0ncQI2Q/B4PQYw==";script.crossOrigin="anonymous";script.onload=resolve;script.onerror=()=>reject(new Error("DOCX extraction library could not load. Save as TXT or paste the text instead."));document.head.appendChild(script)});
   text=(await window.mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()})).value;
  }else throw new Error("Unsupported file type. Use TXT, MD, CSV, JSON, HTML, PDF or DOCX.");
  if(!text.trim())throw new Error("No readable text was found in this file.");
