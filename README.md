@@ -1,5 +1,44 @@
 # Redmark Forge Sandbox
 
+**Trying out steganography, encryption and encoding ideas usually means trusting a website with your files; these studios do the work in your browser and upload nothing.**
+
+## Architecture
+
+```mermaid
+flowchart TD
+    A[index.html: Steganography Studio] --- N[Sidebar navigation]
+    N --- B[Cryptography, forensics, encoding and signal studios]
+    N --- C[RedmarkShare: peer-to-peer file sharing]
+    N --- D[OSINT, Web Scraping, Open Library, Open Source Locator]
+    N --- E[OPS Research Lab and personality studios]
+    A --> F[Web Crypto: AES-GCM + PBKDF2]
+    A --> G[Canvas: LSB and block-DCT embedding]
+    B --> F
+    D -. read-only requests .-> H[Public APIs: GitHub, Hugging Face, Zenodo, OpenAlex, Open Library]
+    E --> I[Bundled JSON knowledge bases]
+    J[GitHub Actions] --> K[GitHub Pages]
+```
+
+Each studio is its own HTML page with its own state and scripts; the sidebar only links them. There is no backend and no upload endpoint. The discovery studios call public APIs directly from the browser.
+
+## Quickstart
+
+No install: open the [live site](https://theraghavraman.github.io/sandbox/).
+
+Locally with Python 3. Serve it rather than opening the file, because Web Crypto and the clipboard need HTTPS or localhost:
+
+```bash
+git clone https://github.com/theraghavraman/sandbox.git
+```
+
+```bash
+python3 -m http.server 8000 --directory sandbox
+```
+
+Then open `http://localhost:8000`. To encrypt a file: **Secure file share**, choose a file, enter a passphrase, **Encrypt complete file**.
+
+---
+
 A browser-first research workspace containing **22 independent destinations**: the original Steganography Studio, RedmarkShare, OSINT Studio, Web Scraping Studio and 15 further standalone research studios. Each studio owns its page, UI, state and JavaScript; navigation connects them without a shared tool runtime. The workspace remains separate from Omni Suite.
 
 ## Features
